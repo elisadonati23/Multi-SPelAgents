@@ -5,13 +5,13 @@
 #########################################################################################
 
 function sardine_step!(Sardine, model)
-    if Sardine.type == :eggmass
+    #if Sardine.type == :eggmass
         egg_step!(Sardine, model)
-    elseif Sardine.type == :juvenile
-        juvenile_step!(Sardine, model)
-    else
-        adult_step!(Sardine, model)
-    end
+    #elseif Sardine.type == :juvenile
+    #    juvenile_step!(Sardine, model)
+    #else
+    #    adult_step!(Sardine, model)
+    #end
 end
 
 ## ENVIRONMENT ----
@@ -112,13 +112,7 @@ function egghatch!(Sardine, model)
         Scaled_En_val = En_val / ( model.Em * ((Lw_val * model.del_Ml)^3))
 
         generate_EggMass(Float64(ceil((1 - model.M_egg) * Float64(floor(Sardine.NrEggs)))), 
-                           model, 
-                           Generation_val, 
-                           En_val, 
-                           Lb_i_val, 
-                           Lw_val, 
-                           Ww_val, 
-                           Scaled_En_val)
+                           model)
         Sardine.dead = true
         model.dead_eggmass += 1                                                    
         remove_agent!(Sardine, model)

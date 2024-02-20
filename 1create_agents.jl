@@ -1,5 +1,5 @@
 @agent Sardine NoSpaceAgent begin
-    type::eggmass # EggMass, Juvenile, Adult
+    type::Symbol # EggMass, Juvenile, Adult
     Age::Float64 # EggMass, Juvenile, Adult
     L::Float64 # EggMass, Juvenile --?
     H::Float64 # EggMass, Juvenile, Adult

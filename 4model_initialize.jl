@@ -47,7 +47,7 @@ function model_initialize(
     #generate_Juvenile(No_J, model)
     generate_EggMass(No_Egg, model)
 
-    agents = collect(values(allagents(model)))
+    #agents = collect(values(allagents(model)))
 
 # Filter the agents based on type and sex
 #females = filter(a -> a.type == :adult && a.Sex == "Female", agents)
