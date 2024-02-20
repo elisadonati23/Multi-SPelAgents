@@ -12,3 +12,4 @@ using Colors
 using DataFrames
 using StatsPlots
 using CategoricalArrays
+using Distributed
