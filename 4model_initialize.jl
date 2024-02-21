@@ -1,3 +1,4 @@
+@everywhere begin
 function model_initialize(
     No_A,  # model
     No_J,  # model
@@ -42,27 +43,8 @@ function model_initialize(
 #    scheduler = Schedulers.ByProperty(:group),
 #)
 
-    # ADD EGGS
-    #generate_Adult(No_A, model)
-    #generate_Juvenile(No_J, model)
     generate_EggMass(No_Egg, model)
 
-    #agents = collect(values(allagents(model)))
-
-# Filter the agents based on type and sex
-#females = filter(a -> a.type == :adult && a.Sex == "Female", agents)
-#
-## Check if there are any agents that match the criteria
-#if !isempty(females)
-#    interquantiles_prop(model, :Ww, :QWw, :adult, "Female") #default assign and use model.Ww_quantiles
-#end
-
-    #mean_Lw = calculate_mean_prop(model, "Lw")
-    ## Calculate the value of f using the given formula
-    #f = (model.X * model.Wv * model.KappaX) / (model.p_Am * model.Tc * model.s_M * (mean_Lw ^ 2))
-    #
-    ## Ensure that f is bounded between 0 and 1
-    #model.f =  max(0, min(f, 1.0))
-
     return model
+end
 end

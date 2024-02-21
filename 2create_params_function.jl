@@ -1,4 +1,4 @@
-function create_params(
+@everywhere begin function create_params(
     #end_experiment, #model
     No_A,  # model
     No_J, # model
@@ -246,4 +246,6 @@ model_parameters = Dict(
         :sd_Ww_puberty =>sd_Ww_puberty)
                            
 return model_parameters            
+end
+
 end

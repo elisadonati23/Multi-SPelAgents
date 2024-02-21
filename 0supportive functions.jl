@@ -1,4 +1,4 @@
-# supportive functions
+@everywhere begin# supportive functions
 function savemyfig(file_name)
     # Specify the path to the folder where you want to save the PNG file
     folder_path = "C:/Users/elli2/Documents/PhD2/figure_report/"
@@ -405,4 +405,6 @@ function diagnostic_plots(out_agent, out_model)
     display(combined_plot1)
     display(combined_plot2)
     Plots.default()
+end
+
 end

@@ -1,3 +1,5 @@
+@everywhere begin
+    
 @agent Sardine NoSpaceAgent begin
     type::Symbol # EggMass, Juvenile, Adult
     Age::Float64 # EggMass, Juvenile, Adult
@@ -35,5 +37,7 @@
     #Kx_i::Float64 not sure what they need -- removed
     #Xc_i::Float64 not sure what they need -- removed
     #l::Float64 scaled lenght I guess not useful -- removed
+
+end
 
 end
