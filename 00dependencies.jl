@@ -1,5 +1,5 @@
 using Distributed
-@everywhere begin#dependencies
+@everywhere begin
 using Pkg
 using Random
 using Agents #5.17.1

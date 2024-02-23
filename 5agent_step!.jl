@@ -1,6 +1,3 @@
-# Using the multiple dispatch method of Julia: look at the predator prey dynamics example in the agent.jl tutorial
-# https://juliadynamics.github.io/Agents.jl/stable/examples/predator_prey/
-
 ## ALL SARDINE --
 #########################################################################################
 @everywhere begin
@@ -17,20 +14,20 @@ end
 #    end
 #end
 
-#function parallel_sardine_step!(agent, model)
-#    sardines = collect(allagents(model))
-#    Threads.@threads for Sardine in sardines
-#        sardine_step!(Sardine, model)
-#    end
-#end
-
-function parallel_sardine_step!(Sardine, model)
+function parallel_sardine_step!(agent, model)
     sardines = collect(allagents(model))
-    futures = [Threads.@spawn sardine_step!(Sardine, model) for Sardine in sardines]
-    for future in futures
-        wait(future)
+    Threads.@threads for Sardine in sardines
+        sardine_step!(Sardine, model)
     end
 end
+
+#function parallel_sardine_step!(Sardine, model)
+#    sardines = collect(allagents(model))
+#    futures = [Threads.@spawn sardine_step!(Sardine, model) for Sardine in sardines]
+#    for future in futures
+#        wait(future)
+#    end
+#end
 
 ## ENVIRONMENT ----
 #########################################################################################
@@ -81,7 +78,7 @@ end
 #end
 
 function eggDEB!(Sardine, model)
-    ## needed variables
+
     V = Sardine.L^3.0
     deltaV = 0.0
     deltaEggEn = 0.0

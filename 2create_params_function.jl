@@ -1,27 +1,27 @@
 @everywhere begin function create_params(
-    #end_experiment, #model
-    No_A,  # model
-    No_J, # model
-    No_Egg, # model
-    #highCarrCap, # model
-    M_f, #fishing mortality (from 0 to 4 /year)
+
+    No_A,  
+    No_J, 
+    No_Egg, 
+
+    M_f, 
     Wv,
     day_of_the_year,
     Xmax,
     f = 1.0,
-    Temp = 14, # model
-    r_food = 0.5,  # model
+    Temp = 14, 
+    r_food = 0.5,  
     DEB_timing = 1.0, 
     model_step = 0,
-    repro_start = 270.0, # sardines repr start in october
-    repro_end = 90.0, # sardines repr end in april
-    #calculate_daily_prob_repro(day, peak1_day, peak2_day, total_reproductions, std_dev)
+    repro_start = 270.0, 
+    repro_end = 90.0, 
+
     peak1_sardine = 1,
     peak2_sardine = missing,
     total_repro_sardine = 10,
     std_dev = 60,
     repro_period = vcat(270.0:365.0, 1.0:90.0),
-#sardines repr start in october and end in april
+
     Sex_ratio = 0.5,
     p_Am = 396.002, #?
     v_rate = 0.0172, #?
@@ -127,7 +127,6 @@
     mean_Ww_puberty = 0.0
     sd_Ww_puberty = 0.0
 
-#nel dict bisogna che assegni agli elementi gli argomenti della funzione?!
 model_parameters = Dict(
         #:end_experiment => end_experiment,
         :No_A => Float64(No_A),
