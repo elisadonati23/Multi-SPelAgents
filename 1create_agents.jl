@@ -1,4 +1,4 @@
-@everywhere begin
+
     
 @agent Sardine NoSpaceAgent begin
     type::Symbol # EggMass, Juvenile, Adult
@@ -40,4 +40,3 @@
 
 end
 
-end

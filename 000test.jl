@@ -1,5 +1,5 @@
 
-using Distributed
+
 
 include("00dependencies.jl")
 include("1create_agents.jl")
@@ -37,7 +37,7 @@ for i in 1:num_runs
     df_model = init_model_dataframe(modello, mdata)
     
     # Run the model
-    run!(modello, parallel_sardine_step!, evolve_environment!,365*15; adata, mdata)
+    
     df_agent = run!(modello, parallel_sardine_step!, evolve_environment!,365*5; adata, mdata)
     # Store the result in the results array
     push!(results, df_agent)
@@ -48,8 +48,6 @@ end
 
 results[1][1]
 show(results[1][1], allrows = true)
-# Filter the DataFrame for id == 105
-#filtered_df = filter(row -> row.step == 1, results[1][1])
 
 calculate_sum_prop(modello, "Ww", type = :adult, sex = "Male")
 

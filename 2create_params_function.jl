@@ -1,4 +1,4 @@
-@everywhere begin function create_params(
+function create_params(
 
     No_A,  
     No_J, 
@@ -247,4 +247,3 @@ model_parameters = Dict(
 return model_parameters            
 end
 
-end

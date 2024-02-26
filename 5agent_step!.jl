@@ -1,33 +1,6 @@
 ## ALL SARDINE --
 #########################################################################################
-@everywhere begin
 
-function sardine_step!(Sardine, model)
-        egg_step!(Sardine, model)
-end
-
-
-#function parallel_sardine_step!(Sardine, model)
-#    sardines = collect(allagents(model))
-#    @distributed for Sardine in sardines
-#        sardine_step!(Sardine, model)
-#    end
-#end
-
-function parallel_sardine_step!(agent, model)
-    sardines = collect(allagents(model))
-    Threads.@threads for Sardine in sardines
-        sardine_step!(Sardine, model)
-    end
-end
-
-#function parallel_sardine_step!(Sardine, model)
-#    sardines = collect(allagents(model))
-#    futures = [Threads.@spawn sardine_step!(Sardine, model) for Sardine in sardines]
-#    for future in futures
-#        wait(future)
-#    end
-#end
 
 ## ENVIRONMENT ----
 #########################################################################################
@@ -46,36 +19,16 @@ end
 ## EGGMASS ----
 #########################################################################################
 
-function egg_step!(Sardine, model)
-    eggDEB!(Sardine, model)
-    #egghatch!(Sardine,model)
-    eggaging!(Sardine, model)
-end
+#function sardine_step!(Sardine, model)
+#    eggDEB!(Sardine, model)
+#    eggaging!(Sardine, model)
+#end
 
 function eggaging!(Sardine, model)
     Sardine.Age += 1.0
     return
 end
 
-#function egghatch!(Sardine, model)
-#    if (Sardine.H >= model.Hb)
-#        Generation_val = Sardine.Generation
-#        En_val = Sardine.En
-#        Lb_i_val = Sardine.L  
-#        Lw_val = (Sardine.L / model.del_Ml)
-#        Ww_val = (model.w * (model.d_V * ((Lw_val * model.del_Ml) ^ 3.0) + model.w_E / model.mu_E *(En_val + 0.0))) #R
-#        Scaled_En_val = En_val / ( model.Em * ((Lw_val * model.del_Ml)^3))
-#
-#        #generate_EggMass(Float64(ceil((1 - model.M_egg) * Float64(floor(Sardine.NrEggs)))), 
-#        #                   model)
-#        generate_EggMass(1, model)
-#        Sardine.dead = true
-#        model.dead_eggmass += 1                                                    
-#        remove_agent!(Sardine, model)
-#        return
-#    end
-#    return
-#end
 
 function eggDEB!(Sardine, model)
 
@@ -117,4 +70,54 @@ function eggDEB!(Sardine, model)
 
     return
 end
+
+function egghatch!(Sardine, model)
+    if (Sardine.H >= model.Hb)
+        Generation_val = Sardine.Generation
+        En_val = Sardine.En
+        Lb_i_val = Sardine.L  
+        Lw_val = (Sardine.L / model.del_Ml)
+        Ww_val = (model.w * (model.d_V * ((Lw_val * model.del_Ml) ^ 3.0) + model.w_E / model.mu_E *(En_val + 0.0))) #R
+        Scaled_En_val = En_val / ( model.Em * ((Lw_val * model.del_Ml)^3))
+
+        #generate_EggMass(Float64(ceil((1 - model.M_egg) * Float64(floor(Sardine.NrEggs)))), 
+        #                   model)
+        generate_EggMass(1, model)
+        Sardine.dead = true
+        model.dead_eggmass += 1                                                    
+        remove_agent!(Sardine, model)
+        return
+    end
+    return
 end
+
+# ensemble --
+
+#function sardine_step!(Sardine, model)
+#        egg_step!(Sardine, model)
+#end
+
+
+#function parallel_sardine_step!(Sardine, model)
+#    sardines = collect(allagents(model))
+#    @distributed for Sardine in sardines
+#        sardine_step!(Sardine, model)
+#    end
+#end
+
+#function parallel_sardine_step!(Sardine, model)
+#    sardines = collect(allagents(model))
+#    futures = [Threads.@spawn sardine_step!(Sardine, model) for Sardine in sardines]
+#    for future in futures
+#        wait(future)
+#    end
+#end
+
+#function parallel_sardine_step!(agent, model)
+#    sardines = collect(allagents(model))
+#    Threads.@threads for Sardine in sardines
+#        sardine_step!(Sardine, model)
+#    end
+#end
+
+

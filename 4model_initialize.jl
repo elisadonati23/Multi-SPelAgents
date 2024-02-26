@@ -1,4 +1,4 @@
-@everywhere begin
+
 function model_initialize(
     No_A,  # model
     No_J,  # model
@@ -46,5 +46,4 @@ function model_initialize(
     generate_EggMass(No_Egg, model)
 
     return model
-end
 end

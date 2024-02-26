@@ -1,5 +1,5 @@
-using Distributed
-@everywhere begin
+
+
 using Pkg
 using Random
 using Agents #5.17.1
@@ -13,4 +13,3 @@ using Colors
 using DataFrames
 #using StatsPlots
 using CategoricalArrays
-end
