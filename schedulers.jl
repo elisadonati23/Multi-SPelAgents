@@ -16,18 +16,13 @@ function (sEA::scheduler_EggAdults2)(model::ABM)
         return ids
 end
 
-function parallel_agent_step!(Sardine, model)
-    eggDEB!(Sardine, model)
-    eggaging!(Sardine, model)
-end
-
 sEA = scheduler_EggAdults2()
 
 function complex_step!(model)
 
     #parallelo
     Threads.@threads for Sardine in collect(allagents(model))
-        parallel_agent_step!(Sardine, model)
+        parallel_sardine_step!(Sardine, model)
     end
 
     #seriale
@@ -114,7 +109,7 @@ for i in 1:num_runs
     end_time = Dates.now()
     duration = end_time - start_time
     println("Simulation in parallel $i took: ", duration)
-end #131 milliseconds #6712 milliseconds #90650 milliseconds
+end #131 milliseconds #6712 milliseconds #90650 milliseconds #87014 milliseconds con 8 threads
 
 
 
