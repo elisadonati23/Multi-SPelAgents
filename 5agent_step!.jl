@@ -1,6 +1,25 @@
 ## ALL SARDINE --
 #########################################################################################
+# wraps --------
+function parallel_sardine_step!(Sardine, model)
+    if Sardine.type == :eggmass
+        parallel_eggmass_step!(Sardine, model)
+    elseif Sardine.type == :juvenile
+        parallel_juvenile_step!(Sardine, model)
+    else
+        parallel_adult_step!(Sardine, model)
+    end
+end
 
+function sardine_step!(Sardine, model)
+    if Sardine.type == :eggmass
+        eggmass_step!(Sardine, model)
+    elseif Sardine.type == :juvenile
+        parallel_juvenile_step!(Sardine, model)
+    else
+        parallel_adult_step!(Sardine, model)
+    end
+end
 
 ## ENVIRONMENT ----
 #########################################################################################
@@ -12,6 +31,7 @@ function evolve_environment!(model)
     else
         model.day_of_the_year += 1.0
     end
+    model.f = 0.8
     return
 end
 
@@ -96,30 +116,6 @@ function egghatch!(Sardine, model)
     return
 end
 
-# ensemble --
-
-#function parallel_sardine_step!(Sardine, model)
-#    sardines = collect(allagents(model))
-#    @distributed for Sardine in sardines
-#        sardine_step!(Sardine, model)
-#    end
-#end
-
-#function parallel_sardine_step!(Sardine, model)
-#    sardines = collect(allagents(model))
-#    futures = [Threads.@spawn sardine_step!(Sardine, model) for Sardine in sardines]
-#    for future in futures
-#        wait(future)
-#    end
-#end
-
-#function parallel_sardine_step!(agent, model)
-#    sardines = collect(allagents(model))
-#    Threads.@threads for Sardine in sardines
-#        sardine_step!(Sardine, model)
-#    end
-#end
-
 # juvenile ----
 
 
@@ -191,17 +187,6 @@ end
 
 function juvemature!(Sardine, model)
 Sardine.t_puberty += 1.0
-
-# if !(Sardine.meta)
-#    if Sardine.H < model.Hj
-#        Sardine.s_M_i = Sardine.Lw * Sardine.del_M_i / Sardine.Lb_i
-#    else
-#        Sardine.meta = true
-#        Sardine.del_M_i = model.del_Ma
-#        Sardine.s_M_i = Sardine.Lw * Sardine.del_M_i / Sardine.Lb_i
-##ma del_m_i era già uguale a del_Ma??!!
-#    end
-#end
 
 if Sardine.H >= model.Hp
  #put adult features
@@ -286,25 +271,5 @@ function adultdie!(Sardine, model)
         Sardine.dead = true
         remove_agent!(Sardine, model)
         return
-    end
-end
-
-function parallel_sardine_step!(Sardine, model)
-    if Sardine.type == :eggmass
-        parallel_eggmass_step!(Sardine, model)
-    elseif Sardine.type == :juvenile
-        parallel_juvenile_step!(Sardine, model)
-    else
-        parallel_adult_step!(Sardine, model)
-    end
-end
-
-function sardine_step!(Sardine, model)
-    if Sardine.type == :eggmass
-        eggmass_step!(Sardine, model)
-    elseif Sardine.type == :juvenile
-        parallel_juvenile_step!(Sardine, model)
-    else
-        parallel_adult_step!(Sardine, model)
     end
 end
