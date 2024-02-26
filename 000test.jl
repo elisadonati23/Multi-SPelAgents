@@ -9,7 +9,7 @@ include("3module Generate_Agents.jl")
 include("4model_initialize.jl")
 include("5agent_step!.jl")
 
-addprocs(6)
+
 # Number of times to run the code
 num_runs = 1
 
@@ -38,7 +38,7 @@ for i in 1:num_runs
     
     # Run the model
     
-    df_agent = run!(modello, parallel_sardine_step!, evolve_environment!,365*5; adata, mdata)
+    df_agent = run!(modello, sardine_step!, evolve_environment!,365*5; adata, mdata)
     # Store the result in the results array
     push!(results, df_agent)
     end_time = Dates.now()

@@ -12,17 +12,17 @@ function evolve_environment!(model)
     else
         model.day_of_the_year += 1.0
     end
-    generate_EggMass(rand(100:500), model)
     return
 end
 
 ## EGGMASS ----
 #########################################################################################
 
-#function sardine_step!(Sardine, model)
-#    eggDEB!(Sardine, model)
-#    eggaging!(Sardine, model)
-#end
+function sardine_step!(Sardine, model)
+    eggDEB!(Sardine, model)
+    egghatch!(Sardine, model)
+    eggaging!(Sardine, model)
+end
 
 function eggaging!(Sardine, model)
     Sardine.Age += 1.0
@@ -82,7 +82,7 @@ function egghatch!(Sardine, model)
 
         #generate_EggMass(Float64(ceil((1 - model.M_egg) * Float64(floor(Sardine.NrEggs)))), 
         #                   model)
-        generate_EggMass(1, model)
+        generate_EggMass(1,model)
         Sardine.dead = true
         model.dead_eggmass += 1                                                    
         remove_agent!(Sardine, model)
@@ -92,11 +92,6 @@ function egghatch!(Sardine, model)
 end
 
 # ensemble --
-
-#function sardine_step!(Sardine, model)
-#        egg_step!(Sardine, model)
-#end
-
 
 #function parallel_sardine_step!(Sardine, model)
 #    sardines = collect(allagents(model))
