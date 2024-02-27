@@ -162,23 +162,8 @@ end
 
 function calculate_sum_prop(model, prop; type = missing, sex = missing)
 
-##giving false due to different arrotondamento
-#calculate_sum_prop(modello, "Ww", type = :juvenile) + calculate_sum_prop(modello, "Ww", type = :adult) == calculate_sum_prop(modello, "Ww")
-## infatti questo codice sotto da true:
-#abs(calculate_sum_prop(modello, "Ww", type = :juvenile) + calculate_sum_prop(modello, "Ww", type = :adult) - calculate_sum_prop(modello, "Ww")) < 1e-10
-## true
-#calculate_sum_prop(modello, "Ww", sex = "Female") + calculate_sum_prop(modello, "Ww", sex = "Male") == calculate_sum_prop(modello, "Ww")
-
     all_agents = collect(values(allagents(model)))
-
-    if any(isundef, all_agents)
-        println("all_agents contains undef elements")
-    end
-    
-    # Check if any Sardine objects don't have a type property
-    if any(agent -> !isdefined(agent, :type), all_agents)
-        println("Some Sardine objects don't have a type property")
-    end
+    #show(collect(values(allagents(model))))
     
     if isempty(all_agents)
         sum_prop = 0.0
@@ -186,7 +171,7 @@ function calculate_sum_prop(model, prop; type = missing, sex = missing)
     
     if ismissing(type) && ismissing(sex)
     # Filter agents based on agent types (juvenile, male, and female)
-    filtered_agents = filter(agent -> (agent.type == :juvenile || agent.type == :adult), all_agents)
+    filtered_agents = filter(agent -> agent.type != :eggmass, all_agents)
     end
 
     if !ismissing(type) && ismissing(sex)
@@ -196,7 +181,7 @@ function calculate_sum_prop(model, prop; type = missing, sex = missing)
 
     if ismissing(type) && !ismissing(sex)
         # Filter agents based on agent types (juvenile, male, and female)
-        filtered_agents = filter(agent -> (agent.type == :juvenile || agent.type == :adult) &&  agent.Sex == sex, all_agents)
+        filtered_agents = filter(agent -> agent.type != :eggmass &&  agent.Sex == sex, all_agents)
     end
 
     if !ismissing(type) && !ismissing(sex)
@@ -220,7 +205,7 @@ function calculate_sum_assimilation(model)
     all_agents = collect(values(allagents(model)))
     
     # Filter agents based on agent types (juvenile, male, and female)
-    filtered_agents = filter(agent -> agent.type == :juvenile || agent.type == :adult, all_agents)
+    filtered_agents = filter(agent -> agent.type != :eggmass, all_agents)
     
     if isempty(filtered_agents)
         println("no agents!")

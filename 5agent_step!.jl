@@ -33,7 +33,7 @@ function evolve_environment!(model)
         model.day_of_the_year += 1.0
     end
 
-    model.max_ID = maximum(collect(allids(model)))
+    model.max_ID = maximum([agent.id for agent in values(allagents(model))])
     println("Day of the year: $(model.day_of_the_year) and max_ID $(model.max_ID)")
 
     ##calculate Xall

@@ -10,7 +10,7 @@ include("schedulers.jl")
 
 # test in parallelo ----
 modello = model_initialize(100.0, 100.0, 100.0, 0.0, 50000.0, 1.0, 110.0)
-maximum(collect(allids(modello)))
+agent_ids = [agent.id for agent in values(allagents(modello))]
 results = []
 num_runs = 1
 
@@ -36,7 +36,7 @@ for i in 1:num_runs
     
     # Run the model
     
-    df_agent = run!(modello, dummystep, complex_step!,3000; adata, mdata)
+    df_agent = run!(modello, dummystep, complex_step!,6000; adata, mdata)
 
     # Store the result in the results array
     push!(results, df_agent)
@@ -48,3 +48,15 @@ end
 
 println(sort(collect(allids(modello))))
 diagnostic_plots(results, results[1][2])
+
+"""
+    allids(model)
+Return an iterator over all agent IDs of the model.
+"""
+allids(model) = eachindex(agent_container(model))
+
+"""
+    allagents(model)
+Return an iterator over all agents of the model.
+"""
+allagents(model) = values(agent_container(model))

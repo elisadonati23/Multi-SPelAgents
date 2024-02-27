@@ -64,7 +64,7 @@ end
     
     # Ensure that f is bounded between 0 and 1
     model.f =  max(0, min(f, 1.0))
-    model.max_ID = maximum(collect(allids(model)))
+    model.max_ID = maximum([agent.id for agent in values(allagents(model))])
 
     return model
 end
