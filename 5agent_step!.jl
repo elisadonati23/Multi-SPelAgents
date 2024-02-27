@@ -25,33 +25,67 @@ end
 #########################################################################################
 
 function evolve_environment!(model)
+    
     # day counter
     if model.day_of_the_year == 365.0
         model.day_of_the_year = 1.0
     else
         model.day_of_the_year += 1.0
     end
-    model.f = 0.8
-    #agents = collect(values(allagents(model)))
-    #females = filter(a -> a.type == :adult && a.Sex == "Female", agents)
-#
-    ## Check if there are any agents that match the criteria
-    #if !isempty(females)
-    #    interquantiles_prop(model, :Ww, :QWw, :adult, "Female")
-    #end
+
+    model.max_ID = maximum(collect(allids(model)))
+    println("Day of the year: $(model.day_of_the_year) and max_ID $(model.max_ID)")
+
+    ##calculate Xall
+    # Xall is initialized like X, which is set to Xmax (look at params)
+    # remove the assimilation of all agents:
+    Xall = model.Xall - (calculate_sum_prop(model, "pA")/ model.KappaX) / model.Wv
+    #
+     if Xall < 0.0  
+         Xall = 0.0 
+     end
+    #
+     model.Xall = Xall
+    #
+    ##food update -- MISSING CHEMOSTAT!
+    ######################################
+    ##at each timestep resources are renewed:
+    #
+     model.X = model.Xmax
+    #
+    ## update response function f ---
+    ###############################
+    #
+    if ismissing(calculate_sum_assimilation(model))
+        f = 0.0
+    else
+    f = (model.X * model.Wv * model.KappaX) / calculate_sum_assimilation(model)
+    end
+    #
+    ## Ensure that f is bounded between 0 and 1
+    model.f = max(0, min(f, 1.0)) # not 1 but 0.8  ## ????? check haberle
+    agents = collect(values(allagents(model)))
+    females = filter(a -> a.type == :adult && a.Sex == "Female", agents)
+
+    # Check if there are any agents that match the criteria
+    if !isempty(females)
+        interquantiles_prop(model, :Ww, :QWw, :adult, "Female")
+    end
 
     #update outputs
     # outputs
+    adults_juv = filter(a -> (a.type == :adult || a.type == :juvenile), agents)
+    if !isempty(adults_juv)
     # B plot
     model.TotB = calculate_sum_prop(model, "Ww")
     model.JuvB = calculate_sum_prop(model, "Ww", type = :juvenile)
     model.AdB = calculate_sum_prop(model, "Ww", type = :adult)
     # mean Ww plot
-    model.meanAdWw = calculate_mean_prop(model, "Ww", type = :adult)
+    model.meanAdWw = calculate_mean_prop(model, "Ww", type = :adult, age = 3.0)
     model.sdAdWw =  calculate_sd_prop(model, "Ww", type = :adult)
     model.meanJuvWw = calculate_mean_prop(model, "Ww", type = :juvenile)
     model.sdJuvWw = calculate_sd_prop(model, "Ww", type = :juvenile)
-    model.meanFAdWw = calculate_mean_prop(model, "Ww", type = :adult, sex = "Female")
+    model.meanFAdWw = calculate_mean_prop(model, "Ww", type = :adult, sex = "Female", age = 3.0)
     model.sdFAdWw =  calculate_sd_prop(model, "Ww", type = :adult, sex = "Female")
     #mean L plot
     model.meanAdL = calculate_mean_prop(model, "Lw", type = :adult)
@@ -61,6 +95,7 @@ function evolve_environment!(model)
     #mean tpuberty plot
     model.mean_tpuberty = calculate_mean_prop(model, "t_puberty", type = :adult)
     model.sd_tpuberty = calculate_sd_prop(model, "t_puberty", type = :adult)
+    end
     #mean spawnings
     model.mean_batch_eggs = mean_eggs(model)
     model.mean_spawning_events = mean_spawning(model)
@@ -106,6 +141,7 @@ function eggDEB!(Sardine, model)
         model.dead_eggmass += 1.0
         Sardine.dead = true
         remove_agent!(Sardine, model)
+        println("Removed agent with ID $(Sardine.id)")
         return
     end
 
@@ -143,6 +179,7 @@ function egghatch!(Sardine, model)
         Sardine.dead = true
         model.dead_eggmass += 1                                                    
         remove_agent!(Sardine, model)
+        println("Removed agent with ID $(Sardine.id)")
         return
     end
     return
@@ -187,6 +224,7 @@ if ((model.Kappa * pC) < pS)
 model.deadJ_starved += 1.0
 Sardine.dead = true
 remove_agent!(Sardine, model)
+println("Removed agent with ID $(Sardine.id)")
 return
 end
 
@@ -232,32 +270,20 @@ return
 end
 
 function juvedie!(Sardine, model)
-# moving to superindividuals:
-# repeat the random extraction for the nr of individuals juvenile
-# count how many jtime the random extraction would lead to a death and reduce the 
-# number of the individuals of the same amount
+
 M = model.M_j
 randomvalue = rand()   
 if ((1- exp(- M))) >= randomvalue
 model.deadJ_nat += 1.0
 Sardine.dead = true
 remove_agent!(Sardine, model)
+println("Removed agent with ID $(Sardine.id)")
 return
 end
 end
 
-function juveaging!(Sardine, model)
-# moving to superindividuals:
-# if the age of the superindividuals is more than the limit
-# all the superindividual dies
-if Sardine.Age >= model.Am
-model.deadJ_old += 1.0
-Sardine.dead = true
-remove_agent!(Sardine, model)
-return
-else
+function juveaging!(Sardine, model) 
 Sardine.Age += 1.0
-end
 return
 end
 
@@ -309,6 +335,7 @@ function adultDEB!(Sardine, model)
             model.deadA_starved += 1.0
             Sardine.dead = true
             remove_agent!(Sardine, model)
+            println("Removed agent with ID $(Sardine.id)")
             return
         else
             Rdyn = (Rdyn - (pS - (model.Kappa * pC)) * model.DEB_timing)
@@ -369,6 +396,7 @@ function adultdie!(Sardine, model)
         end
         Sardine.dead = true
         remove_agent!(Sardine, model)
+        println("Removed agent with ID $(Sardine.id)")
         return
     end
 end
@@ -418,6 +446,7 @@ function adultspawn!(Sardine, model)
                                               EggEn_E0_val,
                                               En_val,
                                               Gen_val)
+                
                 
             end
         end

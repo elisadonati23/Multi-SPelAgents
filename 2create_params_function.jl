@@ -126,6 +126,7 @@ function create_params(
     sd_Lw_puberty = 0.0
     mean_Ww_puberty = 0.0
     sd_Ww_puberty = 0.0
+    max_ID = 0
 
 model_parameters = Dict(
         #:end_experiment => end_experiment,
@@ -242,7 +243,8 @@ model_parameters = Dict(
         :mean_Lw_puberty =>mean_Lw_puberty,
         :sd_Lw_puberty =>sd_Lw_puberty,
         :mean_Ww_puberty =>mean_Ww_puberty,
-        :sd_Ww_puberty =>sd_Ww_puberty)
+        :sd_Ww_puberty =>sd_Ww_puberty,
+        :max_ID => max_ID)
                            
 return model_parameters            
 end
