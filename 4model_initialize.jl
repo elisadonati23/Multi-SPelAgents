@@ -44,7 +44,8 @@ function model_initialize(
 #)
 
     generate_EggMass(No_Egg, model)
-
+    generate_Juvenile(No_J, model)
+    generate_Adult(No_A, model)
     return model
 end
 

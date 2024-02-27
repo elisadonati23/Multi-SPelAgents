@@ -10,16 +10,15 @@ include("5agent_step!.jl")
 mutable struct scheduler_EggAdults2 end
 
 function (sEA::scheduler_EggAdults2)(model::ABM)
-        ids = collect(allids(model))
-        # filter all ids whose agents have `w` less than some amount
-        filter!(id -> (model[id].type == :adult ||  model[id].type == :eggmass), ids)
-        return ids
+    ids = collect(allids(model))
+    # filter all ids whose agents have `w` less than some amount
+    ids = filter!(id -> (model[id].type == :adult ||  model[id].type == :eggmass), ids)
+    return ids
 end
 
 sEA = scheduler_EggAdults2()
 
 function complex_step!(model)
-
     #parallelo
     Threads.@threads for Sardine in collect(allagents(model))
         parallel_sardine_step!(Sardine, model)
@@ -27,24 +26,23 @@ function complex_step!(model)
 
     #seriale
     for Sardine in sEA(model)
-        
-            egghatch!(model[Sardine], model) #call generate_juvenile()
-        
+        if model[Sardine].type == :eggmass
+        egghatch!(model[Sardine], model) #call generate_juvenile()
+        end
+        if model[Sardine].adult == :adult
+        adultspawn(model[Sardine], model) #call generate_juvenile()
+        end
     end
-
     #aggiorna l'ambiente
     evolve_environment!(model)
 end
 # test non in parallelo ----
 
-modello = model_initialize(0.0, 0.0, 100000.0, 0.0, 50000.0, 1.0, 110.0)
-
+modello = model_initialize(100.0, 100.0, 100.0, 0.0, 50000.0, 1.0, 110.0)
 num_runs = 1
 
 # Array to store the results
 results = []
-using Dates
-
 
 for i in 1:num_runs
     start_time = Dates.now()
@@ -66,22 +64,23 @@ for i in 1:num_runs
     
     # Run the model
     
-    df_agent = run!(modello, sardine_step!, evolve_environment!,1000; adata, mdata)
+    df_agent = run!(modello, sardine_step!, evolve_environment!,3000; adata, mdata)
     # Store the result in the results array
     push!(results, df_agent)
     end_time = Dates.now()
     duration = end_time - start_time
     println("Simulation  $i took: ", duration)
-end #1677 milliseconds # 10000 eggs 10297 milliseconds # 100000 eggs 124739 milliseconds
-
+end  #2238 milliseconds
+diagnostic_plots(results, results[1][2])
 
 # test in parallelo ----
-modello = model_initialize(0.0, 0.0, 100000.0, 0.0, 50000.0, 1.0, 110.0)
+modello = model_initialize(100.0, 100.0, 100.0, 0.0, 50000.0, 1.0, 110.0)
+sort(collect(allids(modello)))
+
 results = []
-num_runs = 1
+num_runs = 1 
 
 # Array to store the results
-
 
 for i in 1:num_runs
     start_time = Dates.now()
@@ -103,13 +102,18 @@ for i in 1:num_runs
     
     # Run the model
     
-    df_agent = run!(modello, dummystep, complex_step!,1000; adata, mdata)
+    df_agent = run!(modello, dummystep, complex_step!,3000; adata, mdata)
+
     # Store the result in the results array
     push!(results, df_agent)
     end_time = Dates.now()
     duration = end_time - start_time
     println("Simulation in parallel $i took: ", duration)
 end #131 milliseconds #6712 milliseconds #90650 milliseconds #87014 milliseconds con 8 threads
+#6617 milliseconds
+
+diagnostic_plots(results, results[1][2])
+
 
 
 
