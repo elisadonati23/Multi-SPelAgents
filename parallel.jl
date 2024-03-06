@@ -9,7 +9,7 @@ include("5agent_step!.jl")
 include("schedulers.jl")
 
 # test in parallelo ----
-modello = model_initialize(100.0, 100.0, 100.0, 0.0, 50000.0, 1.0, 110.0)
+modello = model_initialize(7500.0, 15000.0, 7500.0, 0.0, 50000.0, 1.0, 110.0)
 agent_ids = [agent.id for agent in values(allagents(modello))]
 results = []
 num_runs = 1
@@ -36,7 +36,7 @@ for i in 1:num_runs
     
     # Run the model
     
-    df_agent = run!(modello, dummystep, complex_step!,6000; adata, mdata)
+    df_agent = run!(modello, dummystep, complex_step!,365*10; adata, mdata)
 
     # Store the result in the results array
     push!(results, df_agent)
@@ -46,6 +46,7 @@ for i in 1:num_runs
 end 
 
 #Simulation in parallel 1 took: 47945 milliseconds
+#Simulation in parallel 1 took: 614367 milliseconds
 println(sort(collect(allids(modello))))
 diagnostic_plots(results, results[1][2])
 
