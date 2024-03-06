@@ -9,6 +9,7 @@
     NrEggs::Float64 # EggMass
     En::Float64 # EggMass, Juvenile, Adult
     Generation::Float64 # EggMass, Juvenile, Adult
+    Dead::Bool
 
     # Features from Juvenile, Adults
     f_i::Float64
@@ -33,7 +34,6 @@
     #SeasonR::Float64 #we don't apply reproduction like HABERLE so remove
     spawned::Float64 #we don't apply reproduction like HABERLE so removed 
     trans_prob::Bool #males #?
-    dead::Bool
     #Kx_i::Float64 not sure what they need -- removed
     #Xc_i::Float64 not sure what they need -- removed
     #l::Float64 scaled lenght I guess not useful -- removed

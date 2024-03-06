@@ -1,3 +1,6 @@
+function is_dead(sardine::Sardine)
+    return sardine.Dead == true
+end
 
 function savemyfig(file_name)
     # Specify the path to the folder where you want to save the PNG file

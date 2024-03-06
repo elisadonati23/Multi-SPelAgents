@@ -21,6 +21,8 @@ function complex_step!(model)
         parallel_sardine_step!(Sardine, model)
     end
 
+    remove_all!(model, is_dead)
+
     model.max_ID = maximum([agent.id for agent in values(allagents(model))])
     println("Before hatching$(model.max_ID)")
 

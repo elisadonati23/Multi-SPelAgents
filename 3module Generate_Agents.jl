@@ -2,14 +2,14 @@
 
     
 function generate_EggMass(No_Egg, model, NrEggs = missing, EggEn = missing, En = missing, Generation = missing)
-    previousmodelid = model.max_ID 
+
     agent_type = :eggmass
     agent_Age = 0.0
     agent_L = model.L0
     agent_H = 0.00
     agent_spawned = 0.0
     agent_QWw = "Q1"
-    agent_dead = false
+    agent_Dead = false
 
     if ismissing(EggEn)
         agent_EggEn = Float64(model.E0)
@@ -54,18 +54,18 @@ function generate_EggMass(No_Egg, model, NrEggs = missing, EggEn = missing, En =
             agent_En = Float64(En)
         end
 
-        add_agent!(Sardine, model, agent_type, agent_Age, agent_L, agent_H, agent_EggEn, agent_NrEggs, agent_En, agent_Generation,
+        add_agent!(Sardine, model, agent_type, agent_Age, agent_L, agent_H, agent_EggEn, agent_NrEggs, agent_En, agent_Generation, agent_Dead,
         agent_f_i, agent_t_puberty, agent_herma, agent_Sex, agent_Lw, agent_Ww, agent_QWw, agent_meta, agent_R, agent_Scaled_En, agent_del_M_i,
-                   agent_s_M_i, agent_pA, agent_Lb_i, agent_spawned, agent_trans_prob, agent_dead
+                   agent_s_M_i, agent_pA, agent_Lb_i, agent_spawned, agent_trans_prob
                    )
     end
-    println("Added $No_Egg agents to $previousmodelid; max_ID now = $(model.max_ID)")
+    #println("Added $No_Egg agents to $previousmodelid; max_ID now = $(model.max_ID)")
     return
 end
 
 
 function generate_Juvenile(No_J, model, Generation = 0.0, En = missing, Lb_i = model.Lb, Lw = missing, Ww = missing, Scaled_En = missing)
-    previousmodelid = model.max_ID
+
     agent_type = :juvenile
     agent_f_i = 0.8
     agent_L = model.L0
@@ -74,7 +74,7 @@ function generate_Juvenile(No_J, model, Generation = 0.0, En = missing, Lb_i = m
     agent_R = 0.0
     agent_spawned = 0.0
     agent_QWw = "Q1"
-    agent_dead = false
+    agent_Dead = false
 
     # silenced features
     agent_EggEn = 0.0  # EggMass
@@ -132,18 +132,18 @@ function generate_Juvenile(No_J, model, Generation = 0.0, En = missing, Lb_i = m
         #CI = 100 * Ww / (Lw^3)
         #Variability = randn() .* 0.05 .+ 0
 
-        add_agent!(Sardine, model, agent_type, agent_Age, agent_L, agent_H, agent_EggEn, agent_NrEggs , agent_En, agent_Generation,
+        add_agent!(Sardine, model, agent_type, agent_Age, agent_L, agent_H, agent_EggEn, agent_NrEggs , agent_En, agent_Generation, agent_Dead,
         agent_f_i, agent_t_puberty, agent_herma, agent_Sex, agent_Lw, agent_Ww, agent_QWw, agent_meta, agent_R, agent_Scaled_En, agent_del_M_i,
-                   agent_s_M_i, agent_pA, agent_Lb_i, agent_spawned, agent_trans_prob, agent_dead
+                   agent_s_M_i, agent_pA, agent_Lb_i, agent_spawned, agent_trans_prob
                    )
         
     end
-    println("Added $No_J agents to $previousmodelid; max_ID now = $(model.max_ID)")
+    #println("Added $No_J agents to $previousmodelid; max_ID now = $(model.max_ID)")
     return
 end
 
 function generate_Adult(No_A, model, Sex = missing, Age = missing, t_puberty = missing, Lw = missing, Ww = missing, H = missing, R = missing, En = missing, Scaled_En = missing, Generation = missing, pA = missing)
-    previousmodelid = model.max_ID 
+
     agent_L = 0.0
     agent_EggEn = 0.0 
     agent_NrEggs = 0.0
@@ -152,7 +152,7 @@ function generate_Adult(No_A, model, Sex = missing, Age = missing, t_puberty = m
     agent_trans_prob = false
     agent_spawned = 0.0
     agent_QWw = "Q1"
-    agent_dead = false
+    agent_Dead = false
 
     agent_type = :adult
 
@@ -239,12 +239,12 @@ function generate_Adult(No_A, model, Sex = missing, Age = missing, t_puberty = m
             pA
         end
 
-        add_agent!(Sardine, model, agent_type, agent_Age, agent_L, agent_H, agent_EggEn, agent_NrEggs, agent_En, agent_Generation,
+        add_agent!(Sardine, model, agent_type, agent_Age, agent_L, agent_H, agent_EggEn, agent_NrEggs, agent_En, agent_Generation, agent_Dead,
         agent_f_i, agent_t_puberty, agent_herma, agent_Sex, agent_Lw, agent_Ww, agent_QWw, agent_meta, agent_R, agent_Scaled_En, agent_del_M_i,
-                   agent_s_M_i, agent_pA, agent_Lb_i, agent_spawned, agent_trans_prob, agent_dead
+                   agent_s_M_i, agent_pA, agent_Lb_i, agent_spawned, agent_trans_prob
                    )
                    
     end
-    println("Added $No_A agents to $previousmodelid; max_ID now = $(model.max_ID)")
+    #println("Added $No_A agents to $previousmodelid; max_ID now = $(model.max_ID)")
     return
 end

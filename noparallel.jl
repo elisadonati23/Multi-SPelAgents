@@ -1,5 +1,5 @@
 include(schedulers.jl)
-modello = model_initialize(5000.0, 5000.0, 5000.0, 0.0, 50000.0, 1.0, 110.0)
+modello = model_initialize(100.0, 100.0, 100.0, 0.0, 50000.0, 1.0, 110.0)
 num_runs = 1
 
 # Array to store the results
@@ -25,11 +25,11 @@ for i in 1:num_runs
     
     # Run the model
     
-    df_agent = run!(modello, sardine_step!, evolve_environment!,3000; adata, mdata)
+    df_agent = run!(modello, sardine_step!, evolve_environment!,6000; adata, mdata)
     # Store the result in the results array
     push!(results, df_agent)
     end_time = Dates.now()
     duration = end_time - start_time
     println("Simulation  $i took: ", duration)
-end  #7860 milliseconds
+end #310370 milliseconds
 diagnostic_plots(results, results[1][2])

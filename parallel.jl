@@ -45,7 +45,7 @@ for i in 1:num_runs
     println("Simulation in parallel $i took: ", duration)
 end 
 
-
+#Simulation in parallel 1 took: 47945 milliseconds
 println(sort(collect(allids(modello))))
 diagnostic_plots(results, results[1][2])
 
