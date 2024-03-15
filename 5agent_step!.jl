@@ -3,11 +3,11 @@
 # wraps --------
 function parallel_sardine_step!(Sardine, model)
     if Sardine.type == :eggmass
-        parallel_eggmass_step!(Sardine, model)
+        parallel_eggmass_step!(Sardine, model) # all functions that do not generate or remove agents
     elseif Sardine.type == :juvenile
-        parallel_juvenile_step!(Sardine, model)
+        parallel_juvenile_step!(Sardine, model)  # all functions that do not generate or remove agents
     elseif Sardine.type == :adult
-        parallel_adult_step!(Sardine, model)
+        parallel_adult_step!(Sardine, model) # all functions that do not generate or remove agents
     end
 end
 
@@ -34,7 +34,7 @@ function evolve_environment!(model)
     end
 
     model.max_ID = maximum([agent.id for agent in values(allagents(model))])
-    println("Day of the year: $(model.day_of_the_year) and max_ID $(model.max_ID)")
+    #println("Day of the year: $(model.day_of_the_year) and max_ID $(model.max_ID)")
 
     ##calculate Xall
     # Xall is initialized like X, which is set to Xmax (look at params)
@@ -74,7 +74,7 @@ function evolve_environment!(model)
 
     #update outputs
     # outputs
-    adults_juv = filter(a -> (a.type == :adult || a.type == :juvenile), agents)
+    adults_juv = filter(a -> (a.type == :adult || a.type == :juvenile), agents) 
     if !isempty(adults_juv)
     # B plot
     model.TotB = calculate_sum_prop(model, "Ww")
@@ -138,13 +138,13 @@ function eggDEB!(Sardine, model)
     pJ = model.k_J * Sardine.H
 
     ## Variation in the state variables
-    deltaEggEn = 0.0 - pC # must be negative because eggs do not eat
+    deltaEggEn = 0.0 - pC # must be negative because eggs do not eat 
 
     if ((model.Kappa * pC) < pS)
         model.dead_eggmass += 1.0
         Sardine.Dead = true
         #remove_agent!(Sardine, model)
-        println("Removed agent with ID $(Sardine.id)")
+        #println("Removed agent with ID $(Sardine.id)")
         return
     end
 
@@ -263,7 +263,7 @@ end
 
 function juvemature!(Sardine, model)
     if Sardine.Dead == false
-Sardine.t_puberty += 1.0
+    Sardine.t_puberty += 1.0
 
     if Sardine.H >= model.Hp
      #put adult features
@@ -377,16 +377,9 @@ end
 function adultdie!(Sardine, model)
     #fishedW = 0
 if Sardine.Dead == false
-    randomnumber = rand()  #controllare che l'estrazione random  sia la stessa 
-    
-    #set the mortalities like Haberle:
-    #if (Sardine.Age - Sardine.t_puberty) <= 365.0
-    #    M = model.M_ae + model.M_f
-    #else
-    #    M = model.M_a + model.M_f
-    #end
+    randomnumber = rand()  #controllare che l'estrazione random  sia la stessa     
 
-    #set the new mortalities
+    #set the new AGE DEPENDENT MORTALITIS
     if floor(Sardine.Age / 365.0 ) == 0.0
         M = model.M0 + (model.M_f/365.0)
     elseif floor(Sardine.Age / 365.0 ) == 1.0
@@ -406,7 +399,7 @@ if Sardine.Dead == false
         else
             model.deadA_nat += 1.0
         end
-        Sardine.Dead = true
+        Sardine.Dead = true 
         #remove_agent!(Sardine, model)
         #println("Removed agent with ID $(Sardine.id)")
         return
@@ -415,16 +408,15 @@ end
 end
 
 function adultaging!(Sardine, model)
-    if Sardine.Dead == false
+    if Sardine.Dead == false #check that the sardine is not dead
         Sardine.Age += 1.0
     end
     return
-    #Sardine.Age += 1.0
-    #return
 end
 
 function adultspawn!(Sardine, model)
-
+    
+    #do not check if they are dead since all deads are removed before repro
     if ((model.repro_start <= model.day_of_the_year <= 365.0) || (1.0 <= model.day_of_the_year <= model.repro_end))
     
         # if female

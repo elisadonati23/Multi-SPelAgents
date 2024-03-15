@@ -6,11 +6,11 @@ include("0supportive functions.jl")
 include("3module Generate_Agents.jl")
 include("4model_initialize.jl")
 include("5agent_step!.jl")
-include("schedulers.jl")
+include("complex_step.jl")
 
 # test in parallelo ----
-modello = model_initialize(7500.0, 15000.0, 7500.0, 0.0, 50000.0, 1.0, 110.0)
-agent_ids = [agent.id for agent in values(allagents(modello))]
+modello = model_initialize(1000.0, 1000.0, 1000.0, 0.0, 50000.0, 1.0, 110.0)
+#agent_ids = [agent.id for agent in values(allagents(modello))]
 results = []
 num_runs = 1
 
@@ -20,7 +20,7 @@ for i in 1:num_runs
     start_time = Dates.now()
 
     # Initialize your model and data
-    adata = [(is_adult, count), (is_juvenile, count), (is_eggmass, count)]
+    adata = [:type, :f_i, :t_puberty, :herma,:Age, :Sex, :Lw, :Ww, :QWw, :meta, :R, :Scaled_En, :del_M_i, :s_M_i, :pA, :Lb_i, :spawned, :trans_prob, :Dead]
 
     mdata = [:day_of_the_year,
             :mean_batch_eggs, :mean_spawning_events, :Xmax, :f, 
@@ -36,7 +36,7 @@ for i in 1:num_runs
     
     # Run the model
     
-    df_agent = run!(modello, dummystep, complex_step!,365*10; adata, mdata)
+    df_agent = run!(modello, dummystep, complex_step!,365*3; adata, mdata)
 
     # Store the result in the results array
     push!(results, df_agent)
@@ -50,14 +50,15 @@ end
 println(sort(collect(allids(modello))))
 diagnostic_plots(results, results[1][2])
 
-"""
-    allids(model)
-Return an iterator over all agent IDs of the model.
-"""
-allids(model) = eachindex(agent_container(model))
-
-"""
-    allagents(model)
-Return an iterator over all agents of the model.
-"""
-allagents(model) = values(agent_container(model))
+#"""
+#    allids(model)
+#Return an iterator over all agent IDs of the model.
+#"""
+#allids(model) = eachindex(agent_container(model))
+#
+#"""
+#    allagents(model)
+#Return an iterator over all agents of the model.
+#"""
+#allagents(model) = values(agent_container(model))
+#"""
