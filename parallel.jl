@@ -9,8 +9,7 @@ include("5agent_step!.jl")
 include("complex_step.jl")
 
 # test in parallelo ----
-modello = model_initialize(1000.0, 1000.0, 1000.0, 0.0, 50000.0, 1.0, 110.0)
-#agent_ids = [agent.id for agent in values(allagents(modello))]
+modello = model_initialize(1000.0, 1000.0, 1000.0, 0.0, 50000.0, 1.0, 115.0, 0.945, collect(range(15.0, stop = 20.0,length=(365*3 +1 ) )))#agent_ids = [agent.id for agent in values(allagents(modello))]
 results = []
 num_runs = 1
 
@@ -19,8 +18,9 @@ num_runs = 1
 for i in 1:num_runs
     start_time = Dates.now()
 
-    # Initialize your model and data
-    adata = [:type, :f_i, :t_puberty, :herma,:Age, :Sex, :Lw, :Ww, :QWw, :meta, :R, :Scaled_En, :del_M_i, :s_M_i, :pA, :Lb_i, :spawned, :trans_prob, :Dead]
+    # Initialize model and data
+    adata = [:type, :f_i, :t_puberty, :herma,:Age, :Sex, :Lw, :Ww, :QWw, :meta, 
+            :R, :Scaled_En, :del_M_i, :s_M_i, :pA, :Lb_i, :spawned, :trans_prob, :Dead]
 
     mdata = [:day_of_the_year,
             :mean_batch_eggs, :mean_spawning_events, :Xmax, :f, 
@@ -45,8 +45,6 @@ for i in 1:num_runs
     println("Simulation in parallel $i took: ", duration)
 end 
 
-#Simulation in parallel 1 took: 47945 milliseconds
-#Simulation in parallel 1 took: 614367 milliseconds
 println(sort(collect(allids(modello))))
 diagnostic_plots(results, results[1][2])
 

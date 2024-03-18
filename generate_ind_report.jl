@@ -114,5 +114,4 @@ plot(p13, p14, p17, p18, layout = (2, 2))
         weave("report.jmd", out_path="report.html", doctype="md2html")
 
 end
-
 generate_ind_report(results)

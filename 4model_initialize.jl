@@ -1,4 +1,3 @@
-
 function model_initialize(
     No_A,  # model
     No_J,  # model
@@ -6,7 +5,9 @@ function model_initialize(
     M_f,  # fishing mortality (from 0 to 4 /year)
     Wv,
     day_of_the_year,
-    Xmax
+    Xmax,
+    Kappa,
+    Temp
     # seed  = 123
     # parametri del modello (anche in forma di properties)
     # n totale di agenti per ogni tipologia
@@ -27,7 +28,9 @@ function model_initialize(
         M_f,
         Wv,
         day_of_the_year,
-        Xmax
+        Xmax,
+        Kappa,
+        Temp
     )
 
     # create the model
@@ -60,13 +63,18 @@ end
 
     mean_Lw = calculate_mean_prop(model, "Lw")
     # Calculate the value of f using the given formula
-    f = (model.X * model.Wv * model.KappaX) / (model.p_Am * model.Tc * model.s_M * (mean_Lw ^ 2))
+    # at the initialization of the model:
+    # If Xmax is a vector,  X is a vector.
+    # f then should be calculated or iterating
+    # or as a vector
+    # but as a rule I would keep inputs as vectors
+    # and outputs as daily values because julia can then gives me the dataframes
+
+    #sim_timing = 1 at the initialization so I can directly index Xmax and Tc
+    f = (model.Xmax[model.sim_timing] * model.Wv * model.KappaX) / (model.p_Am * model.Tc[model.sim_timing] * model.s_M * (mean_Lw ^ 2))
     
     # Ensure that f is bounded between 0 and 1
     model.f =  max(0, min(f, 1.0))
-    model.max_ID = maximum([agent.id for agent in values(allagents(model))])
 
     return model
 end
-
-

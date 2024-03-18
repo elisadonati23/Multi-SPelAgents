@@ -1,8 +1,10 @@
 # module Generate_Agents
-
+# age at length and parameters are taken from AmP and Deb portal with 20C degrees as reference
+# all rates and then ages at length changes with changing parameters
     
-function generate_EggMass(No_Egg, model, NrEggs = missing, EggEn = missing, En = missing, Generation = missing)
+# module Generate_Agents
 
+function generate_EggMass(No_Egg, model, NrEggs = missing, EggEn = missing, En = missing, Generation = missing)
     agent_type = :eggmass
     agent_Age = 0.0
     agent_L = model.L0
@@ -59,13 +61,10 @@ function generate_EggMass(No_Egg, model, NrEggs = missing, EggEn = missing, En =
                    agent_s_M_i, agent_pA, agent_Lb_i, agent_spawned, agent_trans_prob
                    )
     end
-    #println("Added $No_Egg agents to $previousmodelid; max_ID now = $(model.max_ID)")
-    return
 end
 
-
 function generate_Juvenile(No_J, model, Generation = 0.0, En = missing, Lb_i = model.Lb, Lw = missing, Ww = missing, Scaled_En = missing)
-
+    
     agent_type = :juvenile
     agent_f_i = 0.8
     agent_L = model.L0
@@ -128,7 +127,8 @@ function generate_Juvenile(No_J, model, Generation = 0.0, En = missing, Lb_i = m
             model.s_M
         end
 
-        agent_pA = agent_f_i * model.p_Am * model.Tc * agent_s_M_i * ((agent_Lw * agent_del_M_i)^2.0)
+        Tc_value = isa(model.Tc, Vector{Float64}) ? model.Tc[model.sim_timing] : mmodel.Tc
+        agent_pA = agent_f_i * model.p_Am * Tc_value* agent_s_M_i * ((agent_Lw * agent_del_M_i)^2.0)
         #CI = 100 * Ww / (Lw^3)
         #Variability = randn() .* 0.05 .+ 0
 
@@ -136,14 +136,11 @@ function generate_Juvenile(No_J, model, Generation = 0.0, En = missing, Lb_i = m
         agent_f_i, agent_t_puberty, agent_herma, agent_Sex, agent_Lw, agent_Ww, agent_QWw, agent_meta, agent_R, agent_Scaled_En, agent_del_M_i,
                    agent_s_M_i, agent_pA, agent_Lb_i, agent_spawned, agent_trans_prob
                    )
-        
     end
-    #println("Added $No_J agents to $previousmodelid; max_ID now = $(model.max_ID)")
-    return
 end
 
 function generate_Adult(No_A, model, Sex = missing, Age = missing, t_puberty = missing, Lw = missing, Ww = missing, H = missing, R = missing, En = missing, Scaled_En = missing, Generation = missing, pA = missing)
-
+    # silenced features
     agent_L = 0.0
     agent_EggEn = 0.0 
     agent_NrEggs = 0.0
@@ -197,8 +194,13 @@ function generate_Adult(No_A, model, Sex = missing, Age = missing, t_puberty = m
             agent_Lw
         end
 
+
         agent_Age = if ismissing(Age)
-            model.Am * agent_Lw * model.del_Ma / model.Lm
+            if model.Lm isa Float64
+                model.Am * agent_Lw * model.del_Ma / model.Lm
+            else
+                model.Am * agent_Lw * model.del_Ma / model.Lm[model.sim_timing]
+            end
         else
             agent_Age
         end
@@ -232,19 +234,30 @@ function generate_Adult(No_A, model, Sex = missing, Age = missing, t_puberty = m
             Scaled_En
         end
 
+        #if ismissing(CI)
+        #    CI = 100 * Ww / (Lw ^ 3)
+        #else
+        #    CI = CI
+        #end
+
+        Tc_value = isa(model.Tc, Vector{Float64}) ? model.Tc[model.sim_timing] : mmodel.Tc
 
         agent_pA = if ismissing(pA)
-            agent_f_i * model.p_Am * model.Tc * agent_s_M_i * ((agent_Lw * agent_del_M_i)^2.0)
+            agent_f_i * model.p_Am * Tc_value * agent_s_M_i * ((agent_Lw * agent_del_M_i)^2.0)
         else
             pA
         end
+
+        #if ismissing(Variability)
+        #    Variability = randn() .* 0.05 .+ 0
+        #else
+        #    Variability = Variability
+        #end
 
         add_agent!(Sardine, model, agent_type, agent_Age, agent_L, agent_H, agent_EggEn, agent_NrEggs, agent_En, agent_Generation, agent_Dead,
         agent_f_i, agent_t_puberty, agent_herma, agent_Sex, agent_Lw, agent_Ww, agent_QWw, agent_meta, agent_R, agent_Scaled_En, agent_del_M_i,
                    agent_s_M_i, agent_pA, agent_Lb_i, agent_spawned, agent_trans_prob
                    )
-                   
     end
-    #println("Added $No_A agents to $previousmodelid; max_ID now = $(model.max_ID)")
     return
 end

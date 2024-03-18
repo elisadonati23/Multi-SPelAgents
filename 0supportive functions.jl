@@ -208,7 +208,7 @@ function calculate_sum_assimilation(model)
     all_agents = collect(values(allagents(model)))
     
     # Filter agents based on agent types (juvenile, male, and female)
-    filtered_agents = filter(agent -> agent.type != :eggmass, all_agents)
+    filtered_agents = filter(agent -> agent.type == :juvenile || agent.type == :adult, all_agents)
     
     if isempty(filtered_agents)
         println("no agents!")
@@ -219,9 +219,10 @@ function calculate_sum_assimilation(model)
         s_M_i_values = [getfield(agent, Symbol("s_M_i")) for agent in filtered_agents]
         Lw_values = [getfield(agent, Symbol("Lw")) for agent in filtered_agents]
         del_M_i_values = [getfield(agent, Symbol("del_M_i")) for agent in filtered_agents]
+        Tc_value = isa(model.Tc, Vector{Float64}) ? model.Tc[model.sim_timing] : model.Tc
 
         # Perform element-wise operations and calculate the sum
-        denom = sum((p_Am_values .* model.Tc .* s_M_i_values .* (Lw_values .* del_M_i_values .^ 2)))
+        denom = sum((p_Am_values .* Tc_value .* s_M_i_values .* (Lw_values .* del_M_i_values .^ 2)))
     end
     return denom
 end

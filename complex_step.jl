@@ -9,28 +9,27 @@ function (sEA::scheduler_EggAdults)(model::ABM)
 end
 
 sEA = scheduler_EggAdults()
-modello = model_initialize(5000.0, 5000.0, 5000.0, 0.0, 50000.0, 1.0, 110.0)
-sEA(modello)
 
 function complex_step!(model)
 
     #parallel
-    Threads.@threads for Sardine in collect(values(allagents(model)))
+    Threads.@threads for Sardine in collect(values(allagents(model))) # aging die, DEB and/or mature
         parallel_sardine_step!(Sardine, model)
     end
 
     remove_all!(model, is_dead)
 
+    #hatch
     eggmass_ids = [Sardine for Sardine in sEA(model) if haskey(model.agents, Sardine) && model[Sardine].type == :eggmass]
     for Sardine in eggmass_ids
         egghatch!(model[Sardine], model) #generate new agents with add!
     end
-
+    #spawn
     adult_ids = [Sardine for Sardine in sEA(model) if haskey(model.agents, Sardine) && model[Sardine].type == :adult]
     for Sardine in adult_ids
         adultspawn!(model[Sardine], model) #generate new agents with add!
     end
-    
+    #evolve environment
     evolve_environment!(model)
 end
 

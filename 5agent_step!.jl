@@ -33,7 +33,10 @@ function evolve_environment!(model)
         model.day_of_the_year += 1.0
     end
 
-    model.max_ID = maximum([agent.id for agent in values(allagents(model))])
+    #increase time checher
+    model.sim_timing += 1
+
+    #model.max_ID = maximum([agent.id for agent in values(allagents(model))])
     #println("Day of the year: $(model.day_of_the_year) and max_ID $(model.max_ID)")
 
     ##calculate Xall
@@ -44,24 +47,22 @@ function evolve_environment!(model)
      if Xall < 0.0  
          Xall = 0.0 
      end
-    #
-     model.Xall = Xall
-    #
-    ##food update -- MISSING CHEMOSTAT!
-    ######################################
-    ##at each timestep resources are renewed:
-    #
-     model.X = model.Xmax
-    #
+    
+    model.Xall = Xall
+
     ## update response function f ---
     ###############################
-    #
+    
     if ismissing(calculate_sum_assimilation(model))
         f = 0.0
     else
-    f = (model.X * model.Wv * model.KappaX) / calculate_sum_assimilation(model)
+        #rapporto tra quello disponibile e quello che si mangia su base di taglia e Tc!!
+        # ATTENZIONE QUANDO TC SARà VETTORE
+    Xmax_value = isa(model.Xmax, Vector{Float64}) ? model.Xmax[model.sim_timing] : model.Xmax
+    f = (Xmax_value * model.Wv * model.KappaX) / calculate_sum_assimilation(model)
     end
-    #
+    
+    
     ## Ensure that f is bounded between 0 and 1
     model.f = max(0, min(f, 1.0)) # not 1 but 0.8  ## ????? check haberle
     agents = collect(values(allagents(model)))
@@ -106,8 +107,8 @@ end
 #########################################################################################
 
 function parallel_eggmass_step!(Sardine, model)
-    eggDEB!(Sardine, model)
     eggaging!(Sardine, model)
+    eggDEB!(Sardine, model)
 end
 
 function eggmass_step!(Sardine, model)
@@ -132,15 +133,19 @@ function eggDEB!(Sardine, model)
     deltaEggEn = 0.0
     deltaH = 0.0
 
+    #check whether Kappa is a vector or a float
+    Kappa_value = isa(model.Kappa, Vector{Float64}) ? model.Kappa[model.sim_timing] : model.Kappa
+    Tc_value = isa(model.Tc, Vector{Float64}) ? model.Tc[model.sim_timing] : model.Tc
+
     ## Energy fluxes
-    pS = (model.p_M * model.Tc) * V  #p_M_T*V
-    pC = ((Sardine.EggEn / V) * (model.Eg * (model.v_rate * model.Tc) * (V ^ (2/3)) + pS)/(model.Kappa * (Sardine.EggEn / V) + model.Eg))
+    pS = (model.p_M * Tc_value) * V  #p_M_T*V
+    pC = ((Sardine.EggEn / V) * (model.Eg * (model.v_rate * Tc_value) * (V ^ (2/3)) + pS)/(Kappa_value * (Sardine.EggEn / V) + model.Eg))
     pJ = model.k_J * Sardine.H
 
     ## Variation in the state variables
     deltaEggEn = 0.0 - pC # must be negative because eggs do not eat 
 
-    if ((model.Kappa * pC) < pS)
+    if ((Kappa_value * pC) < pS)
         model.dead_eggmass += 1.0
         Sardine.Dead = true
         #remove_agent!(Sardine, model)
@@ -148,13 +153,13 @@ function eggDEB!(Sardine, model)
         return
     end
 
-    deltaH =  (( 1.0 - model.Kappa) * pC - pJ)
+    deltaH =  (( 1.0 - Kappa_value) * pC - pJ)
 
     if (deltaH < 0.0 )
         deltaH = 0.0
     end
 
-    deltaV = (( model.Kappa * pC - pS) / model.Eg)
+    deltaV = (( Kappa_value * pC - pS) / model.Eg)
     if (deltaV < 0.0)
         deltaV = 0.0
     end
@@ -194,10 +199,11 @@ end
 
 
 function parallel_juvenile_step!(Sardine, model)
+    juveaging!(Sardine, model)
     juvedie!(Sardine, model)
     juveDEB!(Sardine, model)
     juvemature!(Sardine,model)
-    juveaging!(Sardine, model)
+
 end
 
 function juveDEB!(Sardine, model)
@@ -209,24 +215,30 @@ Vdyn = (Sardine.Lw * Sardine.del_M_i) ^ 3.0
 Endyn = Sardine.En
 Hdyn = Sardine.H
 Rdyn = Sardine.R
-p_M_T = model.p_M * model.Tc # this should be in the update environment module
+
+#check whether Kappa is a vector or a float
+Kappa_value = isa(model.Kappa, Vector{Float64}) ? model.Kappa[model.sim_timing] : model.Kappa
+Tc_value = isa(model.Tc, Vector{Float64}) ? model.Tc[model.sim_timing] : model.Tc
+
+
+p_M_T = model.p_M * Tc_value # this should be in the update environment module
 
 deltaV = 0.0
 deltaEn  = 0.0
 deltaH = 0.0
 deltaR = 0.0
 
-v_T = model.v_rate * model.Tc
+v_T = model.v_rate * Tc_value
 
 # Energy fluxes
-pA = (Sardine.f_i * model.p_Am* model.Tc * Sardine.s_M_i * (Vdyn ^ (2/3)))
+pA = (Sardine.f_i * model.p_Am* Tc_value * Sardine.s_M_i * (Vdyn ^ (2/3)))
 pS = p_M_T * Vdyn
-pC = ((Endyn/Vdyn) * (model.Eg * v_T * Sardine.s_M_i * (Vdyn ^ (2/3)) + pS) / (model.Kappa * (Endyn/ Vdyn) + model.Eg))
+pC = ((Endyn/Vdyn) * (model.Eg * v_T * Sardine.s_M_i * (Vdyn ^ (2/3)) + pS) / (Kappa_value * (Endyn/ Vdyn) + model.Eg))
 pJ = model.k_J * Hdyn
 deltaEn = (pA - pC) * model.DEB_timing
 
 # die due to starvation
-if ((model.Kappa * pC) < pS)
+if ((Kappa_value * pC) < pS)
 model.deadJ_starved += 1.0
 Sardine.Dead = true
 #remove_agent!(Sardine, model)
@@ -234,14 +246,14 @@ Sardine.Dead = true
 return
 end
 
-deltaV = ((model.Kappa * pC - pS) / model.Eg) * model.DEB_timing
+deltaV = ((Kappa_value * pC - pS) / model.Eg) * model.DEB_timing
 if (deltaV < 0.0) 
 deltaV = 0.0
 end
 
 # maturing energy
 if Sardine.H < model.Hp
-deltaH = (((1.0 - model.Kappa) * pC - pJ) * model.DEB_timing)
+deltaH = (((1.0 - Kappa_value) * pC - pJ) * model.DEB_timing)
 if deltaH < 0.0
     deltaH = 0.0
 end
@@ -265,12 +277,15 @@ function juvemature!(Sardine, model)
     if Sardine.Dead == false
     Sardine.t_puberty += 1.0
 
+    #check whether Kappa is a vector or a float
+    Tc_value = isa(model.Tc, Vector{Float64}) ? model.Tc[model.sim_timing] : model.Tc
+
     if Sardine.H >= model.Hp
      #put adult features
      Sardine.type = :adult
      Sardine.R = 0.0
      Sardine.del_M_i = model.del_Ma
-     Sardine.pA = Sardine.f_i * model.p_Am * model.Tc * Sardine.s_M_i * ((Sardine.Lw * Sardine.del_M_i)^2.0)
+     Sardine.pA = Sardine.f_i * model.p_Am * Tc_value * Sardine.s_M_i * ((Sardine.Lw * Sardine.del_M_i)^2.0)
      Sardine.Generation += 1.0
     end
 return
@@ -302,9 +317,10 @@ end
 # adult ----
 
 function parallel_adult_step!(Sardine, model)
+    adultaging!(Sardine, model)
     adultdie!(Sardine, model)
     adultDEB!(Sardine, model)
-    adultaging!(Sardine, model)
+
 end
 
 function adult_step!(Sardine, model)
@@ -321,7 +337,12 @@ function adultDEB!(Sardine, model)
     Endyn = Sardine.En
     Hdyn = model.Hb
     Rdyn = Sardine.R
-    p_M_T = model.p_M * model.Tc # this should be in the update environment module
+
+    #check whether Kappa is a vector or a float
+    Kappa_value = isa(model.Kappa, Vector{Float64}) ? model.Kappa[model.sim_timing] : model.Kappa
+    Tc_value = isa(model.Tc, Vector{Float64}) ? model.Tc[model.sim_timing] : model.Tc
+    
+    p_M_T = model.p_M * Tc_value # this should be in the update environment module
     
     deltaV = 0.0
     deltaEn  = 0.0
@@ -330,32 +351,32 @@ function adultDEB!(Sardine, model)
     
     # Energy fluxes
     
-    pA = (Sardine.f_i * model.p_Am * model.Tc * Sardine.s_M_i * (Vdyn ^ (2/3)))
+    pA = (Sardine.f_i * model.p_Am * Tc_value * Sardine.s_M_i * (Vdyn ^ (2/3)))
     pS = p_M_T * Vdyn
-    pC = ((Endyn/Vdyn) * (model.Eg * (model.v_rate * model.Tc) * Sardine.s_M_i * (Vdyn ^ (2/3)) + pS) / (model.Kappa * (Endyn/ Vdyn) + model.Eg))
+    pC = ((Endyn/Vdyn) * (model.Eg * (model.v_rate * Tc_value) * Sardine.s_M_i * (Vdyn ^ (2/3)) + pS) / (Kappa_value * (Endyn/ Vdyn) + model.Eg))
     pJ = model.k_J * Hdyn  # should not take into account the temperature?
     deltaEn = (pA - pC) * model.DEB_timing
     
-    deltaV = ((model.Kappa * pC - pS) / model.Eg) * model.DEB_timing #pG
+    deltaV = ((Kappa_value * pC - pS) / model.Eg) * model.DEB_timing #pG
     if (deltaV < 0.0) 
         deltaV = 0.0
     end
     
     #starvation
-    if ((model.Kappa * pC) < pS)
-        if (Rdyn < ((pS - (model.Kappa * pC)) * model.DEB_timing))
+    if ((Kappa_value * pC) < pS)
+        if (Rdyn < ((pS - (Kappa_value * pC)) * model.DEB_timing))
             model.deadA_starved += 1.0
             Sardine.Dead = true
             #remove_agent!(Sardine, model)
             #println("Removed agent with ID $(Sardine.id)")
             return
         else
-            Rdyn = (Rdyn - (pS - (model.Kappa * pC)) * model.DEB_timing)
+            Rdyn = (Rdyn - (pS - (Kappa_value * pC)) * model.DEB_timing)
         end
     end
 
     #maturing energy
-    deltaR = (((1- model.Kappa)* pC - pJ)* model.DEB_timing)  #pr
+    deltaR = (((1- Kappa_value)* pC - pJ)* model.DEB_timing)  #pr
 
     if (deltaR < 0.0)
         deltaR = 0.0
@@ -438,9 +459,9 @@ function adultspawn!(Sardine, model)
             end
 
             EggEn_E0_val = Float64(((model.E0_max - model.E0_min) / (1.0- model.ep_min)) * (Sardine.Scaled_En - model.ep_min)) + model.E0_min
-            spawned_en = NrEggs_val * EggEn_E0_val #Sardine.R * model.KappaR / spawn_period 
+            spawned_en = NrEggs_val * EggEn_E0_val #Sardine.R * Kappa_valueR / spawn_period 
 
-            if (spawned_en < Sardine.R )#* model.KappaR)    
+            if (spawned_en < Sardine.R )#* Kappa_valueR)    
                 #EggEn_E0_val = Float64(((model.E0_max - model.E0_min) / (1.0- model.ep_min)) * (Sardine.Scaled_En - model.ep_min)) + model.E0_min
                 En_val = Float64(spawned_en)
                 #NrEggs_val = Float64(floor(En_val/ EggEn_E0_val))
