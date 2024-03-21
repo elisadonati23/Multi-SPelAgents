@@ -15,11 +15,18 @@ modello = model_initialize(7500.0, 15000.0, 7500.0, 0.0, 50000.0, 1.0, 115.0, 0.
                                 vcat(repeat([15.0], 365*10), collect(range(15.0, stop = 18.0,length=(365*10 +1) ))))
                                 #agent_ids = [agent.id for agent in values(allagents(modello))]
 #K values
-modello = model_initialize(7500.0, 15000.0, 7500.0, 0.0, 50000.0, 1.0, 115.0, 
-vcat(repeat([0.945], 365*10), collect(range(0.945, stop = 0.90,length=(365*10 +1)))), 15)
+modello = model_initialize(100.0, 100.0, 100.0, 0.0, 50000.0, 1.0, 115.0, 
+vcat(repeat([0.945], 365*5), collect(range(0.945, stop = 0.90,length=(365*5 +1)))), 15)
+
+modello = model_initialize(100.0, 100.0, 100.0, 0.0, 50000.0, 1.0, 115.0, 0.94, 15)
+
+# no forcings
+
+modello = model_initialize(100.0, 100.0, 100.0, 0.0, 50000.0, 1.0, 115.0, 0.945, 15)
 
 # if you have steady state ---------------------
 modello = AgentsIO.load_checkpoint("steadystate.jl")
+
 
 results = []
 num_runs = 1
@@ -45,8 +52,8 @@ for i in 1:num_runs
     df_model = init_model_dataframe(modello, mdata)
     
     # Run the model
-    step!(modello, dummystep, complex_step!,365*10)
-    AgentsIO.save_checkpoint("steadystate_K.jl", modello) # steady state first 10 years
+    #step!(modello, dummystep, complex_step!,365*5)
+    #AgentsIO.save_checkpoint("steadystate_K.jl", modello) # steady state first 10 years
     df_agent = run!(modello, dummystep, complex_step!,365*10; adata, mdata) #store results
 
     # Store the result in the results array

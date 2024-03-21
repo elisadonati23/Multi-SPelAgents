@@ -56,7 +56,7 @@ function create_params(
     E0_min = 0.389
     E0_max = 0.967
     W0 = 0.00021
-    L0 = 0.001
+    L0 = 0.001 #0.001 cm
     M_egg = 0.999855 #o.998 what if not only instant mort?
     M_j = 1.071/365.0
     M_ae = 0.61/365.0

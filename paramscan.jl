@@ -1,2 +1,0 @@
-# paramscan - sensitivity analysis
-
