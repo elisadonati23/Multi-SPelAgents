@@ -127,7 +127,7 @@ function generate_Juvenile(No_J, model, Generation = 0.0, En = missing, Lb_i = m
             model.s_M
         end
 
-        Tc_value = isa(model.Tc, Vector{Float64}) ? model.Tc[model.sim_timing] : mmodel.Tc
+        Tc_value = isa(model.Tc, Vector{Float64}) ? model.Tc[model.sim_timing] : model.Tc
         agent_pA = agent_f_i * model.p_Am * Tc_value* agent_s_M_i * ((agent_Lw * agent_del_M_i)^2.0)
         #CI = 100 * Ww / (Lw^3)
         #Variability = randn() .* 0.05 .+ 0
@@ -240,7 +240,7 @@ function generate_Adult(No_A, model, Sex = missing, Age = missing, t_puberty = m
         #    CI = CI
         #end
 
-        Tc_value = isa(model.Tc, Vector{Float64}) ? model.Tc[model.sim_timing] : mmodel.Tc
+        Tc_value = isa(model.Tc, Vector{Float64}) ? model.Tc[model.sim_timing] : model.Tc
 
         agent_pA = if ismissing(pA)
             agent_f_i * model.p_Am * Tc_value * agent_s_M_i * ((agent_Lw * agent_del_M_i)^2.0)

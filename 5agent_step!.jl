@@ -268,7 +268,11 @@ Sardine.R = Rdyn + deltaR
 Sardine.Ww = (model.w *(model.d_V * V + model.w_E/ model.mu_E * (Sardine.En + Sardine.R)))
 #Sardine.CI = 100.0 * Sardine.Ww / (Sardine.Lw ^ 3)
 Sardine.Scaled_En= Sardine.En / (model.Em * (( Sardine.Lw * Sardine.del_M_i)^3.0))
-Sardine.L = Sardine.Lw * Sardine.del_M_i / model.Lm
+
+#check whether Lm is a vector or a float
+Lm_value = isa(model.Lm, Vector{Float64}) ? model.Lm[model.sim_timing] : model.Lm
+Sardine.L = Sardine.Lw * Sardine.del_M_i / Lm_value 
+
 end
 return
 end
