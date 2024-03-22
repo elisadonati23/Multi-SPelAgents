@@ -1,6 +1,6 @@
 
     
-@agent Sardine NoSpaceAgent begin
+@agent struct Sardine(NoSpaceAgent)
     type::Symbol # EggMass, Juvenile, Adult
     Age::Float64 # EggMass, Juvenile, Adult
     L::Float64 # EggMass, Juvenile --?
