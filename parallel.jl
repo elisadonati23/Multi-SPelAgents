@@ -20,8 +20,7 @@ for i in 1:num_runs
     start_time = Dates.now()
 
     # Initialize your model and data
-    adata = [:type, :f_i, :t_puberty, :herma,:Age, :Sex, :Lw, :Ww, :QWw, :meta, :R, :Scaled_En, :del_M_i, :s_M_i, :pA, :Lb_i, :spawned, :trans_prob, :Dead]
-
+    adata = [(is_adult, count), (is_juvenile, count), (is_eggmass, count)]
     mdata = [:day_of_the_year,
             :mean_batch_eggs, :mean_spawning_events, :Xmax, :f, 
             :deadA_starved, :deadA_nat, :deadA_old,:deadJ_starved, :deadJ_nat, :deadJ_old,
