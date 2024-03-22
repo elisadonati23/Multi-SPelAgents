@@ -1,6 +1,4 @@
 
-
-
 include("00dependencies.jl")
 include("1create_agents.jl")
 include("2create_params_function.jl")
@@ -38,7 +36,7 @@ for i in 1:num_runs
     
     # Run the model
     
-    df_agent = run!(modello, sardine_step!, evolve_environment!,365*5; adata, mdata)
+    df_agent = run!(modello, 365*5; adata, mdata)
     # Store the result in the results array
     push!(results, df_agent)
     end_time = Dates.now()

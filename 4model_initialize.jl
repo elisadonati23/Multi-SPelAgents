@@ -35,7 +35,8 @@ function model_initialize(
 
     # create the model
     model = ABM(Sardine;
-                properties = properties)
+                properties = properties,
+                model_step! = complex_step!)
     # rng)
     # scheduler = Schedulers.Randomly()) # properties, #rng, #scheduler)
 
