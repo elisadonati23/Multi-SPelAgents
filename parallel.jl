@@ -18,7 +18,7 @@ modello = model_initialize(7500.0, 15000.0, 7500.0, 0.0, 50000.0, 1.0, 115.0, 0.
 modello = model_initialize(100.0, 100.0, 100.0, 0.0, 50000.0, 1.0, 115.0, 
 vcat(repeat([0.945], 365*5), collect(range(0.945, stop = 0.90,length=(365*5 +1)))), 15)
 
-modello = model_initialize(100.0, 100.0, 100.0, 0.0, 50000.0, 1.0, 115.0, 0.94, 15)
+modello = model_initialize(0.0, 0.0, 100.0, 0.0, 50000.0, 1.0, 115.0, 0.9, 15)
 
 # no forcings
 
