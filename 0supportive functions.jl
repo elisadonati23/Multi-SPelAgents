@@ -249,12 +249,12 @@ function plot_population_timeseries(adf, nrow, ncol, y_limits = missing)
             current_adf = adf[i][1]
 
             # Plot the data for each category on a subplot
-            Plots.plot!(p[i], current_adf.step, current_adf.count_is_eggmass, color = :yellow, label = "Eggs")
-            Plots.plot!(p[i], current_adf.step, current_adf.count_is_juvenile, color = :blue, label = "Juveniles")
-            Plots.plot!(p[i], current_adf.step, current_adf.count_is_adult, color = :green, label = "Adults")
+            Plots.plot!(p[i], current_adf.time, current_adf.count_is_eggmass, color = :yellow, label = "Eggs")
+            Plots.plot!(p[i], current_adf.time, current_adf.count_is_juvenile, color = :blue, label = "Juveniles")
+            Plots.plot!(p[i], current_adf.time, current_adf.count_is_adult, color = :green, label = "Adults")
 
             # Set the labels for the subplot
-            Plots.xlabel!(p[i], "Step")
+            Plots.xlabel!(p[i], "time")
             Plots.ylabel!(p[i], "count")
 
             if !ismissing(y_limits)
@@ -293,17 +293,17 @@ function plot_param_timeseries(adf, params, ids = missing)
                 for group in grouped_data
                     id = group[1, :id]
                     param_values = group[:, Symbol(param)]
-                    Plots.plot!(p, group[!, :step], param_values, color = color, linewidth = 2, label = "ID $id - $param")
+                    Plots.plot!(p, group[!, :time], param_values, color = color, linewidth = 2, label = "ID $id - $param")
                 end
             end
         else
             for (param, color) in zip(params, colors)
                 param_values = adf[:, Symbol(param)]
-                Plots.plot!(p, adf[!, :step], param_values, color = color, linewidth = 2, label = "$param")
+                Plots.plot!(p, adf[!, :time], param_values, color = color, linewidth = 2, label = "$param")
             end
         end
 
-        Plots.xlabel!(p, "Step")
+        Plots.xlabel!(p, "time")
         return p
     catch e
         println("Failed to generate plot: ", e)
@@ -369,7 +369,7 @@ try
     # Create a new plot
     p = Plots.plot()
 
-    time = df[!, :step]
+    time = df[!, :time]
 
     # Loop over each pair of mean and std columns
     for i in eachindex(mean_cols)

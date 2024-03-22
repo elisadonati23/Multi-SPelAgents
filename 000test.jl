@@ -1,4 +1,3 @@
-
 include("00dependencies.jl")
 include("1create_agents.jl")
 include("2create_params_function.jl")
@@ -13,8 +12,8 @@ num_runs = 1
 
 # Array to store the results
 results = []
-using Dates
-modello = model_initialize(0.0, 0.0, 1000.0, 0.0, 50000.0, 1.0, 110.0)
+
+modello = model_initialize(0.0, 0.0, 1000.0, 0.0, 50000.0, 1.0, 110.0, 0.945, 15)
 
 for i in 1:num_runs
     start_time = Dates.now()
