@@ -18,7 +18,7 @@ using Agents, Statistics
 
 function interquantiles_prop(model, prop, class_prop, agent_type = missing, sex = missing, assign = true, Wwquant = model.Ww_quantiles)
     agents = collect(values(allagents(model)))
-    agents = filter(agent -> haskey(model.agents, agent.id), agents)  # Extract agents from the dictionary
+    agents = filter(agent -> hasid(model, agent.id), agents)  # Extract agents from the dictionary
 
     # Filter the agents based on agent_type and sex if they are specified
     filtered_agents = if ismissing(agent_type) && ismissing(sex)
@@ -61,7 +61,7 @@ end
 
 function get_bigger_agent(agent_type, model, feature)
     all_agents = collect(values(allagents(model)))
-    all_agents = filter(agent -> haskey(model.agents, agent.id), all_agents)
+    all_agents = filter(agent -> hasid(model, agent.id), all_agents)
     sorted_agents = sort((filter(agent -> isa(agent, agent_type), all_agents)), by=agent -> getfield(agent,Symbol(feature)), rev=true)
     agent_with_max_feature = first(sorted_agents)
     return agent_with_max_feature
@@ -70,14 +70,14 @@ end
 
 function sort_agent(agent_type, model, feature)
     all_agents = collect(values(allagents(model)))
-    all_agents = filter(agent -> haskey(model.agents, agent.id), all_agents)
+    all_agents = filter(agent -> hasid(model, agent.id), all_agents)
     sorted_agents = sort((filter(agent -> isa(agent, agent_type), all_agents)), by=agent -> getfield(agent,Symbol(feature)), rev=true)
     return sorted_agents
 end 
 
 function calculate_mean_prop(model, prop; type = missing, sex = missing, age = missing)
     all_agents = collect(values(allagents(model)))
-    all_agents = filter(agent -> haskey(model.agents, agent.id), all_agents)
+    all_agents = filter(agent -> hasid(model, agent.id), all_agents)
     
     if ismissing(type) && ismissing(sex) && ismissing(age)
         # Filter agents based on agent types (juvenile, male, and female)
@@ -131,7 +131,7 @@ end
 
 function calculate_sd_prop(model, prop; type = missing, sex = missing)
     all_agents = collect(values(allagents(model)))
-    all_agents = filter(agent -> haskey(model.agents, agent.id), all_agents)
+    all_agents = filter(agent -> hasid(model, agent.id), all_agents)
     
     if ismissing(type) && ismissing(sex)
         # Filter agents based on agent types (juvenile, male, and female)
