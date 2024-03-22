@@ -1,5 +1,5 @@
-
-    
+using Agents
+Pkg.status("Agents")
 @agent struct Sardine(NoSpaceAgent)
     type::Symbol # EggMass, Juvenile, Adult
     Age::Float64 # EggMass, Juvenile, Adult
