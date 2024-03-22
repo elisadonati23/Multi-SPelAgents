@@ -32,7 +32,9 @@ function model_initialize(
 
     # create the model
     model = ABM(Sardine;
-                properties = properties)
+                properties = properties,
+                agent_step! = complex_step!,
+                model_step! = evolve_environment!)
     # rng)
     # scheduler = Schedulers.Randomly()) # properties, #rng, #scheduler)
 

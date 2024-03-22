@@ -9,7 +9,7 @@ include("5agent_step!.jl")
 include("complex_step.jl")
 
 # test in parallelo ----
-modello = model_initialize(1000.0, 1000.0, 1000.0, 0.0, 50000.0, 1.0, 110.0)
+modello = model_initialize(10.0, 10.0, 10.0, 0.0, 50000.0, 1.0, 110.0)
 #agent_ids = [agent.id for agent in values(allagents(modello))]
 results = []
 num_runs = 1
@@ -36,7 +36,7 @@ for i in 1:num_runs
     
     # Run the model
     
-    df_agent = run!(modello, dummystep, complex_step!,365*3; adata, mdata)
+    df_agent = run!(modello,365*3; adata, mdata)
 
     # Store the result in the results array
     push!(results, df_agent)

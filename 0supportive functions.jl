@@ -18,7 +18,7 @@ using Agents, Statistics
 
 function interquantiles_prop(model, prop, class_prop, agent_type = missing, sex = missing, assign = true, Wwquant = model.Ww_quantiles)
     agents = collect(values(allagents(model)))
-    agents = filter(agent -> haskey(model.agents, agent.id), agents)  # Extract agents from the dictionary
+    agents = filter(agent -> hasid(model, agent.id), agents)  # Extract agents from the dictionary
 
     # Filter the agents based on agent_type and sex if they are specified
     filtered_agents = if ismissing(agent_type) && ismissing(sex)
@@ -61,7 +61,7 @@ end
 
 function get_bigger_agent(agent_type, model, feature)
     all_agents = collect(values(allagents(model)))
-    all_agents = filter(agent -> haskey(model.agents, agent.id), all_agents)
+    all_agents = filter(agent -> Agents.hasid(model, agent.id), all_agents)
     sorted_agents = sort((filter(agent -> isa(agent, agent_type), all_agents)), by=agent -> getfield(agent,Symbol(feature)), rev=true)
     agent_with_max_feature = first(sorted_agents)
     return agent_with_max_feature
@@ -70,14 +70,14 @@ end
 
 function sort_agent(agent_type, model, feature)
     all_agents = collect(values(allagents(model)))
-    all_agents = filter(agent -> haskey(model.agents, agent.id), all_agents)
+    all_agents = filter(agent -> hasid(model, agent.id), all_agents)
     sorted_agents = sort((filter(agent -> isa(agent, agent_type), all_agents)), by=agent -> getfield(agent,Symbol(feature)), rev=true)
     return sorted_agents
 end 
 
 function calculate_mean_prop(model, prop; type = missing, sex = missing, age = missing)
     all_agents = collect(values(allagents(model)))
-    all_agents = filter(agent -> haskey(model.agents, agent.id), all_agents)
+    all_agents = filter(agent -> hasid(model, agent.id), all_agents)
     
     if ismissing(type) && ismissing(sex) && ismissing(age)
         # Filter agents based on agent types (juvenile, male, and female)
@@ -131,7 +131,7 @@ end
 
 function calculate_sd_prop(model, prop; type = missing, sex = missing)
     all_agents = collect(values(allagents(model)))
-    all_agents = filter(agent -> haskey(model.agents, agent.id), all_agents)
+    all_agents = filter(agent -> hasid(model, agent.id), all_agents)
     
     if ismissing(type) && ismissing(sex)
         # Filter agents based on agent types (juvenile, male, and female)
@@ -248,12 +248,12 @@ function plot_population_timeseries(adf, nrow, ncol, y_limits = missing)
             current_adf = adf[i][1]
 
             # Plot the data for each category on a subplot
-            Plots.plot!(p[i], current_adf.step, current_adf.count_is_eggmass, color = :yellow, label = "Eggs")
-            Plots.plot!(p[i], current_adf.step, current_adf.count_is_juvenile, color = :blue, label = "Juveniles")
-            Plots.plot!(p[i], current_adf.step, current_adf.count_is_adult, color = :green, label = "Adults")
+            Plots.plot!(p[i], current_adf.time, current_adf.count_is_eggmass, color = :yellow, label = "Eggs")
+            Plots.plot!(p[i], current_adf.time, current_adf.count_is_juvenile, color = :blue, label = "Juveniles")
+            Plots.plot!(p[i], current_adf.time, current_adf.count_is_adult, color = :green, label = "Adults")
 
             # Set the labels for the subplot
-            Plots.xlabel!(p[i], "Step")
+            Plots.xlabel!(p[i], "time")
             Plots.ylabel!(p[i], "count")
 
             if !ismissing(y_limits)
@@ -292,17 +292,17 @@ function plot_param_timeseries(adf, params, ids = missing)
                 for group in grouped_data
                     id = group[1, :id]
                     param_values = group[:, Symbol(param)]
-                    Plots.plot!(p, group[!, :step], param_values, color = color, linewidth = 2, label = "ID $id - $param")
+                    Plots.plot!(p, group[!, :time], param_values, color = color, linewidth = 2, label = "ID $id - $param")
                 end
             end
         else
             for (param, color) in zip(params, colors)
                 param_values = adf[:, Symbol(param)]
-                Plots.plot!(p, adf[!, :step], param_values, color = color, linewidth = 2, label = "$param")
+                Plots.plot!(p, adf[!, :time], param_values, color = color, linewidth = 2, label = "$param")
             end
         end
 
-        Plots.xlabel!(p, "Step")
+        Plots.xlabel!(p, "time")
         return p
     catch e
         println("Failed to generate plot: ", e)
@@ -368,7 +368,7 @@ try
     # Create a new plot
     p = Plots.plot()
 
-    time = df[!, :step]
+    time = df[!, :time]
 
     # Loop over each pair of mean and std columns
     for i in eachindex(mean_cols)
