@@ -135,7 +135,7 @@ function eggDEB!(Sardine, model)
     ## Energy fluxes
     pS = (model.p_M * model.Tc) * V  #p_M_T*V
     pC = ((Sardine.EggEn / V) * (model.Eg * (model.v_rate * model.Tc) * (V ^ (2/3)) + pS)/(model.Kappa * (Sardine.EggEn / V) + model.Eg))
-    pJ = model.k_J * Sardine.H
+    pJ = model.k_J * Sardine.H * model.Tc
 
     ## Variation in the state variables
     deltaEggEn = 0.0 - pC # must be negative because eggs do not eat 
@@ -222,7 +222,7 @@ v_T = model.v_rate * model.Tc
 pA = (Sardine.f_i * model.p_Am* model.Tc * Sardine.s_M_i * (Vdyn ^ (2/3)))
 pS = p_M_T * Vdyn
 pC = ((Endyn/Vdyn) * (model.Eg * v_T * Sardine.s_M_i * (Vdyn ^ (2/3)) + pS) / (model.Kappa * (Endyn/ Vdyn) + model.Eg))
-pJ = model.k_J * Hdyn
+pJ = model.k_J * Hdyn * model.Tc
 deltaEn = (pA - pC) * model.DEB_timing
 
 # die due to starvation
@@ -333,7 +333,7 @@ function adultDEB!(Sardine, model)
     pA = (Sardine.f_i * model.p_Am * model.Tc * Sardine.s_M_i * (Vdyn ^ (2/3)))
     pS = p_M_T * Vdyn
     pC = ((Endyn/Vdyn) * (model.Eg * (model.v_rate * model.Tc) * Sardine.s_M_i * (Vdyn ^ (2/3)) + pS) / (model.Kappa * (Endyn/ Vdyn) + model.Eg))
-    pJ = model.k_J * Hdyn  # should not take into account the temperature?
+    pJ = model.k_J * Hdyn  * model.Tc# should not take into account the temperature?
     deltaEn = (pA - pC) * model.DEB_timing
     
     deltaV = ((model.Kappa * pC - pS) / model.Eg) * model.DEB_timing #pG
