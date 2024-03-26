@@ -9,24 +9,26 @@ include("5agent_step!.jl")
 include("complex_step.jl")
 
 # test in parallelo -------------
-# first run including steady state:
-#temp
-modello = model_initialize(1000.0, 1000.0, 1000.0, 0.0, 50000.0, 1.0, 115.0, 0.945, 
-                                vcat(repeat([15.0], 365*5), collect(range(15.0, stop = 18.0,length=(365*5 +1) ))))
-                                #agent_ids = [agent.id for agent in values(allagents(modello))]
-#K values
-modello = model_initialize(1000.0, 1000.0, 1000.0, 0.0, 50000.0, 1.0, 115.0, 
-vcat(repeat([0.945], 365*10), collect(range(0.945, stop = 0.90, length=(365*10 +1)))), 15)
 
-modello = model_initialize(0.0, 0.0, 100.0, 0.0, 50000.0, 1.0, 115.0, 0.9, 15)
+temp_increase_vector = vcat(repeat([15.0], 365*10), collect(range(15.0, stop = 18.0,length=(365*10 +1) )),repeat([18.0], 365*10) )
+K_decrease_vector = vcat(repeat([0.945], 365*10), collect(range(0.945, stop = 0.90, length=(365*10 +1))),vcat(repeat([0.90], 365*10)))
 
-# no forcings
+# steady state ---------- 15 degree for 30 years
 
-modello = model_initialize(100.0, 100.0, 100.0, 0.0, 50000.0, 1.0, 115.0, 0.945, 15)
+modello = model_initialize(750.0, 1500.0, 750.0, 0.0, 5000.0, 1.0, 1150.0, 0.945, 15)
 
-# if you have steady state ---------------------
-modello = AgentsIO.load_checkpoint("steadystate.jl")
+#temp increase 15 to 18 degree ------------
+modello = model_initialize(7500.0, 15000.0, 7500.0, 0.0, 50000.0, 1.0, 115.0, 0.945, temp_increase_vector)
 
+#K values --------
+modello = model_initialize(7500.0, 15000.0, 7500.0, 0.0, 50000.0, 1.0, 115.0,  K_decrease_vector, 15)
+
+# k values + temp effect -----------------
+modello = model_initialize(750.0, 1500.0, 750.0, 0.0, 5000.0, 1.0, 1150.0,
+                                                        temp_increase_vector,
+                                                        K_decrease_vector)
+
+# running -----------------
 
 results = []
 num_runs = 1
@@ -54,7 +56,7 @@ for i in 1:num_runs
     # Run the model
     #step!(modello, dummystep, complex_step!,365*5)
     #AgentsIO.save_checkpoint("steadystate_K.jl", modello) # steady state first 10 years
-    df_agent = run!(modello,365*10; adata, mdata) #store results
+    df_agent = run!(modello,365*30; adata, mdata) #store results
 
     # Store the result in the results array
     push!(results, df_agent)
