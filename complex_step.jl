@@ -15,15 +15,18 @@ function complex_step!(model)
 
     remove_all!(model, is_dead)
 
-    eggmass_ids = [sardine for sardine in sEA(model) if hasid(model, sardine) && model[sardine].type == :eggmass]
+    sEA_ids = sEA(model)
+    eggmass_ids = filter!(id -> hasid(model, id) && model[id].type == :eggmass, copy(sEA_ids))
+    adult_ids = filter!(id -> hasid(model, id) && model[id].type == :adult, sEA_ids)
+
     for sardine in eggmass_ids
         egghatch!(model[sardine], model) #generate new agents with add!
     end
 
-    adult_ids = [sardine for sardine in sEA(model) if hasid(model, sardine) && model[sardine].type == :adult]
     for sardine in adult_ids
         adultspawn!(model[sardine], model) #generate new agents with add!
     end
+    
     evolve_environment!(model)
 end
  

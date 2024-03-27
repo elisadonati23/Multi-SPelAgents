@@ -35,17 +35,19 @@ for i in 1:num_runs
     
     # Run the model
     
-    df_agent = run!(modello,365*30; adata, mdata)
+    df_agent = run!(modello,365*20; adata, mdata)
 
     # Store the result in the results array
     push!(results, df_agent)
     end_time = Dates.now()
     duration = end_time - start_time
-    println("Simulation in parallel $i took: ", duration)
+    minutes = Dates.Minute(duration)
+    println("Simulation in parallel $i took: ", minutes, " minutes")
 end 
 
-AgentsIO.save_checkpoint("steady_30y_15_0945.jl", modello)
-println(sort(collect(allids(modello))))
+#10 anni in 10 minuti, vector_params ci impiega 3 volte tanto e da risultati diversi
+#20 anni in 36 minuti
+AgentsIO.save_checkpoint("steady_20y_15_0945.jl", modello)
 diagnostic_plots(results, results[1][2])
 
 
