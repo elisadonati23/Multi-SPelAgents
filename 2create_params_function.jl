@@ -7,7 +7,7 @@ function create_params(
     day_of_the_year,
     Xmax::Union{Float64, Vector{Float64}},
     Kappa::Union{Float64, Vector{Float64}},
-    Temp::Union{Int64, Vector{Float64}})
+    Temp::Union{Float64, Vector{Float64}})
 
     #fixed parameters
     Kappa_value = Kappa[1]
