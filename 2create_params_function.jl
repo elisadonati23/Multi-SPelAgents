@@ -10,6 +10,8 @@ function create_params(
     Temp::Union{Int64, Vector{Float64}})
 
     #fixed parameters
+    Kappa_value = Kappa[1]
+    Tc_value = Temp[1]
     f = 1.0 
     r_food = 0.5
     DEB_timing = 1.0
