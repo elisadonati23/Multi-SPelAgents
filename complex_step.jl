@@ -28,6 +28,7 @@ function complex_step!(model)
     end
     
     evolve_environment!(model)
+    update_outputs!(model)
 end
  
 

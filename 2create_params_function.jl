@@ -9,7 +9,7 @@ function create_params(
     day_of_the_year,
     Xmax,
     f = 1.0,
-    Temp = 15, 
+    Temp = 15.0, 
     r_food = 0.5,  
     DEB_timing = 1.0, 
     model_step = 0,
