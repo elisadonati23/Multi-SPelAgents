@@ -82,6 +82,7 @@ function create_params(
     spawn_period = days_between_dates(repro_start, repro_end)
 
     Xall = Xmax[1] #step initialization#
+    Xmax_value = Xmax[1]
     #del_X = r_food * (Xmax - Xall)
 
     #arrhenius temperature -- it can be a value or a vector depending on Temp
@@ -145,6 +146,7 @@ model_parameters = Dict(
         :Wv => Wv,
         :day_of_the_year => day_of_the_year,
         :f => f,
+        :Xmax_value => Xmax_value, 
         :r_food => r_food,
         :DEB_timing => DEB_timing,
         :day_of_the_year => day_of_the_year,

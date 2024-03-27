@@ -39,6 +39,14 @@ function update_Tc!(model, Tc::Vector{Float64})
     model.Tc_value = Tc[model.sim_timing]
 end
 
+function update_Xmax!(model, Xmax::Float64)
+    model.Xmax_value = Xmax
+end
+
+function update_Xmax!(model, Xmax::Vector{Float64})
+    model.Xmax_value = Xmax[model.sim_timing]
+end
+
 function evolve_environment!(model)
     
     # day counter
@@ -55,10 +63,10 @@ function evolve_environment!(model)
     update_Tc!(model, model.Tc)
     update_Kappa!(model, model.Kappa)
 
-    ##calculate Xall
+    # calculate Xall
     # Xall is initialized like X, which is set to Xmax (look at params)
     # remove the assimilation of all agents:
-    Xall = model.Xall - (calculate_sum_prop(model, "pA")/ model.KappaX) / model.Wv
+    Xall = model.Xmax_value - (calculate_sum_prop(model, "pA")/ model.KappaX) / model.Wv
     #
      if Xall < 0.0  
          Xall = 0.0 
@@ -74,8 +82,7 @@ function evolve_environment!(model)
     else
         #rapporto tra quello disponibile e quello che si mangia su base di taglia e Tc!!
         # ATTENZIONE QUANDO TC SARà VETTORE
-    Xmax_value = isa(model.Xmax, Vector{Float64}) ? model.Xmax[model.sim_timing] : model.Xmax
-    f = (Xmax_value * model.Wv * model.KappaX) / calculate_sum_assimilation(model)
+    f = (model.Xmax_value * model.Wv * model.KappaX) / calculate_sum_assimilation(model)
     end
     
     
@@ -88,9 +95,11 @@ function evolve_environment!(model)
     if !isempty(females)
         interquantiles_prop(model, :Ww, :QWw, :adult, "Female")
     end
+    return
+end
 
-    #update outputs
-    # outputs
+
+function update_outputs!(model)
     adults_juv = filter(a -> (a.type == :adult || a.type == :juvenile), agents) 
     if !isempty(adults_juv)
     # B plot
@@ -102,8 +111,8 @@ function evolve_environment!(model)
     model.sdAdWw =  calculate_sd_prop(model, "Ww", type = :adult)
     model.meanJuvWw = calculate_mean_prop(model, "Ww", type = :juvenile)
     model.sdJuvWw = calculate_sd_prop(model, "Ww", type = :juvenile)
-    model.meanFAdWw = calculate_mean_prop(model, "Ww", type = :adult, sex = "Female", age = 3.0)
-    model.sdFAdWw =  calculate_sd_prop(model, "Ww", type = :adult, sex = "Female")
+    #model.meanFAdWw = calculate_mean_prop(model, "Ww", type = :adult, sex = "Female", age = 3.0)
+    #model.sdFAdWw =  calculate_sd_prop(model, "Ww", type = :adult, sex = "Female")
     #mean L plot
     model.meanAdL = calculate_mean_prop(model, "Lw", type = :adult)
     model.sdAdL = calculate_sd_prop(model, "Lw", type = :adult)
@@ -114,8 +123,8 @@ function evolve_environment!(model)
     model.sd_tpuberty = calculate_sd_prop(model, "t_puberty", type = :adult)
     end
     #mean spawnings
-    model.mean_batch_eggs = mean_eggs(model)
-    model.mean_spawning_events = mean_spawning(model)
+    #model.mean_batch_eggs = mean_eggs(model)
+    #model.mean_spawning_events = mean_spawning(model)
     return
 end
 
