@@ -9,7 +9,7 @@ include("5agent_step!.jl")
 include("complex_step.jl")
 
 # test in parallelo ----
-modello = model_initialize(10.0, 10.0, 10.0, 0.0, 50000.0, 1.0, 110.0)
+modello = model_initialize(7500.0, 15000.0, 7500.0, 0.0, 50000.0, 1.0, 110.0)
 #agent_ids = [agent.id for agent in values(allagents(modello))]
 results = []
 num_runs = 1
@@ -35,7 +35,7 @@ for i in 1:num_runs
     
     # Run the model
     
-    df_agent = run!(modello,365*3; adata, mdata)
+    df_agent = run!(modello,365*30; adata, mdata)
 
     # Store the result in the results array
     push!(results, df_agent)
@@ -44,10 +44,10 @@ for i in 1:num_runs
     println("Simulation in parallel $i took: ", duration)
 end 
 
-#Simulation in parallel 1 took: 47945 milliseconds
-#Simulation in parallel 1 took: 614367 milliseconds
+AgentsIO.save_checkpoint("steady_30y_15_0945.jl", modello)
 println(sort(collect(allids(modello))))
 diagnostic_plots(results, results[1][2])
+
 
 #"""
 #    allids(model)
