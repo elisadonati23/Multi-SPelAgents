@@ -11,7 +11,6 @@ function create_params(
 
     #fixed parameters
     Kappa_value = Kappa[1]
-    Tc_value = Temp[1]
     f = 1.0 
     r_food = 0.5
     DEB_timing = 1.0
@@ -87,6 +86,7 @@ function create_params(
 
     #arrhenius temperature -- it can be a value or a vector depending on Temp
     Tc = exp.( Ta /Tr .- Ta ./ (Temp .+ 273.0))
+    Tc_value = Tc[1]
     
     # Define the reproduction periods for each size class
     repro_periods_Q = Dict("Q1" => (1.0, repro_end),
@@ -140,6 +140,8 @@ model_parameters = Dict(
         :No_J => Float64(No_J),
         :No_Egg => Float64(No_Egg),
         :Temp => Temp,
+        :Tc_value => Tc_value,
+        :Kappa_value => Kappa_value,  
         :Wv => Wv,
         :day_of_the_year => day_of_the_year,
         :f => f,

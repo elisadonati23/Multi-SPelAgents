@@ -23,6 +23,21 @@ end
 
 ## ENVIRONMENT ----
 #########################################################################################
+function update_Kappa!(model, Kappa::Float64)
+    model.Kappa_value = Kappa
+end
+
+function update_Kappa!(model, Kappa::Vector{Float64})
+    model.Kappa_value = Kappa[model.sim_timing]
+end
+
+function update_Tc!(model, Tc::Float64)
+    model.Tc_value = Tc
+end
+
+function update_Tc!(model, Tc::Vector{Float64})
+    model.Tc_value = Tc[model.sim_timing]
+end
 
 function evolve_environment!(model)
     
@@ -36,11 +51,9 @@ function evolve_environment!(model)
     #increase time checher
     model.sim_timing += 1
 
-    model.Kappa_value = isa(model.Kappa, Vector{Float64}) ? model.Kappa[model.sim_timing] : model.Kappa
-    model.Tc_value = isa(model.Tc, Vector{Float64}) ? model.Tc[model.sim_timing] : model.Tc
-
-    #model.max_ID = maximum([agent.id for agent in values(allagents(model))])
-    #println("Day of the year: $(model.day_of_the_year) and max_ID $(model.max_ID)")
+    #faster options to check if temp and kappa are vectors
+    update_Tc!(model, model.Tc)
+    update_Kappa!(model, model.Kappa)
 
     ##calculate Xall
     # Xall is initialized like X, which is set to Xmax (look at params)
@@ -138,7 +151,7 @@ function eggDEB!(Sardine, model)
 
     ## Energy fluxes
     pS = (model.p_M * model.Tc_value) * V  #p_M_T*V
-    pC = ((Sardine.EggEn / V) * (model.Eg * (model.v_rate * model.Tc_value) * (V ^ (2/3)) + pS)/(Kappa_value * (Sardine.EggEn / V) + model.Eg))
+    pC = ((Sardine.EggEn / V) * (model.Eg * (model.v_rate * model.Tc_value) * (V ^ (2/3)) + pS)/(model.Kappa_value * (Sardine.EggEn / V) + model.Eg))
     pJ = model.k_J * Sardine.H * model.Tc_value
 
     ## Variation in the state variables

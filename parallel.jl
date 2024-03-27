@@ -8,14 +8,16 @@ include("4model_initialize.jl")
 include("5agent_step!.jl")
 include("complex_step.jl")
 
+
+# steady state ---------- 15 degree for 30 years
+
+modello = model_initialize(7500.0, 15000.0, 7500.0, 0.0, 50000.0, 1.0, 1150.0, 0.945, 15)
+
 # test in parallelo -------------
 
 temp_increase_vector = vcat(repeat([15.0], 365*10), collect(range(15.0, stop = 18.0,length=(365*10 +1) )),repeat([18.0], 365*10) )
 K_decrease_vector = vcat(repeat([0.945], 365*10), collect(range(0.945, stop = 0.90, length=(365*10 +1))),vcat(repeat([0.90], 365*10)))
 
-# steady state ---------- 15 degree for 30 years
-
-modello = model_initialize(750.0, 1500.0, 750.0, 0.0, 5000.0, 1.0, 1150.0, 0.945, 15)
 
 #temp increase 15 to 18 degree ------------
 modello = model_initialize(7500.0, 15000.0, 7500.0, 0.0, 50000.0, 1.0, 115.0, 0.945, temp_increase_vector)
@@ -54,9 +56,8 @@ for i in 1:num_runs
     df_model = init_model_dataframe(modello, mdata)
     
     # Run the model
-    #step!(modello, dummystep, complex_step!,365*5)
-    #AgentsIO.save_checkpoint("steadystate_K.jl", modello) # steady state first 10 years
-    df_agent = run!(modello,365*30; adata, mdata) #store results
+    df_agent = run!(modello,365*10; adata, mdata)
+    #AgentIO_save_checkpoint("steady_vectorparams_15_0945_30y.jl", modello)
 
     # Store the result in the results array
     push!(results, df_agent)
@@ -65,11 +66,10 @@ for i in 1:num_runs
     println("Simulation in parallel $i took: ", duration)
 end
 
-#AgentsIO.save_checkpoint("modello.jl", modello)
-
-#println(sort(collect(allids(modello))))
 diagnostic_plots(results, results[1][2])
 
+result10 = results 
+#first 10 years took 30min
 
 # Group by step and type, and count the number of agents for each group
 summary_df = groupby(results[1][1], [:step, :type])
