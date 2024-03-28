@@ -11,7 +11,7 @@ include("complex_step.jl")
 
 # steady state ---------- 15 degree for 30 years
 
-modello = model_initialize(7500.0, 15000.0, 7500.0, 0.0, 50000.0, 1.0, 1150.0, 0.945, 15) 
+modello = model_initialize(1000.0, 2000.0, 1000.0, 0.0, 50000.0, 1.0, 1150.0, 0.945, 15.0) 
 
 # test in parallelo -------------
 
@@ -56,15 +56,16 @@ for i in 1:num_runs
     df_model = init_model_dataframe(modello, mdata)
     
     # Run the model
-    df_agent = run!(modello,365*20; adata, mdata)
+    df_agent = run!(modello,365*10; adata, mdata)
     #AgentIO_save_checkpoint("steady_vectorparams_15_0945_30y.jl", modello)
 
     # Store the result in the results array
     push!(results, df_agent)
     end_time = Dates.now()
     duration = end_time - start_time
-    minutes = Dates.Minute(duration)
-    println("Simulation in parallel $i took: ", minutes, " minutes")
+    minutes = duration / Dates.Minute(1)
+    rounded_minutes = round(Int, minutes)
+    println("Simulation $i took: ", minutes, " minutes")
 end
 
 diagnostic_plots(results, results[1][2])

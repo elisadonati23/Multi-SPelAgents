@@ -89,6 +89,12 @@ function evolve_environment!(model)
     
     ## Ensure that f is bounded between 0 and 1
     model.f = max(0, min(f, 1.0)) # not 1 but 0.8  ## ????? check haberle
+
+    return
+end
+
+
+function update_outputs!(model)
     agents = collect(values(allagents(model)))
     females = filter(a -> a.type == :adult && a.Sex == "Female", agents)
 
@@ -96,11 +102,6 @@ function evolve_environment!(model)
     if !isempty(females)
         interquantiles_prop(model, :Ww, :QWw, :adult, "Female")
     end
-    return
-end
-
-
-function update_outputs!(model)
     adults_juv = filter(a -> (a.type == :adult || a.type == :juvenile), agents) 
     if !isempty(adults_juv)
     # B plot
