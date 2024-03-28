@@ -62,6 +62,7 @@ function evolve_environment!(model)
     #faster options to check if temp and kappa are vectors
     update_Tc!(model, model.Tc)
     update_Kappa!(model, model.Kappa)
+    update_Xmax!(model, model.Xmax)
 
     # calculate Xall
     # Xall is initialized like X, which is set to Xmax (look at params)
