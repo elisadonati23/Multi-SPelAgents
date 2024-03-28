@@ -35,7 +35,7 @@ for i in 1:num_runs
     
     # Run the model
     
-    df_agent = run!(modello,365*3; adata, mdata)
+    df_agent = run!(modello,365*5; adata, mdata)
 
     # Store the result in the results array
     push!(results, df_agent)

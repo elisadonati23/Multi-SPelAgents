@@ -78,7 +78,7 @@ function update_outputs!(model)
 
     #update outputs
     # outputs
-    adults_juv = filter(a -> (a.type == :adult || a.type == :juvenile), agents) 
+    adults_juv = filter(a -> (a.type == :adult || a.type == :juvenile), agents)  
     if !isempty(adults_juv)
     # B plot
     model.TotB = calculate_sum_prop(model, "Ww")
@@ -474,3 +474,4 @@ function adultspawn!(Sardine, model)
     end
     return
 end
+ 

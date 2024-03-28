@@ -14,4 +14,3 @@ using DataFrames
 using StatsPlots
 using CategoricalArrays
 using Dates
-using Weave
