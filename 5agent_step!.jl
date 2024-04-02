@@ -134,14 +134,14 @@ end
 #########################################################################################
 
 function parallel_eggmass_step!(Sardine, model)
-    eggaging!(Sardine, model)
     eggDEB!(Sardine, model)
+    eggaging!(Sardine, model)
 end
 
 function eggmass_step!(Sardine, model)
     eggDEB!(Sardine, model)
-    eggaging!(Sardine, model)
     egghatch!(Sardine, model)
+    eggaging!(Sardine, model)
 end
 
 function eggaging!(Sardine, model)
@@ -222,10 +222,10 @@ end
 
 
 function parallel_juvenile_step!(Sardine, model)
-    juveaging!(Sardine, model)
     juvedie!(Sardine, model)
     juveDEB!(Sardine, model)
     juvemature!(Sardine,model)
+    juveaging!(Sardine, model)
 
 end
 
@@ -338,17 +338,16 @@ end
 # adult ----
 
 function parallel_adult_step!(Sardine, model)
-    adultaging!(Sardine, model)
     adultdie!(Sardine, model)
     adultDEB!(Sardine, model)
-
+    adultaging!(Sardine, model)
 end
 
 function adult_step!(Sardine, model)
     adultdie!(Sardine, model)
     adultDEB!(Sardine, model)
     adultaging!(Sardine, model)
-    adultspawn!(Sardine, model) #lo tengo nello stesso ordine del parallelo x avere stessi risultati
+    adultspawn!(Sardine, model) #same order of parallel step
 end
 
 function adultDEB!(Sardine, model)
