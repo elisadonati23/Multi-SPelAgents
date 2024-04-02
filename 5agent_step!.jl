@@ -140,8 +140,8 @@ end
 
 function eggmass_step!(Sardine, model)
     eggDEB!(Sardine, model)
-    egghatch!(Sardine, model)
     eggaging!(Sardine, model)
+    egghatch!(Sardine, model) #stesso ordine del parallel_adult_step per essere confrontabili
 end
 
 function eggaging!(Sardine, model)
