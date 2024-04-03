@@ -11,25 +11,29 @@ include("complex_step.jl")
 
 # steady state ---------- 15 degree for 30 years
 
-modello = model_initialize(7500.0, 15000.0, 7500.0, 0.0, 50000.0, 1.0, 1150.0, 0.945, 15.0) 
+modello = model_initialize(15000.0, 30000.0, 1500.0, 0.0, 50000.0, 1.0, 115.0, 0.945, 18.0) 
 
 # test in parallelo -------------
 
 temp_increase_vector = vcat(repeat([15.0], 365*10), collect(range(15.0, stop = 18.0,length=(365*10 +1) )),repeat([18.0], 365*10) )
 K_decrease_vector = vcat(repeat([0.945], 365*10), collect(range(0.945, stop = 0.90, length=(365*10 +1))),vcat(repeat([0.90], 365*10)))
+temp_revert_vector = vcat(repeat([15.0], 365*10), collect(range(15.0, stop = 18.0,length=(365*5) )),collect(range(18.0, stop = 15.0,length=(365*15) )),repeat([15.0], 365*10+1) )
 
 
 #temp increase 15 to 18 degree ------------
-modello = model_initialize(7500.0, 15000.0, 7500.0, 0.0, 50000.0, 1.0, 115.0, 0.945, temp_increase_vector)
+modello = model_initialize(15000.0, 30000.0, 15000.0, 0.0, 50000.0, 1.0, 115.0, 0.945, temp_increase_vector)
 
 #K values --------
-modello = model_initialize(7500.0, 15000.0, 7500.0, 0.0, 50000.0, 1.0, 115.0,  K_decrease_vector, 15)
+modello = model_initialize(15000.0, 30000.0, 15000.0, 0.0, 50000.0, 1.0, 115.0,  K_decrease_vector, 15.0)
 
 # k values + temp effect -----------------
-modello = model_initialize(750.0, 1500.0, 750.0, 0.0, 5000.0, 1.0, 1150.0,
-                                                        temp_increase_vector,
-                                                        K_decrease_vector)
-
+modello = model_initialize(15000.0, 30000.0, 15000.0, 0.0, 50000.0, 1.0, 115.0,
+                                                        K_decrease_vector,
+                                                        temp_increase_vector)
+# k values + revert temp effect -----------------
+modello = model_initialize(15000.0, 30000.0, 15000.0, 0.0, 50000.0, 1.0, 115.0,
+                                                        K_decrease_vector,
+                                                        temp_revert_vector)
 # running -----------------
 
 results = []
@@ -56,7 +60,7 @@ for i in 1:num_runs
     df_model = init_model_dataframe(modello, mdata)
     
     # Run the model
-    df_agent = run!(modello,365*20; adata, mdata)
+    df_agent = run!(modello,365*30; adata, mdata)
     #AgentIO_save_checkpoint("steady_vectorparams_15_0945_30y.jl", modello)
 
     # Store the result in the results array
@@ -69,9 +73,6 @@ for i in 1:num_runs
 end
 
 diagnostic_plots(results, results[1][2])
-
-result10 = results 
-#first 10 years took 30min
 
 # Group by step and type, and count the number of agents for each group
 summary_df = groupby(results[1][1], [:step, :type])

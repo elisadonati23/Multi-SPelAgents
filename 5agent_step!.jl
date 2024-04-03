@@ -3,21 +3,21 @@
 # wraps --------
 function parallel_sardine_step!(Sardine, model)
     if Sardine.type == :eggmass
-        parallel_eggmass_step!(Sardine, model) # all functions that do not generate or remove agents
+        parallel_eggmass_step!(Sardine, model) # deb + aging
     elseif Sardine.type == :juvenile
-        parallel_juvenile_step!(Sardine, model)  # all functions that do not generate or remove agents
+        parallel_juvenile_step!(Sardine, model)  # die + deb + mature + aging
     elseif Sardine.type == :adult
-        parallel_adult_step!(Sardine, model) # all functions that do not generate or remove agents
+        parallel_adult_step!(Sardine, model) # die deb aging 
     end
 end
 
 function sardine_step!(Sardine, model)
     if Sardine.type == :eggmass
-        eggmass_step!(Sardine, model)
+        eggmass_step!(Sardine, model) # deb + aging + hatch
     elseif Sardine.type == :juvenile
-        parallel_juvenile_step!(Sardine, model)
+        parallel_juvenile_step!(Sardine, model) # die + deb + mature + aging
     elseif Sardine.type == :adult
-        adult_step!(Sardine, model)
+        adult_step!(Sardine, model) # die deb aging + spawn
     end
 end
 
@@ -226,7 +226,6 @@ function parallel_juvenile_step!(Sardine, model)
     juveDEB!(Sardine, model)
     juvemature!(Sardine,model)
     juveaging!(Sardine, model)
-
 end
 
 function juveDEB!(Sardine, model)
