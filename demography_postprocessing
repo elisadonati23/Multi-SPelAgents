@@ -1,0 +1,110 @@
+#you need to run a simulation saving:
+    # Initialize model and data
+    #adata = [(is_adult, count), (is_juvenile, count), (is_eggmass, count)]
+    #adata = [:type, :t_puberty,:Age, :Lw, :Ww, :R, :Dead]
+
+    #mdata = [:day_of_the_year,
+            #:TotB,:JuvB,:AdB]
+
+diagnostic_plots(results, results[1][2])
+
+#CSV.write("results_baseline_last2y_15_0945_multispel_vectorparams.csv", results[1][1])
+results = CSV.read("results_baseline_last2y_15_0945_multispel_vectorparams.csv", DataFrame)
+
+results[!, :type] = Symbol.(results[!, :type])
+results[!, :id] = Symbol.(results[!, :id])
+# HISTOGRAMS AND BOXPLOTS ----------
+# Group by step and type, and count the number of agents for each group
+summary_df = groupby(results, [:time, :type])
+summary_df = combine(summary_df, nrow => :count)
+
+# Plot a line for each type of agent
+StatsPlots.@df summary_df StatsPlots.plot(:time, :count, group=:type, xlabel="Step", ylabel="Count", title="Number of Agents by Type", legend=:topleft)
+
+using DataFrames
+
+# Group by step and type, and sum the Ww for each group
+summary_Ww = groupby(results[1][1], [:time, :type])
+summary_Ww = combine(summary_Ww, :Ww => sum => :total_Ww)
+
+StatsPlots.@df summary_Ww StatsPlots.plot(:time, :total_Ww, group=:type, xlabel="Step", ylabel="Total Biomass", title="Ww of Agents by Type", legend=:topleft)
+
+# Death age plots -- Lifespan
+grouped_df = groupby(results, :id)
+last_row_df = combine(grouped_df, names(results) .=> last)
+show(last_row_df, allcols = true)
+last_row_df_adults = filter(row -> row.type_last == :adult, last_row_df)
+last_row_df_juvenile = filter(row -> row.type_last == :juvenile, last_row_df)
+last_row_df_eggs = filter(row -> row.type_last == :eggmass, last_row_df)
+histogram(last_row_df_adults[!,:Age_last]/365.0, bins=10, xlabel="Age", ylabel="Frequency", title="Lifespan of Adults")
+#histogram(last_row_df_juvenile[!,:Age_last], bins=20, xlabel="Age", ylabel="Frequency", title="Histogram of Juvenile Age at death")
+#histogram(last_row_df_eggs[!,:Age_last], bins=20, xlabel="Age", ylabel="Frequency", title="Histogram of EggMass Days at death")
+
+# Length at puberty ---------
+
+adults_df = filter(row -> row[:type] == :adult, results)
+
+# Filter take the row where Age == t_puberty
+missing_values_df = filter(row -> ismissing(row[:Age]) || ismissing(row[:t_puberty]), adults_df)
+# Remove rows from adults_df that are in missing_values_df
+
+filtered_df = filter(row -> !ismissing(row[:Age]) && !ismissing(row[:t_puberty]) && row[:Age] == row[:t_puberty], adults_df)
+
+# Create a new plot with a boxplot of :Lw
+p1 = StatsPlots.@df filtered_df StatsPlots.boxplot(:Lw, title="Length and Weight at Puberty", ylabel="Length (cm)", fillalpha=0.75, linewidth=2, legend = false)
+
+p2 = twinx()
+# Add a boxplot of :Ww to the right y-axis
+p2 = StatsPlots.@df filtered_df StatsPlots.boxplot!(p2, :Ww, ylabel="Weight (g)", fillalpha=0.75, linewidth=2, fillcolor=:orange, legend = false)
+
+
+# Ultimate size observed in adults --------------
+# take the max size for each adult
+grouped_df = groupby(adults_df, :id)
+max_size_df = combine(grouped_df, :Lw => maximum => :max_Lw)
+histogram(max_size_df[!,:max_Lw], bins=25, xlabel="Max Lw (cm)", ylabel="Frequency", title="Adults Max Length (cm)", legend = false)
+#min_size_df = combine(grouped_df, :Lw => minimum => :min_Lw)
+#histogram(min_size_df[!,:min_Lw], bins=50, xlabel="Max Lw", ylabel="Frequency", title="Histogram of Adults Min Lw")
+
+# Ww and Lw and R for age classes ---------------
+
+using CategoricalArrays
+# Assuming `adults_df` is your DataFrame
+# create a new variable age_year
+adults_df = transform(adults_df, :Age => (x -> ceil.(x / 365)) => :Age_year)
+#adults_df[!, :Age_year] = categorical(adults_df[!, :Age_year])
+adults_df = dropmissing(adults_df)
+
+# Create the boxplots without plotting them immediately
+p1 = StatsPlots.@df adults_df Plots.plot(:Age_year, :Lw, seriestype=:boxplot, fillalpha=0.75, linewidth=2, fillcolor=:green, title="Length of Age classes", ylabel="Length (cm)", xlabel="Age (years)", legend=false)
+p2 = StatsPlots.@df adults_df Plots.plot(:Age_year, :Ww, seriestype=:boxplot, fillalpha=0.75, linewidth=2, fillcolor=:orange, title = "Weight of Age classes", ylabel="Weight (g)", xlabel="Age (years)", legend=false)
+p3 = StatsPlots.@df adults_df Plots.plot(:Age_year, :R, seriestype=:boxplot, fillalpha=0.75, linewidth=2, fillcolor=:blue, title="R: reproduction investment", ylabel="Energy (J)", xlabel="Age (years)", legend=false)
+
+# Combine the plots into a single plot with three subplots
+p = Plots.plot(p1, p2, p3, layout=(3, 1), legend=false)
+
+# Ww and Lw for age classes and steps ---------------
+# Group by Age_year and step
+grouped_adults = groupby(adults_df, [:Age_year, :time])
+
+# Calculate mean Ww and Lw for each Age_year and step
+mean_df = combine(grouped_adults, :Ww => mean, :Lw => mean)
+# Convert Age_year to a categorical variable
+mean_df[!, :Age_year] = categorical(mean_df[!, :Age_year])
+Plots.plot(mean_df[!, :time], mean_df[!, :Ww_mean], group = mean_df[!, :Age_year], xlabel="Step", ylabel="Mean Ww", title="Mean Ww by Age_year and Step", legend=:topleft)
+
+# length frequencies juveniles
+juve_df = filter(row -> row[:type] == :juvenile, results)
+grouped_df = groupby(juve_df, :id)
+# Filter Juvenile
+# Find the row with maximum size
+max_size_df = combine(grouped_df, :Lw => maximum => :max_Lw)
+histogram(max_size_df[!,:max_Lw], bins=25, xlabel="Max Lw", ylabel="Frequency", title="Histogram of Juvenile Max Lw")
+min_size_df = combine(grouped_df, :Lw => minimum => :min_Lw)
+histogram(min_size_df[!,:min_Lw], bins=50, xlabel="Max Lw", ylabel="Frequency", title="Histogram of Juvenile Min Lw")
+
+max_age_df = combine(grouped_df, :Age => maximum => :max_Age)
+histogram(max_age_df[!,:max_Age], bins=25, xlabel="Max Age", ylabel="Frequency", title="Histogram of Juvenile Max Age")
+min_age_df = combine(grouped_df, :Age => minimum => :min_Age)
+histogram(min_age_df[!,:min_Age], bins=50, xlabel="Max Age", ylabel="Frequency", title="Histogram of Juvenile Min Age")
+

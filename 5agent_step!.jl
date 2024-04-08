@@ -369,7 +369,7 @@ function adultDEB!(Sardine, model)
     pA = (Sardine.f_i * model.p_Am * model.Tc_value * Sardine.s_M_i * (Vdyn ^ (2/3)))
     pS = p_M_T * Vdyn
     pC = ((Endyn/Vdyn) * (model.Eg * (model.v_rate * model.Tc_value) * Sardine.s_M_i * (Vdyn ^ (2/3)) + pS) / (model.Kappa_value * (Endyn/ Vdyn) + model.Eg))
-    pJ = model.k_J * Hdyn  * model.Tc_value# should not take into account the temperature?
+    pJ = model.k_J * Hdyn  * model.Tc_value # should not take into account the temperature?
     deltaEn = (pA - pC) * model.DEB_timing
     
     deltaV = ((model.Kappa_value * pC - pS) / model.Eg) * model.DEB_timing #pG
