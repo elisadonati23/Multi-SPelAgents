@@ -62,7 +62,7 @@ for i in 1:num_runs
     
     # Run the model
     run!(modello,365*18; adata, mdata)
-    AgentIO_save_checkpoint("steady_vectorparams_tempincrease_20y.jl", modello)
+    AgentIO.save_checkpoint("steady_vectorparams_tempincrease_20y.jl", modello)
     df_agent = run!(modello,365*2; adata, mdata)
     # Store the result in the results array
     push!(results, df_agent)
@@ -73,4 +73,5 @@ for i in 1:num_runs
     println("Simulation $i took: ", minutes, " minutes")
 end
 
-results
+results[1][1]
+CSV.write("steady_tempincrease_20y.csv", results[1][1])

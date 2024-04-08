@@ -1,35 +1,4 @@
-# demography post processing Multi-spel agents simulations
-results <- read.csv("~/PhD/Multi-SPelAgents/results_baseline_last2y_15_0945_multispel_vectorparams.csv")
 
-library(ggplot2)
-library(tidyr)
-library(dplyr)
-
-# Convert the type and id columns to factors
-results$type <- as.factor(results$type)
-results$id <- as.factor(results$id)
-
-# Group by time and type, and count the number of agents for each group
-summary_df <- results %>%
-  group_by(time, type) %>%
-  summarise(count = n())
-
-# Plot a line for each type of agent
-ggplot(summary_df, aes(x = time, y = count, color = type)) +
-  geom_line() +
-  labs(x = "Step", y = "Count", title = "Number of Agents by Type") +
-  theme(legend.position = "topleft")
-
-# Group by time and type, and sum the Ww for each group
-summary_Ww <- results %>%
-  group_by(time, type) %>%
-  summarise(total_Ww = sum(Ww))
-
-# Plot a line for each type of agent
-ggplot(summary_Ww, aes(x = time, y = total_Ww, color = type)) +
-  geom_line() +
-  labs(x = "Step", y = "Total Biomass", title = "Ww of Agents by Type") +
-  theme(legend.position = "topleft")
 
 # Death age plots -- Lifespan
 grouped_df <- results %>%
@@ -132,3 +101,63 @@ p2 <- bwplot(Ww ~ 1, data = filtered_df, ylab = "Weight (g)", box.fill = TRUE, f
 
 # Combine the two plots with a double y-axis
 doubleYScale(p1, p2, style1 = 1, style2 = 1, add.ylab2 = TRUE, text = c("Length (cm)", "Weight (g)"))
+
+# demography post processing Multi-spel agents simulations
+results <- read.csv("~/PhD/Multi-SPelAgents/results_baseline_last2y_15_0945_multispel_vectorparams.csv")
+
+library(ggplot2)
+library(tidyr)
+library(dplyr)
+
+# Convert the type and id columns to factors
+results$type <- as.factor(results$type)
+results$id <- as.factor(results$id)
+
+# Group by time and type, and count the number of agents for each group
+summary_df <- results %>%
+  group_by(time, type) %>%
+  summarise(count = n())
+
+# Plot a line for each type of agent
+ggplot(summary_df, aes(x = time, y = count, color = type)) +
+  geom_line() +
+  labs(x = "Step", y = "Count", title = "Number of Agents by Type") +
+  theme(legend.position = "topleft")
+
+# Group by time and type, and sum the Ww for each group
+summary_Ww <- results %>%
+  group_by(time, type) %>%
+  summarise(total_Ww = sum(Ww))
+
+# Plot a line for each type of agent
+ggplot(summary_Ww, aes(x = time, y = total_Ww, color = type)) +
+  geom_line() +
+  labs(x = "Step", y = "Total Biomass", title = "Ww of Agents by Type") +
+  theme(legend.position = "topleft")
+
+# Length/age number of adults for each bins
+
+results <- results %>% 
+  group_by(Lw, time) %>% 
+  summarise(tot_B = sum(Ww, na.rm = TRUE), count = n())
+
+# Group by length bin, then calculate the mean total biomass and count over the year
+summary_df <- results %>% 
+  group_by(Lw_bin) %>% 
+  summarise(mean_tot_B = mean(tot_B, na.rm = TRUE), mean_count = mean(count, na.rm = TRUE))
+
+# Plot the mean total biomass for each length bin
+ggplot(summary_df, aes(x = Lw_bin, y = mean_tot_B, fill = mean_tot_B)) +
+  geom_tile() +
+  scale_fill_gradient(low = "white", high = "blue") +
+  labs(x = "Length Bin (cm)", y = "Mean Total Biomass (g)", title = "Mean Total Biomass by Length over the Year") +
+  theme_minimal()
+
+# Plot the mean count for each length bin
+ggplot(summary_df, aes(x = Lw_bin, y = mean_count, fill = mean_count)) +
+  geom_tile() +
+  scale_fill_gradient(low = "white", high = "blue") +
+  labs(x = "Length Bin (cm)", y = "Mean Count", title = "Mean Count by Length over the Year") +
+  theme_minimal()
+
+  # do the same for the ages
