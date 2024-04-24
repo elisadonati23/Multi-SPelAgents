@@ -10,7 +10,7 @@
 include("00dependencies.jl")
 diagnostic_plots(results, results[1][2])
 
-results = CSV.read("steady_tempincrease_20y.csv", DataFrame)
+results = CSV.read("steady_K_20y.csv", DataFrame)
 
 results[!, :type] = Symbol.(results[!, :type])
 results[!, :id] = Symbol.(results[!, :id])
@@ -149,11 +149,10 @@ summary_df = combine(summary_df, :tot_B => mean => :mean_tot_B, :count => mean =
 summary_df_na = filter(row -> !any(isnothing, values(row)), summary_df)
 
 # Assuming :Lw_bin is a column of ranges, extract the second element of each range
-
+summary_df_na
 # Add the :Lw_class column as a categorical variable
-summary_df_na[!, :Lw_class] = categorical([1,5,6,7,8,9,10,11,12,13,14,15,16])
+summary_df_na[!, :Lw_class] = categorical([1,5,6,7,8,9,10,11,12,13])
 
 # Plot bars instead of a histogram
 StatsPlots.@df summary_df_na StatsPlots.bar(:Lw_class, :mean_tot_B, title="Mean Total Biomass by Length over the Year", xlabel="Length Bin (cm)", ylabel="Mean Total Biomass (g)", legend = false)
 StatsPlots.@df summary_df_na StatsPlots.bar(:Lw_class, :mean_count, title="Mean Nind by Length over the Year", xlabel="Length Bin (cm)", ylabel="Counts", legend = false)
-

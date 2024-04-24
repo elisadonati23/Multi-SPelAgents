@@ -11,7 +11,10 @@ include("complex_step.jl")
 
 # steady state ---------- 15 degree for 30 years
 
-modello = model_initialize(15000.0, 30000.0, 15000.0, 0.0, 50000.0, 1.0, 115.0, 0.945, 15.0) 
+modello = model_initialize(15000.0, 30000.0, 15000.0, 1.4, 4.0 * 10^15, 1.0, 1.45*10^-9, 0.945, 15.0) 
+
+#parto vicina allo stato stazionario così faccio meno run
+modello = model_initialize(60000.0, 80000.0, 20000.0, 0.0, 50000.0, 1.0, 115.0, 0.945, 15.0) 
 
 # test in parallelo -------------
 #20 anni: 5 + 5 +10
@@ -29,7 +32,7 @@ modello = model_initialize(60000.0, 80000.0, 20000.0, 0.0, 50000.0, 1.0, 115.0, 
 modello = model_initialize(60000.0, 80000.0, 20000.0, 0.0, 50000.0, 1.0, 115.0,  K_decrease_vector, 15.0)
 
 # k values + temp effect -----------------
-modello = model_initialize(60000.0, 80000.0, 20000.0, 0.0, 50000.0, 1.0, 115.0,
+modello = model_initialize(6000.0, 8000.0, 2000.0, 0.0, 5000.0, 1.0, 115.0,
                                                         K_decrease_vector,
                                                         temp_increase_vector)
 # k values + revert temp effect -----------------
@@ -40,8 +43,7 @@ modello = model_initialize(60000.0, 80000.0, 20000.0, 0.0, 50000.0, 1.0, 115.0,
 
 results = []
 num_runs = 1
-#parto vicina allo stato stazionario così faccio meno run
-modello = model_initialize(60000.0, 80000.0, 20000.0, 0.0, 50000.0, 1.0, 115.0, 0.945, 15.0) 
+
 
 # Array to store the results
 
@@ -61,9 +63,8 @@ for i in 1:num_runs
     df_model = init_model_dataframe(modello, mdata)
     
     # Run the model
-    run!(modello,365*18; adata, mdata)
-    AgentIO.save_checkpoint("steady_vectorparams_tempincrease_20y.jl", modello)
-    df_agent = run!(modello,365*2; adata, mdata)
+    #run!(modello,365*18; adata, mdata)
+    df_agent = run!(modello,365*20; adata, mdata)
     # Store the result in the results array
     push!(results, df_agent)
     end_time = Dates.now()
@@ -74,4 +75,4 @@ for i in 1:num_runs
 end
 
 results[1][1]
-CSV.write("steady_tempincrease_20y.csv", results[1][1])
+CSV.write("steady_K_20y.csv", results[1][1])
