@@ -2,3 +2,5 @@ results_baseline_last2y_15_0945_multispel_vectorparams.csv
 steady_vectorparams_15_0945_10y.jl
 steady_mutispel_tempicrease.jl
 steady_tempincrease_20y.csv
+output/march2024/steady_K_20y.csv
+output/march2024/steady_temp&K_20y.csv
