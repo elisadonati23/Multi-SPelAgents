@@ -130,8 +130,9 @@ function update_outputs!(model)
     return
 end
 
-## EGGMASS ----
-#########################################################################################
+                                  #####################
+                                  #      EGGMASS 
+                                  #####################
 
 function parallel_eggmass_step!(Sardine, model)
     eggDEB!(Sardine, model)
@@ -170,8 +171,6 @@ function eggDEB!(Sardine, model)
     if ((model.Kappa_value * pC) < pS)
         model.dead_eggmass += 1.0
         Sardine.Dead = true
-        #remove_agent!(Sardine, model)
-        #println("Removed agent with ID $(Sardine.id)")
         return
     end
 
@@ -196,10 +195,10 @@ end
 
 function egghatch!(Sardine, model)
     if Sardine.Dead == false
-    if (Sardine.H >= model.Hb)
+    if (Sardine.H >= model.Hb) 
         Generation_val = Sardine.Generation
         En_val = Sardine.En
-        Lb_i_val = Sardine.L  
+        Lb_i_val = Sardine.L
         Lw_val = (Sardine.L / model.del_Ml)
         Ww_val = (model.w * (model.d_V * ((Lw_val * model.del_Ml) ^ 3.0) + model.w_E / model.mu_E *(En_val + 0.0))) #R
         Scaled_En_val = En_val / ( model.Em * ((Lw_val * model.del_Ml)^3))
@@ -210,15 +209,16 @@ function egghatch!(Sardine, model)
                             Float64(ceil((1 - model.M_egg) * Float64(floor(Sardine.Nind))))) #Nind
         Sardine.Dead = true
         model.dead_eggmass += 1                                             
-        #remove_agent!(Sardine, model)
-        #println("Removed agent with ID $(Sardine.id)")
         return
     end
     end
     return
 end
 
-# juvenile ----
+                                  #####################
+                                  #      JUVENILE 
+                                  #####################
+
 
 function parallel_juvenile_step!(Sardine, model)
     juvedie!(Sardine, model)
@@ -229,6 +229,7 @@ end
 
 function juveDEB!(Sardine, model)
     if Sardine.Dead == false
+
 Sardine.f_i = model.f
 
 # juvenile store energy into maturation state variable and eventually they mature
@@ -257,8 +258,6 @@ deltaEn = (pA - pC) * model.DEB_timing
 if ((model.Kappa_value * pC) < pS)
 model.deadJ_starved += 1.0
 Sardine.Dead = true
-#remove_agent!(Sardine, model)
-#println("Removed agent with ID $(Sardine.id)")
 return
 end
 
@@ -294,34 +293,41 @@ return
 end
 
 function juvemature!(Sardine, model)
+
     if Sardine.Dead == false
     Sardine.t_puberty += 1.0
 
-    if Sardine.H >= model.Hp
-     #put adult features
-     #Keep the same number of individuals which survived up to now in juvenile superind
-     Sardine.type = :adult
-     Sardine.R = 0.0
-     Sardine.del_M_i = model.del_Ma
-     Sardine.pA = Sardine.f_i * model.p_Am * model.Tc_value * Sardine.s_M_i * ((Sardine.Lw * Sardine.del_M_i)^2.0)
-     Sardine.Generation += 1.0
+        if Sardine.H >= model.Hp
+         #put adult features
+         #Keep the same number of individuals which survived up to now in juvenile superind
+         Sardine.type = :adult
+         Sardine.R = 0.0
+         Sardine.del_M_i = model.del_Ma
+         Sardine.pA = Sardine.f_i * model.p_Am * model.Tc_value * Sardine.s_M_i * ((Sardine.Lw * Sardine.del_M_i)^2.0)
+         Sardine.Generation += 1.0
+        end
+        return
     end
-return
 end
-end
+
+
 
 function juvedie!(Sardine, model)
     if Sardine.Dead == false
         M = model.M_j
-        randomvalue = rand()   
-        if ((1- exp(- M))) >= randomvalue
-        model.deadJ_nat += 1.0
-        Sardine.Dead = true
-        #remove_agent!(Sardine, model)
-        #println("Removed agent with ID $(Sardine.id)")
-            return
+        for i in 1:Sardine.Nind #loop on Nind to check how many should die
+            randomvalue = rand()
+            if ((1- exp(- M))) >= randomvalue
+                model.deadJ_nat += 1.0 #update the counters
+                Sardine.Nind -= 1.0
+                if Sardine.Nind < 10.0 #if the superindividual is with less than 10 individuals it dies
+                    Sardine.Dead = true
+                    break
+                end
+            end
         end
     end
+    return
 end
 
 function juveaging!(Sardine, model) 
@@ -330,9 +336,9 @@ function juveaging!(Sardine, model)
     end
 return
 end
-
-
-# adult ----
+                                  #####################
+                                  #      ADULT 
+                                  #####################
 
 function parallel_adult_step!(Sardine, model)
     adultdie!(Sardine, model)
@@ -409,40 +415,43 @@ end
 end
 
 function adultdie!(Sardine, model)
-    #fishedW = 0
-if Sardine.Dead == false
-    randomnumber = rand()  #controllare che l'estrazione random  sia la stessa     
-
-    #set the new AGE DEPENDENT MORTALITIS
-    if floor(Sardine.Age / 365.0 ) == 0.0
-        M = model.M0 + (model.M_f/365.0)
-    elseif floor(Sardine.Age / 365.0 ) == 1.0
-        M = model.M1 + (model.M_f/365.0)
-    elseif floor(Sardine.Age / 365.0 ) == 2.0
-        M = model.M2 + (model.M_f/365.0)
-    elseif floor(Sardine.Age / 365.0 ) == 3.0
-        M = model.M3 + (model.M_f/365.0)
-    else
-        M = model.M4 + (model.M_f/365.0)
-    end
-
-    if (1.0 - exp(-M)) >= randomnumber
-        if (((1.0 - exp(-M))) >= randomnumber) && (randomnumber > (1.0 - exp(-(M - (model.M_f/365.0))))) # the fish would not have died without fishing
-            model.fished += 1.0
-            #fishedW = fishedW + (model.Ww / 1000)
+    if Sardine.Dead == false
+        #set the new AGE DEPENDENT MORTALITIES -- If Mf is not 0, it is added to M
+        if floor(Sardine.Age / 365.0 ) == 0.0
+            M = model.M0 + (model.M_f/365.0)
+        elseif floor(Sardine.Age / 365.0 ) == 1.0
+            M = model.M1 + (model.M_f/365.0)
+        elseif floor(Sardine.Age / 365.0 ) == 2.0
+            M = model.M2 + (model.M_f/365.0)
+        elseif floor(Sardine.Age / 365.0 ) == 3.0
+            M = model.M3 + (model.M_f/365.0)
         else
-            model.deadA_nat += 1.0
+            M = model.M4 + (model.M_f/365.0)
         end
-        Sardine.Dead = true 
-        #remove_agent!(Sardine, model)
-        #println("Removed agent with ID $(Sardine.id)")
-        return
+
+        for i in 1:Sardine.Nind
+            randomnumber = rand()
+
+            if (1.0 - exp(-M)) >= randomnumber # if dying... why? fishing or natural?
+                #if the fish would not have died without fishing:
+                if (((1.0 - exp(-M))) >= randomnumber) && (randomnumber > (1.0 - exp(-(M - (model.M_f/365.0))))) # the fish would not have died without fishing
+                    model.fished += 1.0 #then it is fished
+                else
+                    model.deadA_nat += 1.0 # it has died of natural mortality
+                end
+                Sardine.Nind -= 1.0
+                if Sardine.Nind < 10.0
+                    Sardine.Dead = true
+                    break
+                end
+            end
+        end
     end
-end  
+    return
 end
 
 function adultaging!(Sardine, model)
-    if Sardine.Dead == false #check that the sardine is not dead
+    if Sardine.Dead == false 
         Sardine.Age += 1.0
     end
     return
