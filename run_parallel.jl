@@ -11,10 +11,10 @@ include("complex_step.jl")
 
 # steady state ---------- 15 degree for 30 years
 
-modello = model_initialize(15000.0, 30000.0, 15000.0, 1.4, 4.0 * 10^15, 1.0, 1.45*10^-9, 0.945, 15.0) 
+#modello = model_initialize(15000.0, 30000.0, 15000.0, 1.4, 4.0 * 10^15, 1.0, 1.45*10^-9, 0.945, 15.0) 
 
 #parto vicina allo stato stazionario così faccio meno run
-modello = model_initialize(60000.0, 80000.0, 20000.0, 0.0, 50000.0, 1.0, 115.0, 0.945, 15.0) 
+modello = model_initialize(60000.0, 80000.0, 20000.0, 1.0, 50000000.0, 1.0, 0.115, 0.945, 15.0) 
 
 # test in parallelo -------------
 #20 anni: 5 + 5 +10

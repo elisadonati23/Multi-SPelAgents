@@ -14,3 +14,5 @@ using DataFrames
 using StatsPlots
 using CategoricalArrays
 using Dates
+
+#add Random Agents Statistics CSV Plots CairoMakie Distributions Colors DataFrames StatsPlots CategoricalArrays Dates
