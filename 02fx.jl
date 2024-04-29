@@ -19,7 +19,7 @@ using Agents, Statistics
 function interquantiles_prop(model, prop, class_prop, agent_type = missing, assign = true, Wwquant = model.Ww_quantiles)
     
     # a function to assign interquantile classes of a property to specified agents.
-    filtered_agents = filter(agent -> hasid(model, agent.id) && (ismissing(agent_type) || agent.type == agent_type), values(allagents(model)))
+    filtered_agents = filter(agent -> hasid(model, agent.id) && (ismissing(agent_type) || agent.type == agent_type), collect(values(allagents(model))))
     
     #Calculate quantiles
     # Wwquant are calculated at the beginning of the Simulation
@@ -55,7 +55,7 @@ function sort_agent(agent_type, model, feature)
 end 
 
 function calculate_mean_prop(model, prop; type = missing, age = missing)
-    all_agents = filter(agent -> hasid(model, agent.id), values(allagents(model)))
+    all_agents = filter(agent -> hasid(model, agent.id), collect(values(allagents(model))))
     
     filtered_agents = filter(agent -> (ismissing(type) || agent.type == type) && (ismissing(age) || agent.Age >= age), all_agents)
 
@@ -69,7 +69,7 @@ end
 
 
 function calculate_sd_prop(model, prop; type = missing)
-    all_agents = filter(agent -> hasid(model, agent.id), values(allagents(model)))
+    all_agents = filter(agent -> hasid(model, agent.id), collect(values(allagents(model))))
     
     filtered_agents = if ismissing(type)
         # Filter agents based on agent types (juvenile, adult)
@@ -89,7 +89,7 @@ end
 
 
 function calculate_sum_prop(model, prop; type = missing, Nind = false)
-    all_agents = filter(agent -> hasid(model, agent.id), values(allagents(model)))
+    all_agents = filter(agent -> hasid(model, agent.id), collect(values(allagents(model))))
     
     filtered_agents = if ismissing(type)
         # Filter agents based on agent types (not eggmass)
@@ -112,7 +112,7 @@ function calculate_sum_prop(model, prop; type = missing, Nind = false)
 end
 
 function calculate_real_assimilation(model)
-    all_agents = filter(agent -> hasid(model, agent.id), values(allagents(model)))
+    all_agents = filter(agent -> hasid(model, agent.id), collect(values(allagents(model))))
     #i Want adults and juveniles
     filtered_agents = filter(agent -> agent.type != :eggmass, all_agents)
 
