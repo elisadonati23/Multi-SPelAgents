@@ -250,10 +250,18 @@ function plot_population_timeseries(adf, nrow, ncol, y_limits = missing)
         for i in 1:nrow*ncol
             current_adf = adf[i][1]
 
+            # Group by 'type' and 'time' and calculate the sum of 'Nind' for each group
+            grouped_adf = combine(groupby(current_adf, [:type, :time]), :Nind => sum)
+
+            # Get the counts for each type
+            egg_count = grouped_adf[grouped_adf[!, :type] .== :eggmass, :]
+            juvenile_count = grouped_adf[grouped_adf[!, :type] .== :juvenile, :]
+            adult_count = grouped_adf[grouped_adf[!, :type] .== :adult, :]
+
             # Plot the data for each category on a subplot
-            Plots.plot!(p[i], current_adf.time, current_adf.count_is_eggmass, color = :yellow, label = "Eggs")
-            Plots.plot!(p[i], current_adf.time, current_adf.count_is_juvenile, color = :blue, label = "Juveniles")
-            Plots.plot!(p[i], current_adf.time, current_adf.count_is_adult, color = :green, label = "Adults")
+            Plots.plot!(p[i], egg_count.time, egg_count.Nind_sum, color = :yellow, label = "Eggs")
+            Plots.plot!(p[i], juvenile_count.time, juvenile_count.Nind_sum, color = :blue, label = "Juveniles")
+            Plots.plot!(p[i], adult_count.time, adult_count.Nind_sum, color = :green, label = "Adults")
 
             # Set the labels for the subplot
             Plots.xlabel!(p[i], "time")
@@ -264,47 +272,6 @@ function plot_population_timeseries(adf, nrow, ncol, y_limits = missing)
             end
         end
 
-        return p
-    catch e
-        println("Failed to generate plot: ", e)
-        return Plots.plot()  # Return an empty plot in case of error
-    end
-end
-
-function plot_param_timeseries(adf, params, ids = missing)
-    # Generate a distinct color for each parameter, plus some extras
-    colors = distinguishable_colors(length(params) + 10)
-    
-    # Filter out yellow
-    colors = filter(c -> c != colorant"yellow", colors)
-    
-    # Take only as many colors as needed
-    colors = colors[1:length(params)]
-    
-    p = Plots.plot()  # Initialize an empty plot
-
-    try 
-        if !ismissing(ids)
-            # Filter the DataFrame by ids if provided
-            adf = filter(row -> row[:id] in ids, adf)
-            # Group the DataFrame by id
-            grouped_data = groupby(adf, [:id])
-
-            for (param, color) in zip(params, colors)
-                for group in grouped_data
-                    id = group[1, :id]
-                    param_values = group[:, Symbol(param)]
-                    Plots.plot!(p, group[!, :time], param_values, color = color, linewidth = 2, label = "ID $id - $param")
-                end
-            end
-        else
-            for (param, color) in zip(params, colors)
-                param_values = adf[:, Symbol(param)]
-                Plots.plot!(p, adf[!, :time], param_values, color = color, linewidth = 2, label = "$param")
-            end
-        end
-
-        Plots.xlabel!(p, "time")
         return p
     catch e
         println("Failed to generate plot: ", e)
