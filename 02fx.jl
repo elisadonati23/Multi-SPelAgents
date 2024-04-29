@@ -248,15 +248,15 @@ function plot_population_timeseries(adf, nrow, ncol, y_limits = missing)
 
     try
         for i in 1:nrow*ncol
-            current_adf = adf[i][1]
+            current_adf = adf[i, 1]
 
             # Group by 'type' and 'time' and calculate the sum of 'Nind' for each group
             grouped_adf = combine(groupby(current_adf, [:type, :time]), :Nind => sum)
 
             # Get the counts for each type
-            egg_count = grouped_adf[grouped_adf[!, :type] .== :eggmass, :]
-            juvenile_count = grouped_adf[grouped_adf[!, :type] .== :juvenile, :]
-            adult_count = grouped_adf[grouped_adf[!, :type] .== :adult, :]
+            egg_count = grouped_adf[grouped_adf.type .== :eggmass, :]
+            juvenile_count = grouped_adf[grouped_adf.type .== :juvenile, :]
+            adult_count = grouped_adf[grouped_adf.type .== :adult, :]
 
             # Plot the data for each category on a subplot
             Plots.plot!(p[i], egg_count.time, egg_count.Nind_sum, color = :yellow, label = "Eggs")
@@ -278,6 +278,7 @@ function plot_population_timeseries(adf, nrow, ncol, y_limits = missing)
         return Plots.plot()  # Return an empty plot in case of error
     end
 end
+
 
 function diagnostic_plots(out_agent, out_model)
     

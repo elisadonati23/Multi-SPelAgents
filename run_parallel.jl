@@ -74,5 +74,40 @@ for i in 1:num_runs
 end
 
 results[1][1]
+using RCall
+
+R"""
+library(dplyr)
+library(ggplot2)
+
+plot_population_timeseries <- function(df) {
+  # Group by 'type' and 'time' and calculate the sum of 'Nind' for each group
+  df_grouped <- df %>%
+    dplyr::filter(type != "eggmass") %>%
+    dplyr::group_by(type, time) %>%
+    dplyr::summarise(Nind_sum = sum(Nind, na.rm = TRUE))
+  
+  # Create a separate DataFrame for 'eggmass' and count the number of 'eggmass' entries over time
+  egg_df <- df %>%
+    dplyr::filter(type == "eggmass") %>%
+    dplyr::group_by(time) %>%
+    dplyr::summarise(egg_count = n())
+  
+  # Plot the data
+  p <- ggplot() +
+    geom_line(data = df_grouped, aes(x = time, y = Nind_sum, color = type)) +
+    geom_line(data = egg_df, aes(x = time, y = egg_count), color = "black") +
+    labs(x = "Time", y = "Total Nind", color = "Type") +
+    theme_minimal()
+  
+  return(p)
+}
+
+df <- $results[1][1]  # Pass the Julia DataFrame to R
+p <- plot_population_timeseries(df)
+print(p)
+"""
+
+
 plot_population_timeseries(results[1][1],1,1)
-CSV.write("steady_K_20y.csv", results[1][1])
+CSV.write("dcane.csv", results[1][1])
