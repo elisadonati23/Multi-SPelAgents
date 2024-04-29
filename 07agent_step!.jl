@@ -404,7 +404,7 @@ function adultDEB!(Sardine, model)
     Sardine.Ww = (model.w *(model.d_V * V + model.w_E/ model.mu_E * (Sardine.En + Sardine.R)))
     #Sardine.CI = 100.0 * Sardine.Ww / (Sardine.Lw ^ 3)
     Sardine.Scaled_En= Sardine.En / (model.Em * (( Sardine.Lw * Sardine.del_M_i)^3.0))
-    #Sardine.l = Sardine.Lw * Sardine.del_M_i / model.Lm
+    Sardine.L = Sardine.Lw * Sardine.del_M_i / model.Lm
 end
 end
 

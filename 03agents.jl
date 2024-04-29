@@ -4,7 +4,7 @@
     type::Symbol # EggMass, Juvenile, Adult
     Nind::Float64 # number of individuals in the superindividuals
     Age::Float64 # EggMass, Juvenile, Adult
-    L::Float64 # Length of eggs
+    L::Float64 # Scaled length -- in eggs is assumed to be close to 0 from DEB Theory
     H::Float64 # Maturation energy
     EggEn::Float64 # Egg energy
     En::Float64 # Reseve energy
@@ -31,6 +31,5 @@
     spawned::Float64 
     #Kx_i::Float64 not sure what they need -- removed
     #Xc_i::Float64 not sure what they need -- removed
-    #l::Float64 scaled lenght I guess not useful -- removed
 end
 
