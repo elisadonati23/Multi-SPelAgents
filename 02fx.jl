@@ -88,7 +88,7 @@ function calculate_sd_prop(model, prop; type = missing)
 end
 
 
-function calculate_sum_prop(model, prop; type = missing)
+function calculate_sum_prop(model, prop; type = missing, Nind = false)
     all_agents = filter(agent -> hasid(model, agent.id), values(allagents(model)))
     
     filtered_agents = if ismissing(type)
@@ -102,7 +102,11 @@ function calculate_sum_prop(model, prop; type = missing)
     if isempty(filtered_agents)
         return 0.0
     else
+        if Nind == false
         prop_values = [getfield(agent, Symbol(prop)) for agent in filtered_agents]
+        else
+        prop_values = [getfield(agent, Symbol(prop)) * agent.Nind for agent in filtered_agents]
+        end
         return sum(prop_values)
     end
 end

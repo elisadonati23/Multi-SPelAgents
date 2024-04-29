@@ -92,38 +92,39 @@ function evolve_environment!(model)
 end
 
 function update_outputs!(model)
+
     agents = collect(values(allagents(model)))
-    females = filter(a -> a.type == :adult && a.Sex == "Female", agents)
+    adults = filter(a -> a.type == :adult, agents)
 
     # Check if there are any agents that match the criteria
-    if !isempty(females)
-        interquantiles_prop(model, :Ww, :QWw, :adult, "Female")
+    if !isempty(adults)
+        interquantiles_prop(model, :Ww, :QWw, :adult)
     end
+
     adults_juv = filter(a -> (a.type == :adult || a.type == :juvenile), agents) 
     if !isempty(adults_juv)
-    # B plot
-    model.TotB = calculate_sum_prop(model, "Ww")
-    model.JuvB = calculate_sum_prop(model, "Ww", type = :juvenile)
-    model.AdB = calculate_sum_prop(model, "Ww", type = :adult)
+
+    # B plot: take into account Nind
+    model.TotB = calculate_sum_prop(model, "Ww", Nind = true)
+    model.JuvB = calculate_sum_prop(model, "Ww", type = :juvenile, Nind = true)
+    model.AdB = calculate_sum_prop(model, "Ww", type = :adult, Nind = true)
+
     # mean Ww plot
     model.meanAdWw = calculate_mean_prop(model, "Ww", type = :adult, age = 3.0)
     model.sdAdWw =  calculate_sd_prop(model, "Ww", type = :adult)
     model.meanJuvWw = calculate_mean_prop(model, "Ww", type = :juvenile)
     model.sdJuvWw = calculate_sd_prop(model, "Ww", type = :juvenile)
-    #model.meanFAdWw = calculate_mean_prop(model, "Ww", type = :adult, sex = "Female", age = 3.0)
-    #model.sdFAdWw =  calculate_sd_prop(model, "Ww", type = :adult, sex = "Female")
-    #mean L plot
+    
+    #mean Lw plot
     model.meanAdL = calculate_mean_prop(model, "Lw", type = :adult)
     model.sdAdL = calculate_sd_prop(model, "Lw", type = :adult)
     model.meanJuvL = calculate_mean_prop(model, "Lw", type = :juvenile)
     model.sdJuvL = calculate_sd_prop(model, "Lw", type = :juvenile)
+
     #mean tpuberty plot
     model.mean_tpuberty = calculate_mean_prop(model, "t_puberty", type = :adult)
     model.sd_tpuberty = calculate_sd_prop(model, "t_puberty", type = :adult)
     end
-    #mean spawnings
-    #model.mean_batch_eggs = mean_eggs(model)
-    #model.mean_spawning_events = mean_spawning(model)
     return
 end
 
