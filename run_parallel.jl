@@ -8,7 +8,8 @@ include("06initialize.jl")
 include("07agent_step!.jl")
 include("08complex_step.jl")
 
-modello = model_initialize(100.0, 100.0, 100.0, 1.4, 1.68e16, 1.0, 3.42e-10, 0.945, 15.0) 
+modello = model_initialize(1000.0, 1000.0, 1000.0, 1.4, 1.68e16, 1.0, 3.42e-10, 0.945, 15.0) 
+modello = model_initialize(1000.0, 1000.0, 1000.0, 1.4, 50000.0, 1.0, 115.0, 0.945, 15.0) 
 
 #parto vicina allo stato stazionario così faccio meno run
 modello = model_initialize(60000.0, 80000.0, 20000.0, 1.0, 50000000.0, 1.0, 0.115, 0.945, 15.0) 
@@ -50,7 +51,7 @@ for i in 1:num_runs
 
     # Initialize model and data
     #adata = [(is_adult, count), (is_juvenile, count), (is_eggmass, count)]
-    adata = [:type, :t_puberty,:Age, :Lw, :Ww, :R, :Dead]
+    adata = [:type, :Nind, :t_puberty,:Age, :Lw, :Ww, :R, :Dead]
 
     mdata = [:day_of_the_year,
             :TotB,:JuvB,:AdB]
@@ -62,7 +63,7 @@ for i in 1:num_runs
     
     # Run the model
     #run!(modello,365*18; adata, mdata)
-    df_agent = run!(modello,365*20; adata, mdata)
+    df_agent = run!(modello,365*5; adata, mdata)
     # Store the result in the results array
     push!(results, df_agent)
     end_time = Dates.now()
