@@ -4,7 +4,7 @@
     
 # module Generate_Agents
 
-function generate_EggMass(No_Egg, model, NrEggs = missing, EggEn = missing, En = missing, Generation = missing)
+function generate_EggMass(No_Egg, model, Nind = missing, EggEn = missing, En = missing, Generation = missing)
     agent_type = :eggmass
     agent_Age = 0.0
     agent_L = model.L0
@@ -41,26 +41,26 @@ function generate_EggMass(No_Egg, model, NrEggs = missing, EggEn = missing, En =
 
     for _ in 1:No_Egg
 
-        if ismissing(NrEggs)
-            agent_NrEggs = Float64(floor(rand(6000:10000)))
+        if ismissing(Nind)
+            agent_Nind = Float64(floor(rand(6000:10000)))
         else
-            agent_NrEggs = Float64(floor(NrEggs))
+            agent_Nind = Float64(floor(Nind))
         end
 
         if ismissing(En)
-            agent_En = Float64(agent_NrEggs * model.E0)
+            agent_En = Float64(agent_Nind * model.E0)
         else
             agent_En = Float64(En)
         end
 
-        add_agent!(Sardine, model, agent_type, agent_Age, agent_L, agent_H, agent_EggEn, agent_NrEggs, agent_En, agent_Generation, agent_Dead,
+        add_agent!(Sardine, model, agent_type, agent_Nind, agent_Age, agent_L, agent_H, agent_EggEn, agent_En, agent_Generation, agent_Dead,
         agent_f_i, agent_t_puberty, agent_Sex, agent_Lw, agent_Ww, agent_QWw, agent_R, agent_Scaled_En, agent_del_M_i,
                    agent_s_M_i, agent_pA, agent_Lb_i, agent_spawned,
                    )
     end
 end
 
-function generate_Juvenile(No_J, model, Generation = 0.0, En = missing, Lb_i = model.Lb, Lw = missing, Ww = missing, Scaled_En = missing)
+function generate_Juvenile(No_J, model, Nind = missing, Generation = 0.0, En = missing, Lb_i = model.Lb, Lw = missing, Ww = missing, Scaled_En = missing)
     
     agent_type = :juvenile
     agent_f_i = 0.8
@@ -74,12 +74,18 @@ function generate_Juvenile(No_J, model, Generation = 0.0, En = missing, Lb_i = m
 
     # silenced features
     agent_EggEn = 0.0  # EggMass
-    agent_NrEggs = 0.0  # EggMass
+    agent_Nind = 0.0  # EggMass
     # Features from Adult
 
     for _ in 1:No_J
 
         agent_Sex = rand(("Male", "Female"))
+
+        if ismissing(Nind)
+            agent_Nind = 1000.0
+        else
+            agent_Nind = Float64(floor(Nind))
+        end
 
         if ismissing(Lw)
             agent_Lw = clamp(round(randn() * 0.5 + 5.0, digits=2), 4.45, 5.5)
@@ -125,18 +131,18 @@ function generate_Juvenile(No_J, model, Generation = 0.0, En = missing, Lb_i = m
         #CI = 100 * Ww / (Lw^3)
         #Variability = randn() .* 0.05 .+ 0
 
-        add_agent!(Sardine, model, agent_type, agent_Age, agent_L, agent_H, agent_EggEn, agent_NrEggs , agent_En, agent_Generation, agent_Dead,
+        add_agent!(Sardine, model, agent_type, agent_Nind, agent_Age, agent_L, agent_H, agent_EggEn , agent_En, agent_Generation, agent_Dead,
         agent_f_i, agent_t_puberty, agent_Sex, agent_Lw, agent_Ww, agent_QWw, agent_R, agent_Scaled_En, agent_del_M_i,
                    agent_s_M_i, agent_pA, agent_Lb_i, agent_spawned,
                    )
     end
 end
 
-function generate_Adult(No_A, model, Sex = missing, Age = missing, t_puberty = missing, Lw = missing, Ww = missing, H = missing, R = missing, En = missing, Scaled_En = missing, Generation = missing, pA = missing)
+function generate_Adult(No_A, model, Nind = missing, Sex = missing, Age = missing, t_puberty = missing, Lw = missing, Ww = missing, H = missing, R = missing, En = missing, Scaled_En = missing, Generation = missing, pA = missing)
     # silenced features
     agent_L = 0.0
     agent_EggEn = 0.0 
-    agent_NrEggs = 0.0
+    agent_Nind = 0.0
     agent_Lb_i = model.Lb
     agent_spawned = 0.0
     agent_QWw = "Q1"
@@ -175,6 +181,12 @@ function generate_Adult(No_A, model, Sex = missing, Age = missing, t_puberty = m
             rand(("Male", "Female"))
         else
             Sex
+        end
+
+        if ismissing(Nind)
+            agent_Nind = 1000.0
+        else
+            agent_Nind = Float64(floor(Nind))
         end
 
         agent_Lw = if ismissing(Lw)
@@ -243,7 +255,7 @@ function generate_Adult(No_A, model, Sex = missing, Age = missing, t_puberty = m
         #    Variability = Variability
         #end
 
-        add_agent!(Sardine, model, agent_type, agent_Age, agent_L, agent_H, agent_EggEn, agent_NrEggs, agent_En, agent_Generation, agent_Dead,
+        add_agent!(Sardine, model, agent_type, agent_Nind, agent_Age, agent_L, agent_H, agent_EggEn, agent_En, agent_Generation, agent_Dead,
         agent_f_i, agent_t_puberty, agent_Sex, agent_Lw, agent_Ww, agent_QWw, agent_R, agent_Scaled_En, agent_del_M_i,
                    agent_s_M_i, agent_pA, agent_Lb_i, agent_spawned
                    )
