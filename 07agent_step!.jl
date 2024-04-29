@@ -458,7 +458,6 @@ function adultaging!(Sardine, model)
 end
 
 function adultspawn!(Sardine, model)
-    
     #do not check if they are dead since all deads are removed before repro
     if ((model.repro_start <= model.day_of_the_year <= 365.0) || (1.0 <= model.day_of_the_year <= model.repro_end))
     
@@ -496,8 +495,6 @@ function adultspawn!(Sardine, model)
                                               EggEn_E0_val,
                                               En_val,
                                               Gen_val)
-                
-                
             end
         end
 
@@ -509,7 +506,6 @@ function adultspawn!(Sardine, model)
             Sardine.R = Sardine.R - (Sardine.R / spawn_period)
             Sardine.spawned += 1.0
         end
-        
     end
     return
 end
