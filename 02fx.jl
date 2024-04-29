@@ -317,7 +317,7 @@ function mean_eggs(model)
     if isempty(filtered_agents)
         mean_nr_eggs = 0.0
     else
-    mean_nr_eggs = mean_nr_eggs = mean([agent.NrEggs for agent in filtered_agents])
+    mean_nr_eggs = mean_nr_eggs = mean([agent.Nind for agent in filtered_agents])
     end
     return mean_nr_eggs
 end

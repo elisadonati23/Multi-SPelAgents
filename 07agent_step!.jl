@@ -187,7 +187,7 @@ function eggDEB!(Sardine, model)
         deltaV = 0.0
     end
 
-    Sardine.En = Sardine.En + deltaEggEn * Sardine.NrEggs
+    Sardine.En = Sardine.En + deltaEggEn * Sardine.Nind
     Sardine.EggEn = Sardine.EggEn + deltaEggEn
     Sardine.H = Sardine.H + deltaH 
     Sardine.L = (V + deltaV)^(1/3)
@@ -206,7 +206,7 @@ function egghatch!(Sardine, model)
         Scaled_En_val = En_val / ( model.Em * ((Lw_val * model.del_Ml)^3))
 
         
-        generate_Juvenile(Float64(ceil((1 - model.M_egg) * Float64(floor(Sardine.NrEggs)))), 
+        generate_Juvenile(Float64(ceil((1 - model.M_egg) * Float64(floor(Sardine.Nind)))), 
                              model)
         Sardine.Dead = true
         model.dead_eggmass += 1                                                    
@@ -464,28 +464,28 @@ function adultspawn!(Sardine, model)
             rand() <= model.prob_dict[model.day_of_the_year]
 
             if (Sardine.QWw == "Q1")
-                NrEggs_val = Float64(400*Sardine.Ww)
+                Nind_val = Float64(400*Sardine.Ww)
                 elseif (Sardine.QWw == "Q2")
-                NrEggs_val = Float64(450*Sardine.Ww)
+                Nind_val = Float64(450*Sardine.Ww)
                 elseif (Sardine.QWw == "Q3")
-                NrEggs_val = Float64(500*Sardine.Ww)
+                Nind_val = Float64(500*Sardine.Ww)
                 elseif (Sardine.QWw == "Q4")
-                NrEggs_val = Float64(550*Sardine.Ww)
+                Nind_val = Float64(550*Sardine.Ww)
             end
 
             EggEn_E0_val = Float64(((model.E0_max - model.E0_min) / (1.0- model.ep_min)) * (Sardine.Scaled_En - model.ep_min)) + model.E0_min
-            spawned_en = NrEggs_val * EggEn_E0_val #Sardine.R * Kappa_valueR / spawn_period 
+            spawned_en = Nind_val * EggEn_E0_val #Sardine.R * Kappa_valueR / spawn_period 
 
             if (spawned_en < Sardine.R )#* Kappa_valueR)    
                 #EggEn_E0_val = Float64(((model.E0_max - model.E0_min) / (1.0- model.ep_min)) * (Sardine.Scaled_En - model.ep_min)) + model.E0_min
                 En_val = Float64(spawned_en)
-                #NrEggs_val = Float64(floor(En_val/ EggEn_E0_val))
-                #print(NrEggs_val)
+                #Nind_val = Float64(floor(En_val/ EggEn_E0_val))
+                #print(Nind_val)
                 Gen_val = Float64(Sardine.Generation)
                 Sardine.R = Float64(Sardine.R - spawned_en) #(Sardine.R / spawn_period)) 
                 Sardine.spawned += 1.0
                 generate_EggMass(1.0, model,
-                                              NrEggs_val,
+                                              Nind_val,
                                               EggEn_E0_val,
                                               En_val,
                                               Gen_val)
