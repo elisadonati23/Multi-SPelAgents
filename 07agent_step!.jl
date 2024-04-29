@@ -88,7 +88,7 @@ function evolve_environment!(model)
     
     
     ## Ensure that f is bounded between 0 and 1
-    model.f = max(0, min(f, 1.0)) # not 1 but 0.8  ## ????? check haberle
+    model.f = max(0, min(f, 1.0)) # not 1 but 0.8
 
     return
 end
@@ -154,7 +154,6 @@ end
 
 function eggDEB!(Sardine, model)
     if Sardine.Dead == false
-
     V = Sardine.L^3.0
     deltaV = 0.0
     deltaEggEn = 0.0
@@ -206,10 +205,11 @@ function egghatch!(Sardine, model)
         Scaled_En_val = En_val / ( model.Em * ((Lw_val * model.del_Ml)^3))
 
         
-        generate_Juvenile(Float64(ceil((1 - model.M_egg) * Float64(floor(Sardine.Nind)))), 
-                             model)
+        generate_Juvenile(1, 
+                            model,
+                            Float64(ceil((1 - model.M_egg) * Float64(floor(Sardine.Nind))))) #Nind
         Sardine.Dead = true
-        model.dead_eggmass += 1                                                    
+        model.dead_eggmass += 1                                             
         #remove_agent!(Sardine, model)
         #println("Removed agent with ID $(Sardine.id)")
         return
@@ -219,7 +219,6 @@ function egghatch!(Sardine, model)
 end
 
 # juvenile ----
-
 
 function parallel_juvenile_step!(Sardine, model)
     juvedie!(Sardine, model)
@@ -237,7 +236,6 @@ Vdyn = (Sardine.Lw * Sardine.del_M_i) ^ 3.0
 Endyn = Sardine.En
 Hdyn = Sardine.H
 Rdyn = Sardine.R
-
 
 p_M_T = model.p_M * model.Tc_value # this should be in the update environment module
 
@@ -299,9 +297,9 @@ function juvemature!(Sardine, model)
     if Sardine.Dead == false
     Sardine.t_puberty += 1.0
 
-
     if Sardine.H >= model.Hp
      #put adult features
+     #Keep the same number of individuals which survived up to now in juvenile superind
      Sardine.type = :adult
      Sardine.R = 0.0
      Sardine.del_M_i = model.del_Ma
@@ -314,21 +312,21 @@ end
 
 function juvedie!(Sardine, model)
     if Sardine.Dead == false
-M = model.M_j
-randomvalue = rand()   
-if ((1- exp(- M))) >= randomvalue
-model.deadJ_nat += 1.0
-Sardine.Dead = true
-#remove_agent!(Sardine, model)
-#println("Removed agent with ID $(Sardine.id)")
-return
-end
-end
+        M = model.M_j
+        randomvalue = rand()   
+        if ((1- exp(- M))) >= randomvalue
+        model.deadJ_nat += 1.0
+        Sardine.Dead = true
+        #remove_agent!(Sardine, model)
+        #println("Removed agent with ID $(Sardine.id)")
+            return
+        end
+    end
 end
 
 function juveaging!(Sardine, model) 
     if Sardine.Dead == false
-Sardine.Age += 1.0
+    Sardine.Age += 1.0
     end
 return
 end

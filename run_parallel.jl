@@ -1,20 +1,18 @@
 #schedulers
-include("00dependencies.jl")
-include("1create_agents.jl")
-include("2create_params_function.jl")
-include("0supportive functions.jl")
-include("3module Generate_Agents.jl")
-include("4model_initialize.jl")
-include("5agent_step!.jl")
-include("complex_step.jl")
-
-
-# steady state ---------- 15 degree for 30 years
+include("01dependencies.jl")
+include("03agents.jl")
+include("04params.jl")
+include("02fx.jl")
+include("05generate.jl")
+include("06initialize.jl")
+include("07agent_step!.jl")
+include("08complex_step.jl")
 
 #modello = model_initialize(15000.0, 30000.0, 15000.0, 1.4, 4.0 * 10^15, 1.0, 1.45*10^-9, 0.945, 15.0) 
 
 #parto vicina allo stato stazionario così faccio meno run
 modello = model_initialize(60000.0, 80000.0, 20000.0, 1.0, 50000000.0, 1.0, 0.115, 0.945, 15.0) 
+
 
 # test in parallelo -------------
 #20 anni: 5 + 5 +10
