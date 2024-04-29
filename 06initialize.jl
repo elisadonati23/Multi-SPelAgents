@@ -55,11 +55,11 @@ function model_initialize(
     agents = collect(values(allagents(model)))
 
 # Filter the agents based on type and sex
-females = filter(a -> a.type == :adult && a.Sex == "Female", agents)
+adults = filter(a -> a.type == :adult, agents)
 
 # Check if there are any agents that match the criteria
-if !isempty(females)
-    interquantiles_prop(model, :Ww, :QWw, :adult, "Female") #default assign and use model.Ww_quantiles
+if !isempty(adults)
+    interquantiles_prop(model, :Ww, :QWw, :adult) #default assign and use model.Ww_quantiles
 end
 
     mean_Lw = calculate_mean_prop(model, "Lw")

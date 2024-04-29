@@ -461,11 +461,8 @@ function adultspawn!(Sardine, model)
     #do not check if they are dead since all deads are removed before repro
     if ((model.repro_start <= model.day_of_the_year <= 365.0) || (1.0 <= model.day_of_the_year <= model.repro_end))
     
-        # if female
-        if Sardine.Sex == "Female" && 
-            # if we are within the reproduction period for the sardine's size class
-            ((model.repro_periods_Q[Sardine.QWw][1] <= model.day_of_the_year <= 365.0) || 
-             (1.0 <= model.day_of_the_year <= model.repro_periods_Q[Sardine.QWw][2])) &&
+        # if we are within the reproduction period for the sardine's size class
+        if ((model.repro_periods_Q[Sardine.QWw][1] <= model.day_of_the_year <= 365.0) || (1.0 <= model.day_of_the_year <= model.repro_periods_Q[Sardine.QWw][2])) &&
             # random number between 0 and 1 is smaller than the probability of spawning, then reproduction occurs
             rand() <= model.prob_dict[model.day_of_the_year]
 
@@ -490,21 +487,13 @@ function adultspawn!(Sardine, model)
                 Gen_val = Float64(Sardine.Generation)
                 Sardine.R = Float64(Sardine.R - spawned_en) #(Sardine.R / spawn_period)) 
                 Sardine.spawned += 1.0
-                generate_EggMass(1.0, model,
-                                              Nind_val,
-                                              EggEn_E0_val,
-                                              En_val,
-                                              Gen_val)
+                generate_EggMass(floor((Sardine.Nind/2)), #half of the Nind produce eggs (females)
+                                            model,
+                                            Nind_val,
+                                            EggEn_E0_val,
+                                            En_val,
+                                            Gen_val)
             end
-        end
-
-        if Sardine.Sex == "Male" &&  (model.day_of_the_year >= model.repro_start || model.day_of_the_year <= model.repro_end)
-            spawn_period = days_between_dates(model.day_of_the_year, model.repro_end)
-            if spawn_period == 0.0
-                spawn_period = 1.0
-            end
-            Sardine.R = Sardine.R - (Sardine.R / spawn_period)
-            Sardine.spawned += 1.0
         end
     end
     return

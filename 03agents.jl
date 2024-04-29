@@ -14,7 +14,6 @@
     # Features from Juvenile, Adults
     f_i::Float64 #individual functional Response
     t_puberty::Float64 #time to puberty
-    Sex::String #Sex
     Lw::Float64 #Length weight
     Ww::Float64 #Weight
     QWw::String #Quantile weight
