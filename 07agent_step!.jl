@@ -91,6 +91,7 @@ function evolve_environment!(model)
     return
 end
 
+
 function update_outputs!(model)
 
     agents = collect(values(allagents(model)))
@@ -128,6 +129,12 @@ function update_outputs!(model)
     return
 end
 
+function evolve_environment_noparallel!(model)
+    remove_all!(model, is_dead)
+    evolve_environment!(model)
+    update_outputs!(model)
+ end
+ 
                                   #####################
                                   #      EGGMASS 
                                   #####################
@@ -192,23 +199,18 @@ end
 end
 
 function egghatch!(Sardine, model)
-    if Sardine.Dead == false
-    if (Sardine.H >= model.Hb) 
-        Generation_val = Sardine.Generation
-        En_val = Sardine.En
-        Lb_i_val = Sardine.L
-        Lw_val = (Sardine.L / model.del_Ml)
-        Ww_val = (model.w * (model.d_V * ((Lw_val * model.del_Ml) ^ 3.0) + model.w_E / model.mu_E *(En_val + 0.0))) #R
-        Scaled_En_val = En_val / ( model.Em * ((Lw_val * model.del_Ml)^3))
+    if Sardine.Dead == false && (Sardine.H >= model.Hb) 
+        #diventa un giovanile con una mortalità applicata agli Nind
+        Sardine.type = :juvenile
+        Sardine.Nind = Float64(ceil((1 - model.M_egg) * Float64(floor(Sardine.Nind))))
 
-        
-        generate_Juvenile(1, 
-                            model,
-                            Float64(ceil((1 - model.M_egg) * Float64(floor(Sardine.Nind))))) #Nind
-        Sardine.Dead = true
+        Sardine.Lb_i = Sardine.L
+        Sardine.Lw = (Sardine.L / model.del_Ml)
+        Sardine.Ww = (model.w * (model.d_V * ((Sardine.Lw * model.del_Ml) ^ 3.0) + model.w_E / model.mu_E *(Sardine.En + 0.0))) #R
+        Sardine.Scaled_En = Sardine.En / ( model.Em * ((Sardine.Lw * model.del_Ml)^3))
+
         model.dead_eggmass += 1                                             
         return
-    end
     end
     return
 end
@@ -291,11 +293,9 @@ return
 end
 
 function juvemature!(Sardine, model)
-
-    if Sardine.Dead == false
     Sardine.t_puberty += 1.0
 
-        if Sardine.H >= model.Hp
+    if Sardine.Dead == false && (Sardine.H >= model.Hp)
          #put adult features
          #Keep the same number of individuals which survived up to now in juvenile superind
          Sardine.type = :adult
@@ -303,14 +303,19 @@ function juvemature!(Sardine, model)
          Sardine.del_M_i = model.del_Ma
          Sardine.pA = Sardine.f_i * model.p_Am * model.Tc_value * Sardine.s_M_i * ((Sardine.Lw * Sardine.del_M_i)^2.0)
          Sardine.Generation += 1.0
-        end
-        return
     end
+    return
 end
 
 
-
 function juvedie!(Sardine, model)
+
+    if Sardine.Nind < 10.0
+        Sardine.Dead = true
+        model.deadJ_nat += 1.0
+        return
+    end
+
     if Sardine.Dead == false
         M = model.M_j
         for i in 1:Sardine.Nind #loop on Nind to check how many should die
@@ -413,6 +418,12 @@ end
 end
 
 function adultdie!(Sardine, model)
+
+    if Sardine.Nind < 10.0
+        Sardine.Dead = true
+        return
+    end
+
     if Sardine.Dead == false
         #set the new AGE DEPENDENT MORTALITIES -- If Mf is not 0, it is added to M
         if floor(Sardine.Age / 365.0 ) == 0.0
@@ -460,22 +471,24 @@ function adultspawn!(Sardine, model)
     if ((model.repro_start <= model.day_of_the_year <= 365.0) || (1.0 <= model.day_of_the_year <= model.repro_end))
     
         # if we are within the reproduction period for the sardine's size class
-        if ((model.repro_periods_Q[Sardine.QWw][1] <= model.day_of_the_year <= 365.0) || (1.0 <= model.day_of_the_year <= model.repro_periods_Q[Sardine.QWw][2])) &&
+        #if ((model.repro_periods_Q[Sardine.QWw][1] <= model.day_of_the_year <= 365.0) || (1.0 <= model.day_of_the_year <= model.repro_periods_Q[Sardine.QWw][2])) &&
             # random number between 0 and 1 is smaller than the probability of spawning, then reproduction occurs
             rand() <= model.prob_dict[model.day_of_the_year]
 
-            if (Sardine.QWw == "Q1")
-                Nind_val = Float64(400*Sardine.Ww)
-                elseif (Sardine.QWw == "Q2")
-                Nind_val = Float64(450*Sardine.Ww)
-                elseif (Sardine.QWw == "Q3")
-                Nind_val = Float64(500*Sardine.Ww)
-                elseif (Sardine.QWw == "Q4")
-                Nind_val = Float64(550*Sardine.Ww)
-            end
+            #if (Sardine.QWw == "Q1")
+            #    Neggs_val = Float64(400*Sardine.Ww)
+            #    elseif (Sardine.QWw == "Q2")
+            #    Neggs_val = Float64(450*Sardine.Ww)
+            #    elseif (Sardine.QWw == "Q3")
+            #    Neggs_val = Float64(500*Sardine.Ww)
+            #    elseif (Sardine.QWw == "Q4")
+            #    Neggs_val = Float64(550*Sardine.Ww)
+            #end
+
+            Neggs_val = 8000.0 #uova nel batch
 
             EggEn_E0_val = Float64(((model.E0_max - model.E0_min) / (1.0- model.ep_min)) * (Sardine.Scaled_En - model.ep_min)) + model.E0_min
-            spawned_en = Nind_val * EggEn_E0_val #Sardine.R * Kappa_valueR / spawn_period 
+            spawned_en = Neggs_val * EggEn_E0_val #Sardine.R * Kappa_valueR / spawn_period 
 
             if (spawned_en < Sardine.R )#* Kappa_valueR)    
                 En_val = Float64(spawned_en)
@@ -486,12 +499,13 @@ function adultspawn!(Sardine, model)
                 Sardine.spawned += 1.0 #number of times the fish has spawned
                 generate_EggMass(floor((Sardine.Nind/2.0)), #half of the Nind produce eggs (females)
                                             model,
-                                            Nind_val,
+                                            Neggs_val,
                                             EggEn_E0_val,
                                             En_val,
                                             Gen_val)
             end
         end
-    end
-    return
+        return
 end
+
+#end

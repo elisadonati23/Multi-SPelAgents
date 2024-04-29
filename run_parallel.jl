@@ -8,8 +8,8 @@ include("06initialize.jl")
 include("07agent_step!.jl")
 include("08complex_step.jl")
 
-#modello = model_initialize(1000.0, 1000.0, 1000.0, 1.4, 1.68e16, 1.0, 3.42e-10, 0.945, 15.0) 
-modello = model_initialize(100.0, 200.0, 100.0, 1.4, 50000.0, 1.0, 115.0, 0.945, 15.0) 
+#modello = model_initialize_parallel(1000.0, 1000.0, 1000.0, 1.4, 1.68e16, 1.0, 3.42e-10, 0.945, 15.0) 
+modello = model_initialize_parallel(0.0, 10.0, 0.0, 0.0, 50000.0, 1.0, 115.0, 0.945, 15.0) 
 
 #parto vicina allo stato stazionario così faccio meno run
 modello = model_initialize(60000.0, 80000.0, 20000.0, 1.0, 50000000.0, 1.0, 0.115, 0.945, 15.0) 
@@ -25,17 +25,17 @@ temp_revert_vector = vcat(repeat([15.0], 365*5), collect(range(15.0, stop = 18.0
 
 
 #temp increase 15 to 18 degree ------------
-modello = model_initialize(60000.0, 80000.0, 20000.0, 0.0, 50000.0, 1.0, 115.0, 0.945, temp_increase_vector)
+modello = model_initialize_parallel(60000.0, 80000.0, 20000.0, 0.0, 50000.0, 1.0, 115.0, 0.945, temp_increase_vector)
 
 #K values --------
-modello = model_initialize(60000.0, 80000.0, 20000.0, 0.0, 50000.0, 1.0, 115.0,  K_decrease_vector, 15.0)
+modello = model_initialize_parallel(60000.0, 80000.0, 20000.0, 0.0, 50000.0, 1.0, 115.0,  K_decrease_vector, 15.0)
 
 # k values + temp effect -----------------
-modello = model_initialize(6000.0, 8000.0, 2000.0, 0.0, 5000.0, 1.0, 115.0,
+modello = model_initialize_parallel(6000.0, 8000.0, 2000.0, 0.0, 5000.0, 1.0, 115.0,
                                                         K_decrease_vector,
                                                         temp_increase_vector)
 # k values + revert temp effect -----------------
-modello = model_initialize(60000.0, 80000.0, 20000.0, 0.0, 50000.0, 1.0, 115.0,
+modello = model_initialize_parallel(60000.0, 80000.0, 20000.0, 0.0, 50000.0, 1.0, 115.0,
                                                         K_decrease_vector,
                                                         temp_revert_vector)
 # running -----------------
@@ -63,7 +63,7 @@ for i in 1:num_runs
     
     # Run the model
     #run!(modello,365*18; adata, mdata)
-    df_agent = run!(modello,365*5; adata, mdata)
+    df_agent = run!(modello,365*20; adata, mdata)
     # Store the result in the results array
     push!(results, df_agent)
     end_time = Dates.now()
@@ -74,40 +74,6 @@ for i in 1:num_runs
 end
 
 results[1][1]
-using RCall
-
-R"""
-library(dplyr)
-library(ggplot2)
-
-plot_population_timeseries <- function(df) {
-  # Group by 'type' and 'time' and calculate the sum of 'Nind' for each group
-  df_grouped <- df %>%
-    dplyr::filter(type != "eggmass") %>%
-    dplyr::group_by(type, time) %>%
-    dplyr::summarise(Nind_sum = sum(Nind, na.rm = TRUE))
-  
-  # Create a separate DataFrame for 'eggmass' and count the number of 'eggmass' entries over time
-  egg_df <- df %>%
-    dplyr::filter(type == "eggmass") %>%
-    dplyr::group_by(time) %>%
-    dplyr::summarise(egg_count = n())
-  
-  # Plot the data
-  p <- ggplot() +
-    geom_line(data = df_grouped, aes(x = time, y = Nind_sum, color = type)) +
-    geom_line(data = egg_df, aes(x = time, y = egg_count), color = "black") +
-    labs(x = "Time", y = "Total Nind", color = "Type") +
-    theme_minimal()
-  
-  return(p)
-}
-
-df <- $results[1][1]  # Pass the Julia DataFrame to R
-p <- plot_population_timeseries(df)
-print(p)
-"""
-
 
 plot_population_timeseries(results[1][1],1,1)
 CSV.write("dcane.csv", results[1][1])
