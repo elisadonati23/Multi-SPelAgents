@@ -480,13 +480,12 @@ function adultspawn!(Sardine, model)
             spawned_en = Nind_val * EggEn_E0_val #Sardine.R * Kappa_valueR / spawn_period 
 
             if (spawned_en < Sardine.R )#* Kappa_valueR)    
-                #EggEn_E0_val = Float64(((model.E0_max - model.E0_min) / (1.0- model.ep_min)) * (Sardine.Scaled_En - model.ep_min)) + model.E0_min
                 En_val = Float64(spawned_en)
-                #Nind_val = Float64(floor(En_val/ EggEn_E0_val))
-                #print(Nind_val)
                 Gen_val = Float64(Sardine.Generation)
+                
+                #Nind males and females lose the same amount of spawned energy
                 Sardine.R = Float64(Sardine.R - spawned_en) #(Sardine.R / spawn_period)) 
-                Sardine.spawned += 1.0
+                Sardine.spawned += 1.0 #number of times the fish has spawned
                 generate_EggMass(floor((Sardine.Nind/2)), #half of the Nind produce eggs (females)
                                             model,
                                             Nind_val,
