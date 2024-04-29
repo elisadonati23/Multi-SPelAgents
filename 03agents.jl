@@ -2,25 +2,24 @@
     
 @agent struct Sardine(NoSpaceAgent)
     type::Symbol # EggMass, Juvenile, Adult
+    Nind::Float64 # number of individuals in the superindividuals
     Age::Float64 # EggMass, Juvenile, Adult
-    L::Float64 # EggMass, Juvenile --?
-    H::Float64 # EggMass, Juvenile, Adult
-    EggEn::Float64
-    NrEggs::Float64 # EggMass
-    En::Float64 # EggMass, Juvenile, Adult
+    L::Float64 # Length of eggs
+    H::Float64 # Maturation energy
+    EggEn::Float64 # Egg energy
+    NrEggs::Float64 # Nr Eggs
+    En::Float64 # Reseve energy
     Generation::Float64 # EggMass, Juvenile, Adult
-    Dead::Bool
+    Dead::Bool 
 
     # Features from Juvenile, Adults
-    f_i::Float64
-    t_puberty::Float64
-    herma::Bool
-    Sex::String
-    Lw::Float64
-    Ww::Float64
-    QWw::String
-    meta::Bool
-    R::Float64
+    f_i::Float64 #individual functional Response
+    t_puberty::Float64 #time to puberty
+    Sex::String #Sex
+    Lw::Float64 #Length weight
+    Ww::Float64 #Weight
+    QWw::String #Quantile weight
+    R::Float64 #Reproduction
     Scaled_En::Float64
     del_M_i::Float64
     s_M_i::Float64
@@ -30,10 +29,7 @@
     Lb_i::Float64 # ?
 
     # Features from Adult
-    #Engaged::Bool #we don't apply reproduction like HABERLE so removed 
-    #SeasonR::Float64 #we don't apply reproduction like HABERLE so remove
-    spawned::Float64 #we don't apply reproduction like HABERLE so removed 
-    trans_prob::Bool #males #?
+    spawned::Float64 
     #Kx_i::Float64 not sure what they need -- removed
     #Xc_i::Float64 not sure what they need -- removed
     #l::Float64 scaled lenght I guess not useful -- removed

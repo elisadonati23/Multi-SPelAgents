@@ -28,18 +28,15 @@ function generate_EggMass(No_Egg, model, NrEggs = missing, EggEn = missing, En =
     # put silenced features
     agent_f_i = 0.0
     agent_t_puberty = 0.0
-    agent_herma = false
     agent_Sex = "M"
     agent_Lw = 0.0
     agent_Ww = 0.0
-    agent_meta = false
     agent_R = 0.0
     agent_Scaled_En = 0.0
     agent_del_M_i = 0.0
     agent_s_M_i = 0.0
     agent_pA = 0.0
     agent_Lb_i = 0.0
-    agent_trans_prob = 0.0
     agent_Lb_i = 0.0
 
     for _ in 1:No_Egg
@@ -57,8 +54,8 @@ function generate_EggMass(No_Egg, model, NrEggs = missing, EggEn = missing, En =
         end
 
         add_agent!(Sardine, model, agent_type, agent_Age, agent_L, agent_H, agent_EggEn, agent_NrEggs, agent_En, agent_Generation, agent_Dead,
-        agent_f_i, agent_t_puberty, agent_herma, agent_Sex, agent_Lw, agent_Ww, agent_QWw, agent_meta, agent_R, agent_Scaled_En, agent_del_M_i,
-                   agent_s_M_i, agent_pA, agent_Lb_i, agent_spawned, agent_trans_prob
+        agent_f_i, agent_t_puberty, agent_Sex, agent_Lw, agent_Ww, agent_QWw, agent_R, agent_Scaled_En, agent_del_M_i,
+                   agent_s_M_i, agent_pA, agent_Lb_i, agent_spawned,
                    )
     end
 end
@@ -79,13 +76,10 @@ function generate_Juvenile(No_J, model, Generation = 0.0, En = missing, Lb_i = m
     agent_EggEn = 0.0  # EggMass
     agent_NrEggs = 0.0  # EggMass
     # Features from Adult
-    agent_trans_prob = 0.0  # males
-
 
     for _ in 1:No_J
 
-        agent_herma = false  # rand((true, false))
-        agent_Sex = agent_herma ? "Male" : rand(("Male", "Female"))
+        agent_Sex = rand(("Male", "Female"))
 
         if ismissing(Lw)
             agent_Lw = clamp(round(randn() * 0.5 + 5.0, digits=2), 4.45, 5.5)
@@ -103,7 +97,6 @@ function generate_Juvenile(No_J, model, Generation = 0.0, En = missing, Lb_i = m
         end
 
         agent_H = model.Hp * (agent_Lw * model.del_Ma) / model.Lp
-        agent_meta = agent_H >= model.Hj
 
         if ismissing(En)
             agent_En = agent_f_i * model.Em * ((agent_Lw * model.del_Ma)^3.0)
@@ -133,8 +126,8 @@ function generate_Juvenile(No_J, model, Generation = 0.0, En = missing, Lb_i = m
         #Variability = randn() .* 0.05 .+ 0
 
         add_agent!(Sardine, model, agent_type, agent_Age, agent_L, agent_H, agent_EggEn, agent_NrEggs , agent_En, agent_Generation, agent_Dead,
-        agent_f_i, agent_t_puberty, agent_herma, agent_Sex, agent_Lw, agent_Ww, agent_QWw, agent_meta, agent_R, agent_Scaled_En, agent_del_M_i,
-                   agent_s_M_i, agent_pA, agent_Lb_i, agent_spawned, agent_trans_prob
+        agent_f_i, agent_t_puberty, agent_Sex, agent_Lw, agent_Ww, agent_QWw, agent_R, agent_Scaled_En, agent_del_M_i,
+                   agent_s_M_i, agent_pA, agent_Lb_i, agent_spawned,
                    )
     end
 end
@@ -144,9 +137,7 @@ function generate_Adult(No_A, model, Sex = missing, Age = missing, t_puberty = m
     agent_L = 0.0
     agent_EggEn = 0.0 
     agent_NrEggs = 0.0
-    agent_herma = false
     agent_Lb_i = model.Lb
-    agent_trans_prob = false
     agent_spawned = 0.0
     agent_QWw = "Q1"
     agent_Dead = false
@@ -171,8 +162,6 @@ function generate_Adult(No_A, model, Sex = missing, Age = missing, t_puberty = m
     else
         model.s_M
     end
-
-    agent_meta = agent_H >= model.Hj
 
     if ismissing(Generation)
         agent_Generation = 0.0
@@ -255,8 +244,8 @@ function generate_Adult(No_A, model, Sex = missing, Age = missing, t_puberty = m
         #end
 
         add_agent!(Sardine, model, agent_type, agent_Age, agent_L, agent_H, agent_EggEn, agent_NrEggs, agent_En, agent_Generation, agent_Dead,
-        agent_f_i, agent_t_puberty, agent_herma, agent_Sex, agent_Lw, agent_Ww, agent_QWw, agent_meta, agent_R, agent_Scaled_En, agent_del_M_i,
-                   agent_s_M_i, agent_pA, agent_Lb_i, agent_spawned, agent_trans_prob
+        agent_f_i, agent_t_puberty, agent_Sex, agent_Lw, agent_Ww, agent_QWw, agent_R, agent_Scaled_En, agent_del_M_i,
+                   agent_s_M_i, agent_pA, agent_Lb_i, agent_spawned
                    )
     end
     return
