@@ -67,8 +67,9 @@ function evolve_environment!(model)
     # calculate Xall
     # Xall is initialized like X, which is set to Xmax (look at params)
     # remove the assimilation of all agents:
-    Xall = model.Xmax_value - (calculate_sum_prop(model, "pA")/ model.KappaX) / model.Wv
-    #
+
+    Xall = model.Xmax_value - (calculate_real_assimilation(model)/ model.KappaX) / model.Wv
+    
      if Xall < 0.0  
          Xall = 0.0 
      end
@@ -78,21 +79,17 @@ function evolve_environment!(model)
     ## update response function f ---
     ###############################
     
-    if ismissing(calculate_sum_assimilation(model))
+    if ismissing(calculate_max_assimilation(model))
         f = 0.0
     else
         #rapporto tra quello disponibile e quello che si mangia su base di taglia e Tc!!
-        # ATTENZIONE QUANDO TC SARà VETTORE
-    f = (model.Xmax_value * model.Wv * model.KappaX) / calculate_sum_assimilation(model)
+
+    f = (model.Xmax_value * model.Wv * model.KappaX) / calculate_max_assimilation(model) #take into consideration the Nind of the superindividuals
     end
-    
-    
     ## Ensure that f is bounded between 0 and 1
     model.f = max(0, min(f, 1.0)) # not 1 but 0.8
-
     return
 end
-
 
 function update_outputs!(model)
     agents = collect(values(allagents(model)))
@@ -482,11 +479,11 @@ function adultspawn!(Sardine, model)
             if (spawned_en < Sardine.R )#* Kappa_valueR)    
                 En_val = Float64(spawned_en)
                 Gen_val = Float64(Sardine.Generation)
-                
+
                 #Nind males and females lose the same amount of spawned energy
                 Sardine.R = Float64(Sardine.R - spawned_en) #(Sardine.R / spawn_period)) 
                 Sardine.spawned += 1.0 #number of times the fish has spawned
-                generate_EggMass(floor((Sardine.Nind/2)), #half of the Nind produce eggs (females)
+                generate_EggMass(floor((Sardine.Nind/2.0)), #half of the Nind produce eggs (females)
                                             model,
                                             Nind_val,
                                             EggEn_E0_val,
