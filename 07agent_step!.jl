@@ -69,6 +69,7 @@ function evolve_environment!(model)
     # remove the assimilation of all agents:
 
     Xall = model.Xmax_value - (calculate_real_assimilation(model)/ model.KappaX) / model.Wv
+    #println("real assimilation:", calculate_real_assimilation(model))
     
      if Xall < 0.0  
          Xall = 0.0 
@@ -78,17 +79,25 @@ function evolve_environment!(model)
 
     ## update response function f ---
     ###############################
-    
-    if ismissing(calculate_max_assimilation(model))
+    println("max assimilation is:", calculate_max_assimilation(model))
+
+    if ismissing(calculate_max_assimilation(model)) || calculate_max_assimilation(model) == 0.0 || isnan(calculate_max_assimilation(model))
         f = 0.0
     else
         #rapporto tra quello disponibile e quello che si mangia su base di taglia e Tc!!
-
     f = (model.Xmax_value * model.Wv * model.KappaX) / calculate_max_assimilation(model) #take into consideration the Nind of the superindividuals
     end
     ## Ensure that f is bounded between 0 and 1
     model.f = max(0, min(f, 1.0)) # not 1 but 0.8
+    println("before model.f is ", model.f)
+    agents = collect(values(allagents(model)))
+    adults = filter(a -> a.type == :adult, agents)
+    juve = filter(a -> a.type == :juvenile, agents)
+    if isempty(adults) && isempty(juve)
+        model.f = 0.8 # it could prevent from the problem of f = 0 when model is initialized only with eggs and they become juve
     return
+    println("after model.f is ", model.f)
+end
 end
 
 
@@ -142,7 +151,8 @@ function evolve_environment_noparallel!(model)
 function parallel_eggmass_step!(Sardine, model)
     eggDEB!(Sardine, model)
     eggaging!(Sardine, model)
-end
+    egghatch!(Sardine, model) # egghatch non comporta più un generate_fx() con i superindividui quindi può andare in paralelo
+end #-- it follows hatch! in complex step so same order of eggmass_step!()
 
 function eggmass_step!(Sardine, model)
     eggDEB!(Sardine, model)
@@ -199,16 +209,30 @@ end
 end
 
 function egghatch!(Sardine, model)
-    if Sardine.Dead == false && (Sardine.H >= model.Hb) 
+    if Sardine.Dead == false && (Sardine.H >= model.Hb)
         #diventa un giovanile con una mortalità applicata agli Nind
         Sardine.type = :juvenile
-        Sardine.Nind = Float64(ceil((1 - model.M_egg) * Float64(floor(Sardine.Nind))))
-
-        Sardine.Lb_i = Sardine.L
+        Sardine.f_i = model.f # if model is initialized only with eggs, this value is set to 0.8, otherwise from the model
+        Sardine.del_M_i = model.del_Ml
         Sardine.Lw = (Sardine.L / model.del_Ml)
+        Sardine.Lb_i = Sardine.L
+
+        Sardine.s_M_i = if model.Hb >= Sardine.H
+            1.0
+        elseif Sardine.H > model.Hb && model.Hj > Sardine.H
+            Sardine.Lw * Sardine.del_M_i / Sardine.Lb_i
+        else
+            model.s_M
+        end
+
+        # 0.8 is f = functional response: I start juvenile starts exogenous feeding with not limiting capacity;
+        # this allow to calculate first pA and then update real and maximum assimilation in the evolve_environment function
+        # once they enter DEB module, pA is updated with the real assimilation
+        
+        Sardine.pA = Sardine.f_i * model.p_Am * model.Tc_value* Sardine.s_M_i * ((Sardine.Lw * Sardine.del_M_i)^2.0)
+        Sardine.Nind = Float64(ceil((1 - model.M_egg) * Float64(floor(Sardine.Nind))))
         Sardine.Ww = (model.w * (model.d_V * ((Sardine.Lw * model.del_Ml) ^ 3.0) + model.w_E / model.mu_E *(Sardine.En + 0.0))) #R
         Sardine.Scaled_En = Sardine.En / ( model.Em * ((Sardine.Lw * model.del_Ml)^3))
-
         model.dead_eggmass += 1                                             
         return
     end
@@ -228,12 +252,15 @@ function parallel_juvenile_step!(Sardine, model)
 end
 
 function juveDEB!(Sardine, model)
-    if Sardine.Dead == false
 
-Sardine.f_i = model.f
+if Sardine.Dead == false
+
+Sardine.f_i = model.f #if no one is eating (model initilized with eggs, it is set to 0.8)
 
 # juvenile store energy into maturation state variable and eventually they mature
+#println("for agent $(Sardine.id) Lw is ", Sardine.Lw, "and del_M_i is ", Sardine.del_M_i)
 Vdyn = (Sardine.Lw * Sardine.del_M_i) ^ 3.0
+#println("Vdyn is ", Vdyn)
 Endyn = Sardine.En
 Hdyn = Sardine.H
 Rdyn = Sardine.R
@@ -262,18 +289,19 @@ return
 end
 
 deltaV = ((model.Kappa_value * pC - pS) / model.Eg) * model.DEB_timing
+#println("deltaV is", deltaV)
 if (deltaV < 0.0) 
 deltaV = 0.0
 end
 
 # maturing energy
+
 if Sardine.H < model.Hp
 deltaH = (((1.0 - model.Kappa_value) * pC - pJ) * model.DEB_timing)
 if deltaH < 0.0
     deltaH = 0.0
 end
 end
-
 # update state variables
 Sardine.En = Endyn + deltaEn
 V = Vdyn + deltaV
@@ -294,7 +322,6 @@ end
 
 function juvemature!(Sardine, model)
     Sardine.t_puberty += 1.0
-
     if Sardine.Dead == false && (Sardine.H >= model.Hp)
          #put adult features
          #Keep the same number of individuals which survived up to now in juvenile superind
@@ -309,8 +336,7 @@ end
 
 
 function juvedie!(Sardine, model)
-
-    if Sardine.Nind < 10.0
+    if Sardine.Nind < 1.0
         Sardine.Dead = true
         model.deadJ_nat += 1.0
         return
@@ -419,7 +445,7 @@ end
 
 function adultdie!(Sardine, model)
 
-    if Sardine.Nind < 10.0
+    if Sardine.Nind < 1.0
         Sardine.Dead = true
         return
     end

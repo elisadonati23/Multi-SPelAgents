@@ -26,7 +26,7 @@ function generate_EggMass(No_Egg, model, Nind = missing, EggEn = missing, En = m
     end
 
     # put silenced features
-    agent_f_i = 0.0
+    agent_f_i = 0.8
     agent_t_puberty = 0.0
     agent_Lw = 0.0
     agent_Ww = 0.0

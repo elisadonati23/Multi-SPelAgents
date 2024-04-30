@@ -136,12 +136,23 @@ function calculate_max_assimilation(model)
         denom = missing
     else
         # Extract property values for each agent
+        #type_values = [getfield(agent, Symbol("type")) for agent in filtered_agents]
+        #generation_values = [getfield(agent, Symbol("Generation")) for agent in filtered_agents]
+        #age_values = [getfield(agent, Symbol("Age")) for agent in filtered_agents]
         p_Am_values = fill(model.p_Am, length(filtered_agents))
         s_M_i_values = [getfield(agent, Symbol("s_M_i")) for agent in filtered_agents]
         Lw_values = [getfield(agent, Symbol("Lw")) for agent in filtered_agents]
         del_M_i_values = [getfield(agent, Symbol("del_M_i")) for agent in filtered_agents]
         Tc_value = isa(model.Tc, Vector{Float64}) ? model.Tc[model.sim_timing] : model.Tc
         Nind_values = [getfield(agent, Symbol("Nind")) for agent in filtered_agents]
+# Iterate over the filtered_agents
+#for agent in filtered_agents
+#    # Check if Lw is NaN
+#    if isnan(agent.Lw)
+#        # Print the agent or its id
+#        println("Agent with id $(agent.id) type $(agent.type) gen $(agent.Generation) and age $(agent.Age) has Lw as NaN")
+#    end
+#end
 
         # Perform element-wise operations and calculate the sum
         denom = sum(Nind_values .* (p_Am_values .* Tc_value .* s_M_i_values .* (Lw_values .* del_M_i_values .^ 2)))

@@ -8,19 +8,19 @@ include("06initialize.jl")
 include("07agent_step!.jl")
 include("08complex_step.jl")
 
-modello = model_initialize_noparallel(0.0, 10.0, 0.0, 0.0, 50000.0, 1.0, 115.0, 0.945, 15.0) 
-num_runs = 1
+modello = model_initialize_noparallel(0.0, 1.0, 0.0, 0.0, 50000.0, 1.0, 115.0, 0.945, 15.0) 
 
 # Array to store the results
+num_runs = 1
 results = []
 
 for i in 1:num_runs
     start_time = Dates.now()
 
-    adata = [:type, :Nind, :t_puberty,:Age, :Lw, :Ww, :R, :Dead]
+    adata = [:type, :Nind, :Age, :L, :EggEn, :En, :f_i, :QWw, :Scaled_En, :del_M_i, :s_M_i, :pA, :Lb_i, :t_puberty, :Lw, :Ww, :R, :H, :Dead, :Generation]
 
     mdata = [:day_of_the_year,
-            :TotB,:JuvB,:AdB]
+            :TotB,:JuvB,:AdB, :f, :deadJ_nat, :deadJ_old, :deadJ_starved]
 
     
     # Initialize dataframes
@@ -29,7 +29,7 @@ for i in 1:num_runs
     
     # Run the model
     
-    df_agent = run!(modello, 365*10; adata, mdata)
+    df_agent = run!(modello, 365*2; adata, mdata)
     # Store the result in the results array
     push!(results, df_agent)
     end_time = Dates.now()
@@ -38,3 +38,5 @@ for i in 1:num_runs
 end 
 #diagnostic_plots(results, results[1][2])
 CSV.write("dcane.csv", results[1][1])
+results[1][1]
+CSV.write("dcane_modello.csv", results[1][2])

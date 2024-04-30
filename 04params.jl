@@ -30,7 +30,7 @@ function create_params(
     Fm = 6.5
     del_M = 0.1152
     del_Ml = 0.1152
-    del_Ma =0.1152 
+    del_Ma = 0.1152 
     k_J = 0.002 #agents juveniles or adults
     s_M = 3.093 #agent
     p_M = 396.195 #agent
@@ -58,7 +58,7 @@ function create_params(
     E0_max = 0.967
     W0 = 0.00021
     L0 = 0.001 #0.001 cm
-    M_egg = 0.998 #o.998 what if not only instant mort?
+    M_egg = 0.999 #o.998 what if not only instant mort?
     M_j = 1.071/365.0
     M_ae = 0.61/365.0
     M_a = 0.38 /365.0
