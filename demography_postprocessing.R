@@ -1,7 +1,6 @@
 library(ggplot2)
 library(dplyr)
 dcane <- read.csv("C:/Users/elli2/Documents/PhD/Multi-SPelAgents/dcane.csv")
-summary(dcane)
 
 plot_population_timeseries <- function(df) {
   # Group by 'type' and 'time' and calculate the sum of 'Nind' for each group
@@ -36,8 +35,10 @@ plot_population_timeseries(dcane)
 
 # Filter the dataframe to include only the data for the specified juvenile
 df_juvenile <- dcane %>%
-  dplyr::filter(type == "juvenile") %>%
-  filter(id == "10")
+  dplyr::filter(f_i != 1.0 & type != "eggmass") 
+
+
+
 # Plot the H value over time
 ggplot(df_juvenile, aes(x = time, y = H)) +
   geom_line() +
@@ -46,7 +47,14 @@ ggplot(df_juvenile, aes(x = time, y = H)) +
 
 print(p)
 
-8000*0.002
+dcane_modello <- read.csv("C:/Users/elli2/Documents/PhD/Multi-SPelAgents/dcane_modello.csv")
+
+# Plot the H value over time
+ggplot(dcane_modello, aes(x = time, y = f)) +
+  geom_line() +
+  labs(x = "Time", y = "f value", title = paste("F Value Over Time for Juvenile")) +
+  theme_minimal()
+
 
 # Death age plots -- Lifespan
 grouped_df <- results %>%

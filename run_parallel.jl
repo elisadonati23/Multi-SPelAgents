@@ -10,33 +10,8 @@ include("08complex_step.jl")
 
 modello = model_initialize_parallel(0.0, 0.0, 10.0, 0.0, 50000.0, 1.0, 115.0, 0.945, 15.0) 
 
-#parto vicina allo stato stazionario così faccio meno run
-modello = model_initialize(60000.0, 80000.0, 20000.0, 1.0, 50000000.0, 1.0, 0.115, 0.945, 15.0) 
 
 
-# test in parallelo -------------
-#20 anni: 5 + 5 +10
-temp_increase_vector = vcat(repeat([15.0], 365*5), collect(range(15.0, stop = 18.0,length=(365*5 +1) )),repeat([18.0], 365*10) )
-# 20 anni : 5+5+10
-K_decrease_vector = vcat(repeat([0.945], 365*5), collect(range(0.945, stop = 0.90, length=(365*5 +1))),vcat(repeat([0.90], 365*10)))
-#25 anni : 5+5+5+10
-temp_revert_vector = vcat(repeat([15.0], 365*5), collect(range(15.0, stop = 18.0,length=(365*5) )),collect(range(18.0, stop = 15.0,length=(365*5) )),repeat([15.0], 365*10+1) )
-
-
-#temp increase 15 to 18 degree ------------
-modello = model_initialize_parallel(60000.0, 80000.0, 20000.0, 0.0, 50000.0, 1.0, 115.0, 0.945, temp_increase_vector)
-
-#K values --------
-modello = model_initialize_parallel(60000.0, 80000.0, 20000.0, 0.0, 50000.0, 1.0, 115.0,  K_decrease_vector, 15.0)
-
-# k values + temp effect -----------------
-modello = model_initialize_parallel(6000.0, 8000.0, 2000.0, 0.0, 5000.0, 1.0, 115.0,
-                                                        K_decrease_vector,
-                                                        temp_increase_vector)
-# k values + revert temp effect -----------------
-modello = model_initialize_parallel(60000.0, 80000.0, 20000.0, 0.0, 50000.0, 1.0, 115.0,
-                                                        K_decrease_vector,
-                                                        temp_revert_vector)
 # running -----------------
 
 results = []
@@ -76,3 +51,36 @@ results[1][1]
 
 plot_population_timeseries(results[1][1],1,1)
 CSV.write("dcane.csv", results[1][1])
+
+
+
+
+
+
+
+#-#-#-#-#-#-#
+#parto vicina allo stato stazionario così faccio meno run
+modello = model_initialize(60000.0, 80000.0, 20000.0, 1.0, 50000000.0, 1.0, 0.115, 0.945, 15.0) 
+# test in parallelo -------------
+#20 anni: 5 + 5 + 10
+temp_increase_vector = vcat(repeat([15.0], 365*5), collect(range(15.0, stop = 18.0,length=(365*5 +1) )),repeat([18.0], 365*10) )
+# 20 anni : 5+5+10
+K_decrease_vector = vcat(repeat([0.945], 365*5), collect(range(0.945, stop = 0.90, length=(365*5 +1))),vcat(repeat([0.90], 365*10)))
+#25 anni : 5+5+5+10
+temp_revert_vector = vcat(repeat([15.0], 365*5), collect(range(15.0, stop = 18.0,length=(365*5) )),collect(range(18.0, stop = 15.0,length=(365*5) )),repeat([15.0], 365*10+1) )
+
+
+#temp increase 15 to 18 degree ------------
+modello = model_initialize_parallel(60000.0, 80000.0, 20000.0, 0.0, 50000.0, 1.0, 115.0, 0.945, temp_increase_vector)
+
+#K values --------
+modello = model_initialize_parallel(60000.0, 80000.0, 20000.0, 0.0, 50000.0, 1.0, 115.0,  K_decrease_vector, 15.0)
+
+# k values + temp effect -----------------
+modello = model_initialize_parallel(6000.0, 8000.0, 2000.0, 0.0, 5000.0, 1.0, 115.0,
+                                                        K_decrease_vector,
+                                                        temp_increase_vector)
+# k values + revert temp effect -----------------
+modello = model_initialize_parallel(60000.0, 80000.0, 20000.0, 0.0, 50000.0, 1.0, 115.0,
+                                                        K_decrease_vector,
+                                                        temp_revert_vector)
