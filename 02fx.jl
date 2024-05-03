@@ -357,10 +357,11 @@ function diagnostic_plots(out_agent, out_model)
     p5 = plot_means_with_std(out_model, [:meanAdL, :meanJuvL], [:sdAdL, :sdJuvL])
     p6 = plot_means_with_std(out_model, [:mean_tpuberty], [:sd_tpuberty])
     p7 = plot_means_with_std(out_model, [:meanAdWw, :meanJuvWw], [:sdAdWw, :sdJuvWw])
+    p8 = plot_means_with_std(out_model, [:mean_Hjuve], [:sd_Hjuve])
 
     # Combine the plots in a 3x3 grid
-    combined_plot1 = Plots.plot(p1,p2,p3,p5, layout = (2,2))
-    combined_plot2 = Plots.plot(p4,p6,p7, layout = (2,2))   
+    combined_plot1 = Plots.plot(p1,p2,p3,p4, layout = (2,2))
+    combined_plot2 = Plots.plot(p5,p6,p7,p8, layout = (2,2))   
     display(combined_plot1)
     display(combined_plot2)
     Plots.default()

@@ -8,7 +8,7 @@ include("06initialize.jl")
 include("07agent_step!.jl")
 include("08complex_step.jl")
 
-modello = model_initialize_noparallel(0.0, 0.0, 10.0, 0.0, 50000.0, 1.0, 115.0, 0.945, 15.0) 
+modello = model_initialize_noparallel(0.0, 100.0, 0.0, 0.0, 50000.0, 1.0, 115.0, 0.945, 15.0) 
 
 # Array to store the results
 num_runs = 1
@@ -35,7 +35,7 @@ for i in 1:num_runs
     
     # Run the model
     
-    df_agent = run!(modello, 365*2; adata, mdata)
+    df_agent = run!(modello, 365*3; adata, mdata)
     # Store the result in the results array
     push!(results, df_agent)
     end_time = Dates.now()
@@ -48,11 +48,5 @@ CSV.write("d.csv", results[1][1])
 results[1][1]
 CSV.write("d_modello.csv", results[1][2])
 out_model = results[1][2]
-plot_population_timeseries(results[1][1])
-plot_param_timeseries(out_model,[:deadA_starved, :deadA_nat, :deadA_old,:deadJ_starved, :deadJ_nat, :deadJ_old])
-plot_param_timeseries(out_model,[:TotB, :JuvB, :AdB])
-plot_param_timeseries(out_model, [:f])
-plot_means_with_std(out_model, [:meanAdL, :meanJuvL], [:sdAdL, :sdJuvL])
-plot_means_with_std(out_model, [:mean_tpuberty], [:sd_tpuberty])
-plot_means_with_std(out_model, [:meanAdWw, :meanJuvWw], [:sdAdWw, :sdJuvWw])
-plot_means_with_std(out_model, [:mean_Hjuve], [:sd_Hjuve])
+
+diagnostic_plots(results[1][1], results[1][2])
