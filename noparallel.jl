@@ -20,7 +20,13 @@ for i in 1:num_runs
     adata = [:type, :Nind, :Age, :L, :EggEn, :En, :f_i, :QWw, :Scaled_En, :del_M_i, :s_M_i, :pA, :Lb_i, :t_puberty, :Lw, :Ww, :R, :H, :Dead, :Generation]
 
     mdata = [:day_of_the_year,
-            :TotB,:JuvB,:AdB, :f, :deadJ_nat, :deadJ_old, :deadJ_starved]
+            :TotB,:JuvB,:AdB, :f, 
+            :deadJ_nat, :deadJ_old, :deadJ_starved,
+            :deadA_nat, :deadA_old, :deadA_starved,
+            :meanJuvL, :sdJuvL, :meanAdL, :sdAdL,
+            :mean_tpuberty, :sd_tpuberty,
+            :meanJuvWw, :sdJuvWw, :meanAdWw, :sdAdWw,
+            :mean_Hjuve, :sd_Hjuve]
 
     
     # Initialize dataframes
@@ -35,7 +41,8 @@ for i in 1:num_runs
     end_time = Dates.now()
     duration = end_time - start_time
     println("Simulation  $i took: ", duration)
-end 
+end
+
 #diagnostic_plots(results, results[1][2])
 CSV.write("d.csv", results[1][1])
 results[1][1]
@@ -48,3 +55,4 @@ plot_param_timeseries(out_model, [:f])
 plot_means_with_std(out_model, [:meanAdL, :meanJuvL], [:sdAdL, :sdJuvL])
 plot_means_with_std(out_model, [:mean_tpuberty], [:sd_tpuberty])
 plot_means_with_std(out_model, [:meanAdWw, :meanJuvWw], [:sdAdWw, :sdJuvWw])
+plot_means_with_std(out_model, [:mean_Hjuve], [:sd_Hjuve])

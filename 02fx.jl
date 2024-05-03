@@ -304,6 +304,47 @@ function plot_population_timeseries(adf, y_limits = missing)
     end
 end
 
+function plot_param_timeseries(adf, params, ids = missing)
+    # Generate a distinct color for each parameter, plus some extras
+    colors = distinguishable_colors(length(params) + 10)
+    
+    # Filter out yellow
+    colors = filter(c -> c != colorant"yellow", colors)
+    
+    # Take only as many colors as needed
+    colors = colors[1:length(params)]
+    
+    p = Plots.plot()  # Initialize an empty plot
+
+    try 
+        if !ismissing(ids)
+            # Filter the DataFrame by ids if provided
+            adf = filter(row -> row[:id] in ids, adf)
+            # Group the DataFrame by id
+            grouped_data = groupby(adf, [:id])
+
+            for (param, color) in zip(params, colors)
+                for group in grouped_data
+                    id = group[1, :id]
+                    param_values = group[:, Symbol(param)]
+                    Plots.plot!(p, group[!, :time], param_values, color = color, linewidth = 2, label = "ID $id - $param")
+                end
+            end
+        else
+            for (param, color) in zip(params, colors)
+                param_values = adf[:, Symbol(param)]
+                Plots.plot!(p, adf[!, :time], param_values, color = color, linewidth = 2, label = "$param")
+            end
+        end
+
+        Plots.xlabel!(p, "time")
+        return p
+    catch e
+        println("Failed to generate plot: ", e)
+        return Plots.plot()  # Return an empty plot in case of error
+    end
+end
+
 function diagnostic_plots(out_agent, out_model)
     
     Plots.default(legendfontsize = 4)  # Set the plot size

@@ -102,7 +102,6 @@ end
 
 
 function update_outputs!(model)
-
     agents = collect(values(allagents(model)))
     adults = filter(a -> a.type == :adult, agents)
 
@@ -134,6 +133,9 @@ function update_outputs!(model)
     #mean tpuberty plot
     model.mean_tpuberty = calculate_mean_prop(model, "t_puberty", type = :adult)
     model.sd_tpuberty = calculate_sd_prop(model, "t_puberty", type = :adult)
+    #mean tpuberty plot
+    model.mean_Hjuve = calculate_mean_prop(model, "H", type = :juvenile)
+    model.sd_Hjuve = calculate_sd_prop(model, "H", type = :juvenile)
     end
     return
 end
@@ -143,7 +145,7 @@ function evolve_environment_noparallel!(model)
     evolve_environment!(model)
     update_outputs!(model)
  end
- 
+
                                   #####################
                                   #      EGGMASS 
                                   #####################

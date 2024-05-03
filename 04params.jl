@@ -134,6 +134,8 @@ function create_params(
     sd_Lw_puberty = 0.0
     mean_Ww_puberty = 0.0
     sd_Ww_puberty = 0.0
+    mean_Hjuve = 0.0
+    sd_Hjuve = 0.0
 
 
 model_parameters = Dict(
@@ -251,7 +253,9 @@ model_parameters = Dict(
         :mean_Lw_puberty =>mean_Lw_puberty,
         :sd_Lw_puberty =>sd_Lw_puberty,
         :mean_Ww_puberty =>mean_Ww_puberty,
-        :sd_Ww_puberty =>sd_Ww_puberty)
+        :sd_Ww_puberty =>sd_Ww_puberty,
+        :mean_Hjuve => mean_Hjuve,
+        :sd_Hjuve =>sd_Hjuve)
                            
 return model_parameters            
 end
