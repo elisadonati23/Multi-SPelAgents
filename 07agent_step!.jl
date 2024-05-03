@@ -222,7 +222,6 @@ function egghatch!(Sardine, model)
 end
 
 #function egghatch!(Sardine, model)
-#    if Sardine.Dead == false
 #    if (Sardine.H >= model.Hb)
 #        Generation_val = Sardine.Generation
 #        En_val = Sardine.En
@@ -231,16 +230,19 @@ end
 #        Ww_val = (model.w * (model.d_V * ((Lw_val * model.del_Ml) ^ 3.0) + model.w_E / model.mu_E *(En_val + 0.0))) #R
 #        Scaled_En_val = En_val / ( model.Em * ((Lw_val * model.del_Ml)^3))
 #
-#        
 #        generate_Juvenile(1, 
-#                             model,
-#                             Float64(ceil((1 - model.M_egg) * Float64(floor(Sardine.NrEggs)))))
-#        Sardine.Dead = true
+#                           model,
+#                           Float64(ceil((1 - model.M_egg) * Float64(floor(Sardine.NrEggs))))
+#                           Generation_val, 
+#                           En_val, 
+#                           Lb_i_val, 
+#                           Lw_val, 
+#                           Ww_val, 
+#                           Scaled_En_val)
+#        Sardine.dead = true
 #        model.dead_eggmass += 1                                                    
-#        #remove_agent!(Sardine, model)
-#        #println("Removed agent with ID $(Sardine.id)")
+#        remove_agent!(Sardine, model)
 #        return
-#    end
 #    end
 #    return
 #end
