@@ -137,9 +137,14 @@ function evolve_environment_noparallel!(model)
 
 function parallel_eggmass_step!(Sardine, model)
     eggDEB!(Sardine, model)
-    egghatch!(Sardine, model)
     eggaging!(Sardine, model) # egghatch non comporta più un generate_fx() con i superindividui quindi può andare in paralelo
 end #-- it follows hatch! in complex step so same order of eggmass_step!()
+
+function eggmass_step!(Sardine, model)
+    eggDEB!(Sardine, model)
+    eggaging!(Sardine, model)
+    egghatch!(Sardine, model)
+end
 
 function eggaging!(Sardine, model)
     if !Sardine.Dead
@@ -190,62 +195,62 @@ function eggDEB!(Sardine, model)
     return
 end
 
-function egghatch!(Sardine, model)
-    if !Sardine.Dead && (Sardine.H >= model.Hb)
-        #diventa un giovanile con una mortalità applicata agli Nind
-        Sardine.type = :juvenile
-        Sardine.f_i = model.f # if model is initialized only with eggs, this value is set to 0.8, otherwise from the model
-        Sardine.del_M_i = model.del_Ml
-        Sardine.Lw = (Sardine.L / model.del_Ml)
-        Sardine.Lb_i = Sardine.L
-
-        Sardine.s_M_i = if model.Hb >= Sardine.H
-            1.0
-        elseif Sardine.H > model.Hb && model.Hj > Sardine.H
-            Sardine.Lw * Sardine.del_M_i / Sardine.Lb_i
-        else
-            model.s_M
-        end
-
-        # 0.8 is f = functional response: I start juvenile starts exogenous feeding with not limiting capacity;
-        # this allow to calculate first pA and then update real and maximum assimilation in the evolve_environment function
-        # once they enter DEB module, pA is updated with the real assimilation
-        
-        Sardine.pA = Sardine.f_i * model.p_Am * model.Tc_value* Sardine.s_M_i * ((Sardine.Lw * Sardine.del_M_i)^2.0)
-        Sardine.Nind = Float64(ceil((1 - model.M_egg) * Float64((Sardine.Nind))))
-        Sardine.Ww = (model.w * (model.d_V * ((Sardine.Lw * model.del_Ml) ^ 3.0) + model.w_E / model.mu_E *(Sardine.En + 0.0))) #R
-        Sardine.Scaled_En = Sardine.En / ( model.Em * ((Sardine.Lw * model.del_Ml)^3))
-        model.dead_eggmass += 1                                             
-        return
-    end
-    return
-end
-
 #function egghatch!(Sardine, model)
-#    if (Sardine.H >= model.Hb)
-#        Generation_val = Sardine.Generation
-#        En_val = Sardine.En
-#        Lb_i_val = Sardine.L  
-#        Lw_val = (Sardine.L / model.del_Ml)
-#        Ww_val = (model.w * (model.d_V * ((Lw_val * model.del_Ml) ^ 3.0) + model.w_E / model.mu_E *(En_val + 0.0))) #R
-#        Scaled_En_val = En_val / ( model.Em * ((Lw_val * model.del_Ml)^3))
+#    if !Sardine.Dead && (Sardine.H >= model.Hb)
+#        #diventa un giovanile con una mortalità applicata agli Nind
+#        Sardine.type = :juvenile
+#        Sardine.f_i = model.f # if model is initialized only with eggs, this value is set to 0.8, otherwise from the model
+#        Sardine.del_M_i = model.del_Ml
+#        Sardine.Lw = (Sardine.L / model.del_Ml)
+#        Sardine.Lb_i = Sardine.L
 #
-#        generate_Juvenile(1, 
-#                           model,
-#                           Float64(ceil((1 - model.M_egg) * Float64(floor(Sardine.NrEggs))))
-#                           Generation_val, 
-#                           En_val, 
-#                           Lb_i_val, 
-#                           Lw_val, 
-#                           Ww_val, 
-#                           Scaled_En_val)
-#        Sardine.dead = true
-#        model.dead_eggmass += 1                                                    
-#        remove_agent!(Sardine, model)
+#        Sardine.s_M_i = if model.Hb >= Sardine.H
+#            1.0
+#        elseif Sardine.H > model.Hb && model.Hj > Sardine.H
+#            Sardine.Lw * Sardine.del_M_i / Sardine.Lb_i
+#        else
+#            model.s_M
+#        end
+#
+#        # 0.8 is f = functional response: I start juvenile starts exogenous feeding with not limiting capacity;
+#        # this allow to calculate first pA and then update real and maximum assimilation in the evolve_environment function
+#        # once they enter DEB module, pA is updated with the real assimilation
+#        
+#        Sardine.pA = Sardine.f_i * model.p_Am * model.Tc_value* Sardine.s_M_i * ((Sardine.Lw * Sardine.del_M_i)^2.0)
+#        Sardine.Nind = Float64(ceil((1 - model.M_egg) * Float64((Sardine.Nind))))
+#        Sardine.Ww = (model.w * (model.d_V * ((Sardine.Lw * model.del_Ml) ^ 3.0) + model.w_E / model.mu_E *(Sardine.En + 0.0))) #R
+#        Sardine.Scaled_En = Sardine.En / ( model.Em * ((Sardine.Lw * model.del_Ml)^3))
+#        model.dead_eggmass += 1                                             
 #        return
 #    end
 #    return
 #end
+
+function egghatch!(Sardine, model)
+    if (Sardine.H >= model.Hb)
+        Generation_val = Sardine.Generation
+        En_val = Sardine.En
+        Lb_i_val = Sardine.L  
+        Lw_val = (Sardine.L / model.del_Ml)
+        Ww_val = (model.w * (model.d_V * ((Lw_val * model.del_Ml) ^ 3.0) + model.w_E / model.mu_E *(En_val + 0.0))) #R
+        Scaled_En_val = En_val / ( model.Em * ((Lw_val * model.del_Ml)^3))ù
+        Nind_val = Float64(ceil((1 - model.M_egg) * Float64((Sardine.Nind))))
+
+        generate_Juvenile(1, # in this way they will have f = 0.8
+                           model,
+                           Nind_val,
+                           Generation_val, 
+                           En_val, 
+                           Lb_i_val, 
+                           Lw_val, 
+                           Ww_val, 
+                           Scaled_En_val)
+        model.dead_eggmass += 1                                                    
+        Sardine.Dead == true
+        return
+    end
+    return
+end
 
                                   #####################
                                   #      JUVENILE 
