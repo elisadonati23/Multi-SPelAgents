@@ -1,3 +1,29 @@
+function update_Kappa!(model, Kappa::Float64)
+    model.Kappa_value = Kappa
+end
+
+function update_Kappa!(model, Kappa::Vector{Float64})
+    model.Kappa_value = Kappa[model.sim_timing]
+end
+
+function update_Tc!(model, Tc::Float64)
+    model.Tc_value = Tc
+end
+
+function update_Tc!(model, Tc::Vector{Float64})
+    model.Tc_value = Tc[model.sim_timing]
+end
+
+function update_Xmax!(model, Xmax::Float64)
+    model.Xmax_value = Xmax
+end
+
+function update_Xmax!(model, Xmax::Vector{Float64})
+    model.Xmax_value = Xmax[model.sim_timing]
+end
+
+
+
 function is_dead(sardine::Sardine)
     return sardine.Dead == true
 end
@@ -132,7 +158,7 @@ function calculate_max_assimilation(model)
     filtered_agents = filter(agent -> agent.type == :juvenile || agent.type == :adult, all_agents)
     
     if isempty(filtered_agents)
-        println("no agents!")
+        println("no agents to calculate assimilation, probably only eggs!")
         denom = missing
     else
         # Extract property values for each agent

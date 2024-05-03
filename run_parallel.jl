@@ -8,7 +8,7 @@ include("06initialize.jl")
 include("07agent_step!.jl")
 include("08complex_step.jl")
 
-modello = model_initialize_parallel(100000.0, 100000.0, 0.0, 0.0, 50000.0, 1.0, 1150000.0, 0.945, 15.0) 
+modello = model_initialize_parallel(60.0, 80.0, 20.0, 0.0, 50000.0, 1.0, 115.0, 0.945, 15.0) 
 
 # running -----------------
 
@@ -52,10 +52,9 @@ for i in 1:num_runs
     println("Simulation $i took: ", minutes, " minutes")
 end
 
-results[1][1]
 
 diagnostic_plots(results[1][1], results[1][2])
-CSV.write("dcane.csv", results[1][1])
+
 
 
 
