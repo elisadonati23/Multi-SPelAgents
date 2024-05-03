@@ -169,7 +169,6 @@ function eggaging!(Sardine, model)
     return
 end
 
-
 function eggDEB!(Sardine, model)
     if Sardine.Dead == false
     V = Sardine.L^3.0
@@ -261,13 +260,13 @@ Sardine.f_i = model.f #if no one is eating (model initilized with eggs, it is se
 
 # juvenile store energy into maturation state variable and eventually they mature
 #println("for agent $(Sardine.id) Lw is ", Sardine.Lw, "and del_M_i is ", Sardine.del_M_i)
+
 Vdyn = (Sardine.Lw * Sardine.del_M_i) ^ 3.0
-#println("Vdyn is ", Vdyn)
 Endyn = Sardine.En
 Hdyn = Sardine.H
 Rdyn = Sardine.R
 
-p_M_T = model.p_M * model.Tc_value # this should be in the update environment module
+p_M_T = model.p_M * model.Tc_value 
 
 deltaV = 0.0
 deltaEn  = 0.0
@@ -291,7 +290,6 @@ return
 end
 
 deltaV = ((model.Kappa_value * pC - pS) / model.Eg) * model.DEB_timing
-#println("deltaV is", deltaV)
 if (deltaV < 0.0) 
 deltaV = 0.0
 end
@@ -300,9 +298,10 @@ end
 
 if Sardine.H < model.Hp
 deltaH = (((1.0 - model.Kappa_value) * pC - pJ) * model.DEB_timing)
-if deltaH < 0.0
-    deltaH = 0.0
-end
+ if deltaH < 0.0
+     deltaH = 0.0
+ end
+else Sardine.type = :adult #maturation
 end
 # update state variables
 Sardine.En = Endyn + deltaEn
@@ -311,8 +310,7 @@ Sardine.Lw = (V ^ (1/3)) / Sardine.del_M_i
 Sardine.H = Hdyn + deltaH
 Sardine.R = Rdyn + deltaR
 Sardine.Ww = (model.w *(model.d_V * V + model.w_E/ model.mu_E * (Sardine.En + Sardine.R)))
-#Sardine.CI = 100.0 * Sardine.Ww / (Sardine.Lw ^ 3)
-Sardine.Scaled_En= Sardine.En / (model.Em * (( Sardine.Lw * Sardine.del_M_i)^3.0))
+Sardine.Scaled_En = Sardine.En / (model.Em * (( Sardine.Lw * Sardine.del_M_i)^3.0))
 
 #check whether Lm is a vector or a float
 Lm_value = isa(model.Lm, Vector{Float64}) ? model.Lm[model.sim_timing] : model.Lm
@@ -336,14 +334,12 @@ function juvemature!(Sardine, model)
     return
 end
 
-
 function juvedie!(Sardine, model)
-    if Sardine.Nind < 1.0
+
+if  Sardine.Nind < 1.0
         Sardine.Dead = true
         model.deadJ_nat += 1.0
-        return
-    end
-
+    else 
     if Sardine.Dead == false
         M = model.M_j
         for i in 1:Sardine.Nind #loop on Nind to check how many should die
@@ -351,7 +347,7 @@ function juvedie!(Sardine, model)
             if ((1- exp(- M))) >= randomvalue
                 model.deadJ_nat += 1.0 #update the counters
                 Sardine.Nind -= 1.0
-                if Sardine.Nind < 10.0 #if the superindividual is with less than 10 individuals it dies
+                if Sardine.Nind < 1.0 #if the superindividual is with less than 10 individuals it dies
                     Sardine.Dead = true
                     break
                 end
@@ -359,6 +355,7 @@ function juvedie!(Sardine, model)
         end
     end
     return
+end
 end
 
 function juveaging!(Sardine, model) 
@@ -449,42 +446,42 @@ function adultdie!(Sardine, model)
 
     if Sardine.Nind < 1.0
         Sardine.Dead = true
-        return
+        model.deadA_nat += 1.0
+    else
+     if Sardine.Dead == false
+         #set the new AGE DEPENDENT MORTALITIES -- If Mf is not 0, it is added to M
+         if floor(Sardine.Age / 365.0 ) == 0.0
+             M = model.M0 + (model.M_f/365.0)
+         elseif floor(Sardine.Age / 365.0 ) == 1.0
+             M = model.M1 + (model.M_f/365.0)
+         elseif floor(Sardine.Age / 365.0 ) == 2.0
+             M = model.M2 + (model.M_f/365.0)
+         elseif floor(Sardine.Age / 365.0 ) == 3.0
+             M = model.M3 + (model.M_f/365.0)
+         else
+             M = model.M4 + (model.M_f/365.0)
+         end
+ 
+         for i in 1:Sardine.Nind
+             randomnumber = rand()
+ 
+             if (1.0 - exp(-M)) >= randomnumber # if dying... why? fishing or natural?
+                 #if the fish would not have died without fishing:
+                  if (((1.0 - exp(-M))) >= randomnumber) && (randomnumber > (1.0 - exp(-(M - (model.M_f/365.0))))) # the fish would not have died without fishing
+                      model.fished += 1.0 #then it is fished
+                  else
+                      model.deadA_nat += 1.0 # it has died of natural mortality
+                  end
+                 Sardine.Nind -= 1.0
+                 if Sardine.Nind < 1.0
+                     Sardine.Dead = true
+                     break
+                 end
+             end
+         end
+     end
+            return
     end
-
-    if Sardine.Dead == false
-        #set the new AGE DEPENDENT MORTALITIES -- If Mf is not 0, it is added to M
-        if floor(Sardine.Age / 365.0 ) == 0.0
-            M = model.M0 + (model.M_f/365.0)
-        elseif floor(Sardine.Age / 365.0 ) == 1.0
-            M = model.M1 + (model.M_f/365.0)
-        elseif floor(Sardine.Age / 365.0 ) == 2.0
-            M = model.M2 + (model.M_f/365.0)
-        elseif floor(Sardine.Age / 365.0 ) == 3.0
-            M = model.M3 + (model.M_f/365.0)
-        else
-            M = model.M4 + (model.M_f/365.0)
-        end
-
-        for i in 1:Sardine.Nind
-            randomnumber = rand()
-
-            if (1.0 - exp(-M)) >= randomnumber # if dying... why? fishing or natural?
-                #if the fish would not have died without fishing:
-                if (((1.0 - exp(-M))) >= randomnumber) && (randomnumber > (1.0 - exp(-(M - (model.M_f/365.0))))) # the fish would not have died without fishing
-                    model.fished += 1.0 #then it is fished
-                else
-                    model.deadA_nat += 1.0 # it has died of natural mortality
-                end
-                Sardine.Nind -= 1.0
-                if Sardine.Nind < 10.0
-                    Sardine.Dead = true
-                    break
-                end
-            end
-        end
-    end
-    return
 end
 
 function adultaging!(Sardine, model)

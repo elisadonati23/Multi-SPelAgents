@@ -1,6 +1,6 @@
 library(ggplot2)
 library(dplyr)
-dcane <- read.csv("C:/Users/elli2/Documents/PhD/Multi-SPelAgents/dcane.csv")
+df <- read.csv("C:/Users/elli2/Documents/PhD/Multi-SPelAgents/d.csv")
 
 plot_population_timeseries <- function(df) {
   # Group by 'type' and 'time' and calculate the sum of 'Nind' for each group
@@ -31,7 +31,7 @@ plot_population_timeseries <- function(df) {
 }
 
 # Use the function
-plot_population_timeseries(dcane)
+plot_population_timeseries(df)
 
 # Filter the dataframe to include only the data for the specified juvenile
 df_juvenile <- dcane %>%
