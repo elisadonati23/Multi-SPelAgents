@@ -135,7 +135,8 @@ function evolve_environment_noparallel!(model)
 
 function parallel_eggmass_step!(Sardine, model)
     eggDEB!(Sardine, model)
-    eggaging!(Sardine, model) # egghatch non comporta più un generate_fx() con i superindividui quindi può andare in paralelo
+    eggaging!(Sardine, model)
+    egghatch!(Sardine, model) # egghatch non comporta più un generate_fx() con i superindividui quindi può andare in paralelo
 end #-- it follows hatch! in complex step so same order of eggmass_step!()
 
 function eggmass_step!(Sardine, model)
@@ -251,25 +252,20 @@ end
 
 function juvedie!(Sardine, model)
 
-    if  Sardine.Nind < 1.0 && !Sardine.Dead
-            Sardine.Dead = true
-            model.deadJ_nat += 1.0
-    end
-
+    #single individual die
     if !Sardine.Dead && Sardine.Nind >= 1.0
             for i in 1:Sardine.Nind #loop on Nind to check how many should die
-                randomvalue = rand()
-                if ((1- exp(- model.M_j))) >= randomvalue
+                if ((1- exp(- model.M_j))) >=  rand()
                     model.deadJ_nat += 1.0 #update the counters
                     Sardine.Nind -= 1.0
                 end
             end
-
     end
-
-    if Sardine.Nind < 1.0 #if the superindividual is with less than 10 individuals it dies
+#if less than 1 ind, superindividual dies
+if  Sardine.Nind < 1.0 && !Sardine.Dead
         Sardine.Dead = true
-    end
+        model.deadJ_nat += 1.0
+end
 
     remove_all!(model, is_dead)
 return
@@ -386,11 +382,6 @@ end
 
 function adultdie!(Sardine, model)
 
-    if Sardine.Nind < 1.0
-        Sardine.Dead = true
-        model.deadA_nat += 1.0
-    end
-
     if !Sardine.Dead
          #set the new AGE DEPENDENT MORTALITIES -- If Mf is not 0, it is added to M
          if floor(Sardine.Age / 365.0 ) == 0.0
@@ -407,7 +398,6 @@ function adultdie!(Sardine, model)
  
          for i in 1:Sardine.Nind
              randomnumber = rand()
- 
              if (1.0 - exp(-M)) >= randomnumber # if dying... why? fishing or natural?
                  #if the fish would not have died without fishing:
                   if (((1.0 - exp(-M))) >= randomnumber) && (randomnumber > (1.0 - exp(-(M - (model.M_f/365.0))))) # the fish would not have died without fishing
@@ -421,7 +411,8 @@ function adultdie!(Sardine, model)
      end
 
     if Sardine.Nind < 1.0
-    Sardine.Dead = true
+        Sardine.Dead = true
+        model.deadA_nat += 1.0
     end
 
     remove_all!(model, is_dead)
@@ -465,19 +456,19 @@ if !Sardine.Dead
             Sardine.Dead = true
             return
         else
+            #take energy from repro reserve in case of starvation
             Rdyn = (Rdyn - (pS - (model.Kappa_value * pC)) * model.DEB_timing)
         end
     end
 
     #maturing energy
-    deltaR = (((1- model.Kappa_value)* pC - pJ)* model.DEB_timing)  #pr
+    deltaR = (((1- model.Kappa_value)* pC - pJ)* model.DEB_timing)
 
     if (deltaR < 0.0)
         deltaR = 0.0
     end
     
     Sardine.En = Endyn + deltaEn
-
     V = Vdyn + deltaV
     Sardine.Lw = (V ^ (1/3)) / model.del_M
     Sardine.H = Hdyn + deltaH

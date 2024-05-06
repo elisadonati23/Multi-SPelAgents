@@ -186,12 +186,11 @@ function calculate_max_assimilation(model)
         p_Am_values = fill(model.p_Am, length(filtered_agents))
         s_M_i_values = [getfield(agent, Symbol("s_M_i")) for agent in filtered_agents]
         Lw_values = [getfield(agent, Symbol("Lw")) for agent in filtered_agents]
-        del_M_i_values = [getfield(agent, Symbol("del_M_i")) for agent in filtered_agents]
         Tc_value = isa(model.Tc, Vector{Float64}) ? model.Tc[model.sim_timing] : model.Tc
         Nind_values = [getfield(agent, Symbol("Nind")) for agent in filtered_agents]
         #the total max assimilation of the Superindividuals
         # Perform element-wise operations and calculate the sum
-        denom = sum(Nind_values .* (p_Am_values .* Tc_value .* s_M_i_values .* (Lw_values .* del_M_i_values .^ 2)))
+        denom = sum(Nind_values .* (p_Am_values .* Tc_value .* s_M_i_values .* (Lw_values .* model.del_M .^ 2)))
     end
     return denom
 end

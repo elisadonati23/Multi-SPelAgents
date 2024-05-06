@@ -8,7 +8,7 @@ include("06initialize.jl")
 include("07agent_step!.jl")
 include("08complex_step.jl")
 
-modello = model_initialize_noparallel(60.0, 80.0, 20.0, 0.0, 50000.0, 1.0, 115.0, 0.945, 15.0)
+modello = model_initialize_noparallel(6.0, 8.0, 2.0, 0.0, 50000.0, 1.0, 115.0, 0.945, 15.0)
 
 modello.f
 
@@ -19,7 +19,7 @@ results = []
 for i in 1:num_runs
     start_time = Dates.now()
 
-    adata = [:type, :Nind, :Age, :L, :EggEn, :En, :f_i, :QWw, :Scaled_En, :del_M_i, :s_M_i, :pA, :Lb_i, :t_puberty, :Lw, :Ww, :R, :H, :Dead, :Generation]
+    adata = [:type, :Nind, :Age, :L, :EggEn, :En, :f_i, :QWw, :Scaled_En, :s_M_i, :pA, :Lb_i, :t_puberty, :Lw, :Ww, :R, :H, :Dead, :Generation]
 
     mdata = [:day_of_the_year,
             :TotB,:JuvB,:AdB, :f, 

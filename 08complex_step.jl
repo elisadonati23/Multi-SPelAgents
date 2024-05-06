@@ -16,12 +16,7 @@ function complex_step!(model)
     remove_all!(model, is_dead)
 
     sEA_ids = sEA(model)
-    egg_ids = filter!(id -> hasid(model, id) && model[id].type == :eggmass, copy(sEA_ids))
     adult_ids = filter!(id -> hasid(model, id) && model[id].type == :adult, copy(sEA_ids))
-
-    for sardine in egg_ids
-        egghatch!(model[sardine], model) #generate new agents with add!
-    end
 
     remove_all!(model, is_dead) # remove eggs which trantitioned to juveniles
 
