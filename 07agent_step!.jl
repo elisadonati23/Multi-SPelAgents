@@ -209,6 +209,7 @@ function egghatch!(Sardine, model)
         Sardine.f_i = model.f # if model is initialized only with eggs, this value is set to 0.8, otherwise from the model
         Sardine.Lw = (Sardine.L / model.del_M)
         Sardine.Lb_i = Sardine.L
+        Sardine.Age = model.Am * Sardine.Lw * model.del_M / model.Lm
 
         Sardine.s_M_i = if model.Hb >= Sardine.H
             1.0
