@@ -1,5 +1,5 @@
 @agent struct Sardine(NoSpaceAgent)
-    type::Symbol # EggMass, Juvenile, Adult
+    type::Symbol # :eggmass, :juvenile, :adult
     Nind::Float64 # number of individuals in the superindividuals
     Age::Float64 # EggMass, Juvenile, Adult
     L::Float64 # Scaled length -- in eggs is assumed to be close to 0 from DEB Theory

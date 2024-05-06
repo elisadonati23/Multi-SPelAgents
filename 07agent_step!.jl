@@ -162,25 +162,33 @@ function eggDEB!(Sardine, model)
         deltaH = 0.0
         
         ## Energy fluxes
+                #Somatic maintenance
         pS = (model.p_M * model.Tc_value) * V  #p_M_T*V
+        # Mobilized energy
         pC = ((Sardine.EggEn / V) * (model.Eg * (model.v_rate * model.Tc_value) * (V ^ (2/3)) + pS)/(model.Kappa_value * (Sardine.EggEn / V) + model.Eg))
+
+
+        #Maturity maintenance
         pJ = model.k_J * Sardine.H * model.Tc_value
         
         ## Variation in the state variables
+        # part of reserve used to increase complexity
         deltaEggEn = 0.0 - pC # must be negative because eggs do not eat 
         
+        # Enrgy reserve is not enough to pay somatic maintenance:
         if ((model.Kappa_value * pC) < pS)
             model.dead_eggmass += 1.0
             Sardine.Dead = true
             return
         end
-    
+        
+
         deltaH =  (( 1.0 - model.Kappa_value) * pC - pJ)
         if (deltaH < 0.0 )
             deltaH = 0.0
         end
     
-        deltaV = (( model.Kappa_value * pC - pS) / model.Eg)
+        deltaV = ((model.Kappa_value * pC - pS) / model.Eg)
         if (deltaV < 0.0)
             deltaV = 0.0
         end
@@ -190,12 +198,13 @@ function eggDEB!(Sardine, model)
         Sardine.H = Sardine.H + deltaH 
         Sardine.L = (V + deltaV)^(1/3)
     end
+    remove_all!(model, is_dead)
     return
 end
 
 function egghatch!(Sardine, model)
     if !Sardine.Dead && (Sardine.H >= model.Hb)
-        #diventa un giovanile con una mortalità applicata agli Nind
+        # If egg survived starvation In deb()! and has enough complexity, it becomes a juvenile
         Sardine.type = :juvenile
         Sardine.f_i = model.f # if model is initialized only with eggs, this value is set to 0.8, otherwise from the model
         Sardine.del_M_i = model.del_Ml
@@ -218,37 +227,14 @@ function egghatch!(Sardine, model)
         Sardine.Nind = Float64(ceil((1 - model.M_egg) * Float64((Sardine.Nind))))
         Sardine.Ww = (model.w * (model.d_V * ((Sardine.Lw * model.del_Ml) ^ 3.0) + model.w_E / model.mu_E *(Sardine.En + 0.0))) #R
         Sardine.Scaled_En = Sardine.En / ( model.Em * ((Sardine.Lw * model.del_Ml)^3))
-        model.dead_eggmass += 1                                             
+        Sardine.t_puberty = 0.0
+
+        model.dead_eggmass += 1.0                                              
         return
     end
     return
 end
 
-#function egghatch!(Sardine, model)
-#    if (Sardine.H >= model.Hb)
-#        Generation_val = Sardine.Generation
-#        En_val = Sardine.En
-#        Lb_i_val = Sardine.L  
-#        Lw_val = (Sardine.L / model.del_Ml)
-#        Ww_val = (model.w * (model.d_V * ((Lw_val * model.del_Ml) ^ 3.0) + model.w_E / model.mu_E *(En_val + 0.0))) #R
-#        Scaled_En_val = En_val / ( model.Em * ((Lw_val * model.del_Ml)^3))ù
-#        Nind_val = Float64(ceil((1 - model.M_egg) * Float64((Sardine.Nind))))
-#
-#        generate_Juvenile(1, # in this way they will have f = 0.8
-#                           model,
-#                           Nind_val,
-#                           Generation_val, 
-#                           En_val, 
-#                           Lb_i_val, 
-#                           Lw_val, 
-#                           Ww_val, 
-#                           Scaled_En_val)
-#        model.dead_eggmass += 1                                                    
-#        Sardine.Dead == true
-#        return
-#    end
-#    return
-#end
 
                                   #####################
                                   #      JUVENILE 
@@ -264,27 +250,30 @@ end
 
 function juvedie!(Sardine, model)
 
-    if  Sardine.Nind < 1.0
+    if  Sardine.Nind < 1.0 && !Sardine.Dead
             Sardine.Dead = true
             model.deadJ_nat += 1.0
-    else 
-        if !Sardine.Dead
-            M = model.M_j 
+    end
+
+    if !Sardine.Dead && Sardine.Nind >= 1.0
             for i in 1:Sardine.Nind #loop on Nind to check how many should die
                 randomvalue = rand()
-                if ((1- exp(- M))) >= randomvalue
+                if ((1- exp(- model.M_j))) >= randomvalue
                     model.deadJ_nat += 1.0 #update the counters
                     Sardine.Nind -= 1.0
-                    if Sardine.Nind < 1.0 #if the superindividual is with less than 10 individuals it dies
-                        Sardine.Dead = true
-                        break
-                    end
                 end
             end
-        end
-        return
+
     end
+
+    if Sardine.Nind < 1.0 #if the superindividual is with less than 10 individuals it dies
+        Sardine.Dead = true
     end
+
+    remove_all!(model, is_dead)
+return
+end
+
 
 
 function juveDEB!(Sardine, model)
@@ -297,7 +286,7 @@ function juveDEB!(Sardine, model)
         #println("for agent $(Sardine.id) Lw is ", Sardine.Lw, "and del_M_i is ", Sardine.del_M_i)
 
         #initialize the state variables before the fluxes
-        Vdyn = (Sardine.Lw * Sardine.del_M_i) ^ 3.0 
+        Vdyn = (Sardine.Lw * Sardine.del_M_i) ^ 3.0
         Endyn = Sardine.En
         Hdyn = Sardine.H
         Rdyn = Sardine.R
@@ -307,7 +296,7 @@ function juveDEB!(Sardine, model)
         #initialize the variation in the state variables
         deltaV = 0.0
         deltaEn  = 0.0
-        deltaH = 0.0
+        #deltaH = 0.0
         deltaR = 0.0
 
         v_T = model.v_rate * model.Tc_value
@@ -342,7 +331,7 @@ function juveDEB!(Sardine, model)
         Sardine.En = Endyn + deltaEn
         V = Vdyn + deltaV
         Sardine.Lw = (V ^ (1/3)) / Sardine.del_M_i
-        Sardine.H = Hdyn + deltaH
+        Sardine.H = model.Hp #Hdyn + deltaH
         Sardine.R = Rdyn + deltaR
         Sardine.Ww = (model.w *(model.d_V * V + model.w_E/ model.mu_E * (Sardine.En + Sardine.R)))
         Sardine.Scaled_En = Sardine.En / (model.Em * (( Sardine.Lw * Sardine.del_M_i)^3.0))
@@ -350,8 +339,8 @@ function juveDEB!(Sardine, model)
         #check whether Lm is a vector or a float
         Lm_value = isa(model.Lm, Vector{Float64}) ? model.Lm[model.sim_timing] : model.Lm
         Sardine.L = Sardine.Lw * Sardine.del_M_i / Lm_value 
-
     end
+    remove_all!(model, is_dead)
 return
 end
 
@@ -364,6 +353,7 @@ function juvemature!(Sardine, model)
          Sardine.del_M_i = model.del_Ma
          Sardine.pA = Sardine.f_i * model.p_Am * model.Tc_value * Sardine.s_M_i * ((Sardine.Lw * Sardine.del_M_i)^2.0)
          Sardine.Generation += 1.0
+         Sardine.s_M_i = model.s_M
     else
         Sardine.t_puberty += 1.0
     end
@@ -399,8 +389,9 @@ function adultdie!(Sardine, model)
     if Sardine.Nind < 1.0
         Sardine.Dead = true
         model.deadA_nat += 1.0
-    else
-     if !Sardine.Dead
+    end
+
+    if !Sardine.Dead
          #set the new AGE DEPENDENT MORTALITIES -- If Mf is not 0, it is added to M
          if floor(Sardine.Age / 365.0 ) == 0.0
              M = model.M0 + (model.M_f/365.0)
@@ -425,15 +416,16 @@ function adultdie!(Sardine, model)
                       model.deadA_nat += 1.0 # it has died of natural mortality
                   end
                  Sardine.Nind -= 1.0
-                 if Sardine.Nind < 1.0
-                     Sardine.Dead = true
-                     break
-                 end
              end
          end
      end
-            return
+
+    if Sardine.Nind < 1.0
+    Sardine.Dead = true
     end
+
+    remove_all!(model, is_dead)
+    return
 end
 
 
@@ -494,6 +486,8 @@ if !Sardine.Dead
     Sardine.Scaled_En= Sardine.En / (model.Em * (( Sardine.Lw * Sardine.del_M_i)^3.0))
     Sardine.L = Sardine.Lw * Sardine.del_M_i / model.Lm
 end
+remove_all!(model, is_dead)
+return
 end
 
 function adultaging!(Sardine, model) 
