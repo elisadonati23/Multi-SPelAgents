@@ -1,3 +1,7 @@
+
+                                          ##############
+                                          # Ouutput fx #
+                                          ##############
 function update_Kappa!(model, Kappa::Float64)
     model.Kappa_value = Kappa
 end
@@ -21,8 +25,20 @@ end
 function update_Xmax!(model, Xmax::Vector{Float64})
     model.Xmax_value = Xmax[model.sim_timing]
 end
+                                                ###############
+                                                # is xx_agent #
+                                                ###############
+function is_eggmass(a)
+    return a.type == :eggmass
+end
 
+function is_juvenile(a)
+    return a.type == :juvenile
+end
 
+function is_adult(a)
+    return a.type == :adult
+end
 
 function is_dead(sardine::Sardine)
     return sardine.Dead == true
@@ -40,7 +56,9 @@ function savemyfig(file_name)
     return
 end
 
-using Agents, Statistics
+                                        ####################
+                                        # agent properties #
+                                        ####################
 
 function interquantiles_prop(model, prop, class_prop, agent_type = missing, assign = true, Wwquant = model.Ww_quantiles)
     
@@ -171,34 +189,12 @@ function calculate_max_assimilation(model)
         del_M_i_values = [getfield(agent, Symbol("del_M_i")) for agent in filtered_agents]
         Tc_value = isa(model.Tc, Vector{Float64}) ? model.Tc[model.sim_timing] : model.Tc
         Nind_values = [getfield(agent, Symbol("Nind")) for agent in filtered_agents]
-# Iterate over the filtered_agents
-#for agent in filtered_agents
-#    # Check if Lw is NaN
-#    if isnan(agent.Lw)
-#        # Print the agent or its id
-#        println("Agent with id $(agent.id) type $(agent.type) gen $(agent.Generation) and age $(agent.Age) has Lw as NaN")
-#    end
-#end
-
+        #the total max assimilation of the Superindividuals
         # Perform element-wise operations and calculate the sum
         denom = sum(Nind_values .* (p_Am_values .* Tc_value .* s_M_i_values .* (Lw_values .* del_M_i_values .^ 2)))
     end
     return denom
 end
-
-
-function is_eggmass(a)
-    return a.type == :eggmass
-end
-
-function is_juvenile(a)
-    return a.type == :juvenile
-end
-
-function is_adult(a)
-    return a.type == :adult
-end
-
 
 function mean_eggs(model)
     all_agents = collect(values(allagents(model)))
@@ -247,6 +243,9 @@ function days_between_dates(date1, date2)
     end
 end
 
+                                        #####################
+                                        #    plottings      #
+                                        #####################
 
 function plot_means_with_std(df, mean_cols, std_cols)
     # Check if the lengths of mean_cols and std_cols are the same

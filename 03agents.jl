@@ -1,5 +1,3 @@
-
-    
 @agent struct Sardine(NoSpaceAgent)
     type::Symbol # EggMass, Juvenile, Adult
     Nind::Float64 # number of individuals in the superindividuals

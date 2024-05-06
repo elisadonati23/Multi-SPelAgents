@@ -1,6 +1,8 @@
-## ALL SARDINE --
-#########################################################################################
-# wraps --------
+                                        ###############
+                                        #   wraps     #
+                                        ###############
+
+
 function parallel_sardine_step!(Sardine, model)
     if Sardine.type == :eggmass
         parallel_eggmass_step!(Sardine, model) # deb + aging
@@ -13,7 +15,7 @@ end
 
 function sardine_step!(Sardine, model)
     if Sardine.type == :eggmass
-        parallel_eggmass_step!(Sardine, model) # deb + aging + hatch
+        eggmass_step!(Sardine, model) # deb + aging + hatch
     elseif Sardine.type == :juvenile
         parallel_juvenile_step!(Sardine, model) # die + deb + mature + aging
     elseif Sardine.type == :adult
@@ -21,8 +23,9 @@ function sardine_step!(Sardine, model)
     end
 end
 
-## ENVIRONMENT ----
-#########################################################################################
+                                            ###################
+                                            ## ENVIRONMENT   ##
+                                            ###################
 
 
 function evolve_environment!(model)
@@ -37,8 +40,7 @@ function evolve_environment!(model)
     #increase time checher
     model.sim_timing += 1
 
-    #faster options to check if temp and kappa are vectors:
-    #they update tc, kappa and xmax at each time step according to the timeseries
+    # update time dependent parameters
     update_Tc!(model, model.Tc)
     update_Kappa!(model, model.Kappa)
     update_Xmax!(model, model.Xmax)
@@ -56,8 +58,7 @@ function evolve_environment!(model)
     
     model.Xall = Xall
 
-    ## update response function f ---
-    ###############################
+    ## update response function f 
 
     if ismissing(calculate_max_assimilation(model)) || calculate_max_assimilation(model) == 0.0 || isnan(calculate_max_assimilation(model))
         f = 0.0
@@ -69,16 +70,14 @@ function evolve_environment!(model)
     ## Ensure that f is bounded between 0 and 1
     model.f = max(0, min(f, 1.0)) # not 1 but 0.8
 
-    agents = collect(values(allagents(model)))
-    adults = filter(a -> a.type == :adult, agents)
-    juve = filter(a -> a.type == :juvenile, agents)
+    adults_juve = filter(a -> a.type == :adult || a.type == :juvenile, collect(values(allagents(model))))
 
     # if there are no adults or juveniles, set f to 0.8.
     # this prevent numerical instability when there are no agents in the model that feed exogenously
     # infact, with just eggs, Lw and WW and Volume would go to zero and the population assimilation
     # cannot be calculated with max and real assimilation functions.
 
-    if isempty(adults) && isempty(juve)
+    if isempty(adults_juve)
         model.f = 0.8 
     return
 
@@ -121,7 +120,6 @@ function update_outputs!(model)
         #mean tpuberty plot
         model.mean_Hjuve = calculate_mean_prop(model, "H", type = :juvenile)
         model.sd_Hjuve = calculate_sd_prop(model, "H", type = :juvenile)
-
     end
     return
 end
@@ -266,18 +264,18 @@ end
 
 function juvedie!(Sardine, model)
 
-    if  Sardine.Nind <= 1.0
+    if  Sardine.Nind < 1.0
             Sardine.Dead = true
             model.deadJ_nat += 1.0
-        else 
+    else 
         if !Sardine.Dead
-            M = model.M_j
+            M = model.M_j 
             for i in 1:Sardine.Nind #loop on Nind to check how many should die
                 randomvalue = rand()
                 if ((1- exp(- M))) >= randomvalue
                     model.deadJ_nat += 1.0 #update the counters
                     Sardine.Nind -= 1.0
-                    if Sardine.Nind <= 1.0 #if the superindividual is with less than 10 individuals it dies
+                    if Sardine.Nind < 1.0 #if the superindividual is with less than 10 individuals it dies
                         Sardine.Dead = true
                         break
                     end
@@ -299,7 +297,7 @@ function juveDEB!(Sardine, model)
         #println("for agent $(Sardine.id) Lw is ", Sardine.Lw, "and del_M_i is ", Sardine.del_M_i)
 
         #initialize the state variables before the fluxes
-        Vdyn = (Sardine.Lw * Sardine.del_M_i) ^ 3.0
+        Vdyn = (Sardine.Lw * Sardine.del_M_i) ^ 3.0 
         Endyn = Sardine.En
         Hdyn = Sardine.H
         Rdyn = Sardine.R
@@ -398,7 +396,7 @@ end
 
 function adultdie!(Sardine, model)
 
-    if Sardine.Nind <= 1.0
+    if Sardine.Nind < 1.0
         Sardine.Dead = true
         model.deadA_nat += 1.0
     else
@@ -427,7 +425,7 @@ function adultdie!(Sardine, model)
                       model.deadA_nat += 1.0 # it has died of natural mortality
                   end
                  Sardine.Nind -= 1.0
-                 if Sardine.Nind <= 1.0
+                 if Sardine.Nind < 1.0
                      Sardine.Dead = true
                      break
                  end
@@ -440,7 +438,8 @@ end
 
 
 function adultDEB!(Sardine, model)
-    if !Sardine.Dead
+
+if !Sardine.Dead
     Sardine.f_i = model.f
     Vdyn = (Sardine.Lw * Sardine.del_M_i) ^ 3.0
     Endyn = Sardine.En
@@ -497,7 +496,7 @@ function adultDEB!(Sardine, model)
 end
 end
 
-function adultaging!(Sardine, model)
+function adultaging!(Sardine, model) 
     if !Sardine.Dead 
         Sardine.Age += 1.0
     end
@@ -529,12 +528,13 @@ if (!Sardine.Dead && Sardine.Nind >= 1.0)  &&
 
             # and if the energy to be spawned is lower than the energy available, spawn!
             if (spawned_en < Sardine.R )#* Kappa_valueR)    
-                En_val = Float64(spawned_en)
+                En_val = Float64(spawned_en) 
                 Gen_val = Float64(Sardine.Generation)
                 #Nind males and females lose the same amount of spawned energy
                 Sardine.R = Float64(Sardine.R - spawned_en) #(Sardine.R / spawn_period)) 
                 Sardine.spawned += 1.0 #number of times the fish has spawned
-                generate_EggMass(floor((Sardine.Nind/2.0)), #half of the Nind produce eggs (females)
+                #here i use ceil since if Nind = 1, half is 0.5 and i want to have at least 1 egg
+                generate_EggMass(ceil((Sardine.Nind/2.0)), #half of the Nind produce eggs (females)
                                             model,
                                             Neggs_val,
                                             EggEn_E0_val,
