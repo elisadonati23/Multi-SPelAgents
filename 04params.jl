@@ -28,9 +28,7 @@ function create_params(
     KappaX = 0.8
     KappaR = 0.95
     Fm = 6.5
-    del_M = 0.1152
-    del_Ml = 0.1152
-    del_Ma = 0.1152 
+    del_M = 0.1152 #equal if juvenile or adult - isomorph
     k_J = 0.002 #agents juveniles or adults
     s_M = 3.093 #agent
     p_M = 396.195 #agent

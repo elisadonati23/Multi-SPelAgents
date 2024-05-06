@@ -17,7 +17,6 @@
     QWw::String #Quantile weight
     R::Float64 #Reproduction
     Scaled_En::Float64
-    del_M_i::Float64 #shape parameter
     s_M_i::Float64 #shape parameter
     pA::Float64 #assimilation
     #CI::Float64 -- not needed atm 

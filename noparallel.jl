@@ -8,7 +8,7 @@ include("06initialize.jl")
 include("07agent_step!.jl")
 include("08complex_step.jl")
 
-modello = model_initialize_noparallel(0.0, 0.0, 2000.0, 0.0, 50000.0, 1.0, 115.0, 0.945, 15.0)
+modello = model_initialize_noparallel(60.0, 80.0, 20.0, 0.0, 50000.0, 1.0, 115.0, 0.945, 15.0)
 
 modello.f
 
@@ -37,7 +37,7 @@ for i in 1:num_runs
     
     # Run the model
     
-    df_agent = run!(modello, 365*5; adata, mdata)
+    df_agent = run!(modello, 365*10; adata, mdata)
     # Store the result in the results array
     push!(results, df_agent)
     end_time = Dates.now()

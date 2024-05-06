@@ -207,14 +207,13 @@ function egghatch!(Sardine, model)
         # If egg survived starvation In deb()! and has enough complexity, it becomes a juvenile
         Sardine.type = :juvenile
         Sardine.f_i = model.f # if model is initialized only with eggs, this value is set to 0.8, otherwise from the model
-        Sardine.del_M_i = model.del_Ml
-        Sardine.Lw = (Sardine.L / model.del_Ml)
+        Sardine.Lw = (Sardine.L / model.del_M)
         Sardine.Lb_i = Sardine.L
 
         Sardine.s_M_i = if model.Hb >= Sardine.H
             1.0
         elseif Sardine.H > model.Hb && model.Hj > Sardine.H
-            Sardine.Lw * Sardine.del_M_i / Sardine.Lb_i
+            Sardine.Lw * model.del_M / Sardine.Lb_i
         else
             model.s_M
         end
@@ -223,11 +222,12 @@ function egghatch!(Sardine, model)
         # this allow to calculate first pA and then update real and maximum assimilation in the evolve_environment function
         # once they enter DEB module, pA is updated with the real assimilation
         
-        Sardine.pA = Sardine.f_i * model.p_Am * model.Tc_value* Sardine.s_M_i * ((Sardine.Lw * Sardine.del_M_i)^2.0)
+        Sardine.pA = Sardine.f_i * model.p_Am * model.Tc_value* Sardine.s_M_i * ((Sardine.Lw * model.del_M)^2.0)
         Sardine.Nind = Float64(ceil((1 - model.M_egg) * Float64((Sardine.Nind))))
-        Sardine.Ww = (model.w * (model.d_V * ((Sardine.Lw * model.del_Ml) ^ 3.0) + model.w_E / model.mu_E *(Sardine.En + 0.0))) #R
-        Sardine.Scaled_En = Sardine.En / ( model.Em * ((Sardine.Lw * model.del_Ml)^3))
+        Sardine.Ww = (model.w * (model.d_V * ((Sardine.Lw * model.del_M) ^ 3.0) + model.w_E / model.mu_E *(Sardine.En + 0.0))) #R
+        Sardine.Scaled_En = Sardine.En / ( model.Em * ((Sardine.Lw * model.del_M)^3.0))
         Sardine.t_puberty = 0.0
+        Sardine.H = model.Hp * (Sardine.Lw * model.del_M) / model.Lp
 
         model.dead_eggmass += 1.0                                              
         return
@@ -283,10 +283,10 @@ function juveDEB!(Sardine, model)
         Sardine.f_i = model.f #if no one is eating (=model initilized with eggs), it is set to 0.8)
 
         # juvenile store energy into maturation state variable and eventually they mature
-        #println("for agent $(Sardine.id) Lw is ", Sardine.Lw, "and del_M_i is ", Sardine.del_M_i)
+        #println("for agent $(Sardine.id) Lw is ", Sardine.Lw, "and del_M_i is ", model.del_M)
 
         #initialize the state variables before the fluxes
-        Vdyn = (Sardine.Lw * Sardine.del_M_i) ^ 3.0
+        Vdyn = (Sardine.Lw * model.del_M) ^ 3.0
         Endyn = Sardine.En
         Hdyn = Sardine.H
         Rdyn = Sardine.R
@@ -296,7 +296,7 @@ function juveDEB!(Sardine, model)
         #initialize the variation in the state variables
         deltaV = 0.0
         deltaEn  = 0.0
-        #deltaH = 0.0
+        deltaH = 0.0
         deltaR = 0.0
 
         v_T = model.v_rate * model.Tc_value
@@ -330,15 +330,15 @@ function juveDEB!(Sardine, model)
         # update state variables
         Sardine.En = Endyn + deltaEn
         V = Vdyn + deltaV
-        Sardine.Lw = (V ^ (1/3)) / Sardine.del_M_i
-        Sardine.H = model.Hp #Hdyn + deltaH
+        Sardine.Lw = (V ^ (1/3)) / model.del_M
+        Sardine.H = Hdyn + deltaH
         Sardine.R = Rdyn + deltaR
         Sardine.Ww = (model.w *(model.d_V * V + model.w_E/ model.mu_E * (Sardine.En + Sardine.R)))
-        Sardine.Scaled_En = Sardine.En / (model.Em * (( Sardine.Lw * Sardine.del_M_i)^3.0))
+        Sardine.Scaled_En = Sardine.En / (model.Em * (( Sardine.Lw * model.del_M)^3.0))
 
         #check whether Lm is a vector or a float
         Lm_value = isa(model.Lm, Vector{Float64}) ? model.Lm[model.sim_timing] : model.Lm
-        Sardine.L = Sardine.Lw * Sardine.del_M_i / Lm_value 
+        Sardine.L = Sardine.Lw * model.del_M / Lm_value 
     end
     remove_all!(model, is_dead)
 return
@@ -350,8 +350,7 @@ function juvemature!(Sardine, model)
          #Keep the same number of individuals which survived up to now in juvenile superind
          Sardine.type = :adult
          Sardine.R = 0.0
-         Sardine.del_M_i = model.del_Ma
-         Sardine.pA = Sardine.f_i * model.p_Am * model.Tc_value * Sardine.s_M_i * ((Sardine.Lw * Sardine.del_M_i)^2.0)
+         Sardine.pA = Sardine.f_i * model.p_Am * model.Tc_value * Sardine.s_M_i * ((Sardine.Lw * model.del_M)^2.0)
          Sardine.Generation += 1.0
          Sardine.s_M_i = model.s_M
     else
@@ -433,7 +432,7 @@ function adultDEB!(Sardine, model)
 
 if !Sardine.Dead
     Sardine.f_i = model.f
-    Vdyn = (Sardine.Lw * Sardine.del_M_i) ^ 3.0
+    Vdyn = (Sardine.Lw * model.del_M) ^ 3.0
     Endyn = Sardine.En
     Hdyn = model.Hb
     Rdyn = Sardine.R
@@ -479,12 +478,12 @@ if !Sardine.Dead
     Sardine.En = Endyn + deltaEn
 
     V = Vdyn + deltaV
-    Sardine.Lw = (V ^ (1/3)) / Sardine.del_M_i
+    Sardine.Lw = (V ^ (1/3)) / model.del_M
     Sardine.H = Hdyn + deltaH
     Sardine.R = Rdyn + deltaR
     Sardine.Ww = (model.w *(model.d_V * V + model.w_E/ model.mu_E * (Sardine.En + Sardine.R)))
-    Sardine.Scaled_En= Sardine.En / (model.Em * (( Sardine.Lw * Sardine.del_M_i)^3.0))
-    Sardine.L = Sardine.Lw * Sardine.del_M_i / model.Lm
+    Sardine.Scaled_En= Sardine.En / (model.Em * (( Sardine.Lw * model.del_M)^3.0))
+    Sardine.L = Sardine.Lw * model.del_M / model.Lm
 end
 remove_all!(model, is_dead)
 return
