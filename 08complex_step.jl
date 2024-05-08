@@ -1,11 +1,11 @@
-mutable struct scheduler_EggAdults end
+mutable struct scheduler_Adults end
 
-function (sEA::scheduler_EggAdults)(model::ABM)
+function (sEA::scheduler_Adults)(model::ABM)
     ids = [agent.id for agent in values(allagents(model))] 
     ids = filter!(id -> hasid(model, id) && (model[id].type == :adult), ids)
     return ids
 end
-sEA = scheduler_EggAdults()
+sEA = scheduler_Adults()
 
 function complex_step!(model)
     #parallel

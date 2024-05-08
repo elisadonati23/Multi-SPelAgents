@@ -199,7 +199,6 @@ function eggDEB!(Sardine, model)
         Sardine.H = Sardine.H + deltaH 
         Sardine.L = (V + deltaV)^(1/3)
     end
-    remove_all!(model, is_dead)
     return
 end
 
@@ -337,7 +336,6 @@ function juveDEB!(Sardine, model)
         Lm_value = isa(model.Lm, Vector{Float64}) ? model.Lm[model.sim_timing] : model.Lm
         Sardine.L = Sardine.Lw * model.del_M / Lm_value 
     end
-    remove_all!(model, is_dead)
 return
 end
 
@@ -414,8 +412,6 @@ function adultdie!(Sardine, model)
         Sardine.Dead = true
         model.deadA_nat += 1.0
     end
-
-    remove_all!(model, is_dead)
     return
 end
 
@@ -477,7 +473,6 @@ if !Sardine.Dead
     Sardine.Scaled_En= Sardine.En / (model.Em * (( Sardine.Lw * model.del_M)^3.0))
     Sardine.L = Sardine.Lw * model.del_M / model.Lm
 end
-remove_all!(model, is_dead)
 return
 end
 
