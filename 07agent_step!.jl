@@ -261,12 +261,10 @@ function juvedie!(Sardine, model)
             end
     end
 #if less than 1 ind, superindividual dies
-if  Sardine.Nind < 1.0 && !Sardine.Dead
-        Sardine.Dead = true
-        model.deadJ_nat += 1.0
-end
-
-    remove_all!(model, is_dead)
+    if  Sardine.Nind < 1.0 && !Sardine.Dead
+            Sardine.Dead = true
+            model.deadJ_nat += 1.0
+    end
 return
 end
 
