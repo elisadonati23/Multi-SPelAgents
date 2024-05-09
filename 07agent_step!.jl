@@ -209,7 +209,9 @@ function egghatch!(Sardine, model)
         Sardine.f_i = model.f # if model is initialized only with eggs, this value is set to 0.8, otherwise from the model
         Sardine.Lw = (Sardine.L / model.del_M)
         Sardine.Lb_i = Sardine.L
-        Sardine.Age = model.Am * Sardine.Lw * model.del_M / model.Lm
+        Sardine.Age = model.Ap * (Sardine.Lw * model.del_M) / model.Lp
+        Sardine.H = model.Hp * (Sardine.Lw * model.del_M) / model.Lp
+        Sardine.Nind = Float64(ceil((1 - model.M_egg) * Float64((Sardine.Nind))))
 
         Sardine.s_M_i = if model.Hb >= Sardine.H
             1.0
@@ -224,12 +226,9 @@ function egghatch!(Sardine, model)
         # once they enter DEB module, pA is updated with the real assimilation
         
         Sardine.pA = Sardine.f_i * model.p_Am * model.Tc_value* Sardine.s_M_i * ((Sardine.Lw * model.del_M)^2.0)
-        Sardine.Nind = Float64(ceil((1 - model.M_egg) * Float64((Sardine.Nind))))
         Sardine.Ww = (model.w * (model.d_V * ((Sardine.Lw * model.del_M) ^ 3.0) + model.w_E / model.mu_E *(Sardine.En + 0.0))) #R
         Sardine.Scaled_En = Sardine.En / ( model.Em * ((Sardine.Lw * model.del_M)^3.0))
         Sardine.t_puberty = 0.0
-        Sardine.H = model.Hp * (Sardine.Lw * model.del_M) / model.Lp
-
         model.dead_eggmass += 1.0                                              
         return
     end
@@ -498,21 +497,22 @@ if (!Sardine.Dead && Sardine.Nind >= 1.0)  &&
             # Define a dictionary to map QWw values to multipliers
             multipliers = Dict("Q1" => 450, "Q2" => 500, "Q3" => 550, "Q4" => 600)
             # Determine the number of eggs
-            Neggs_val = Float64(multipliers[Sardine.QWw] * Sardine.Ww)
+            Neggs_val = Float64(multipliers[Sardine.QWw] * Sardine.Ww)#* ceil((Sardine.Nind/2.0)) 
 
             # Then determine the energy content of the eggs
             EggEn_E0_val = Float64(((model.E0_max - model.E0_min) / (1.0- model.ep_min)) * (Sardine.Scaled_En - model.ep_min)) + model.E0_min
+            # spawned energy of the superindividual, so I don't multiply by Nind
             spawned_en = Neggs_val * EggEn_E0_val #Sardine.R * Kappa_valueR / spawn_period 
 
             # and if the energy to be spawned is lower than the energy available, spawn!
-            if (spawned_en < Sardine.R )#* Kappa_valueR)    
+            if (spawned_en < Sardine.R ) #* Kappa_valueR)    
                 En_val = Float64(spawned_en) 
                 Gen_val = Float64(Sardine.Generation)
                 #Nind males and females lose the same amount of spawned energy
                 Sardine.R = Float64(Sardine.R - spawned_en) #(Sardine.R / spawn_period)) 
                 Sardine.spawned += 1.0 #number of times the fish has spawned
                 #here i use ceil since if Nind = 1, half is 0.5 and i want to have at least 1 egg
-                generate_EggMass(ceil((Sardine.Nind/2.0)), #half of the Nind produce eggs (females)
+                generate_EggMass(ceil((Sardine.Nind/2.0)) , #half of the Nind produce eggs (females)
                                             model,
                                             Neggs_val,
                                             EggEn_E0_val,
