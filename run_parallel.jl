@@ -8,7 +8,7 @@ include("06initialize.jl")
 include("07agent_step!.jl")
 include("08complex_step.jl")
 
-modello = model_initialize_parallel(60.0, 80.0, 20.0, 0.0, 50000.0, 1.0, 115.0, 0.945, 15.0) 
+modello = model_initialize_parallel(1.0, 8.0, 2.0, 0.0, 50000.0, 1.0, 115.0, 0.945, 15.0) 
 
 # running -----------------
 
@@ -42,7 +42,7 @@ for i in 1:num_runs
     
     # Run the model
     #run!(modello,365*18; adata, mdata)
-    df_agent = run!(modello, 365*20; adata, mdata)
+    df_agent = run!(modello, 365*5; adata, mdata)
     # Store the result in the results array
     push!(results, df_agent)
     end_time = Dates.now()
@@ -54,12 +54,6 @@ end
 
 
 diagnostic_plots(results[1][1], results[1][2])
-
-
-
-
-
-
 
 
 #-#-#-#-#-#-#

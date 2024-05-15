@@ -497,12 +497,13 @@ if (!Sardine.Dead && Sardine.Nind >= 1.0)  &&
             # Define a dictionary to map QWw values to multipliers
             multipliers = Dict("Q1" => 450, "Q2" => 500, "Q3" => 550, "Q4" => 600)
             # Determine the number of eggs
-            Neggs_val = Float64(multipliers[Sardine.QWw] * Sardine.Ww)#* ceil((Sardine.Nind/2.0)) 
+            Neggs_val_single = Float64(multipliers[Sardine.QWw] * Sardine.Ww)
+            Neggs_val = Float64(multipliers[Sardine.QWw] * Sardine.Ww)* ceil((Sardine.Nind/2.0)) 
 
             # Then determine the energy content of the eggs
             EggEn_E0_val = Float64(((model.E0_max - model.E0_min) / (1.0- model.ep_min)) * (Sardine.Scaled_En - model.ep_min)) + model.E0_min
             # spawned energy of the superindividual, so I don't multiply by Nind
-            spawned_en = Neggs_val * EggEn_E0_val #Sardine.R * Kappa_valueR / spawn_period 
+            spawned_en = Neggs_val_single * EggEn_E0_val #Sardine.R * Kappa_valueR / spawn_period 
 
             # and if the energy to be spawned is lower than the energy available, spawn!
             if (spawned_en < Sardine.R ) #* Kappa_valueR)    
@@ -512,7 +513,7 @@ if (!Sardine.Dead && Sardine.Nind >= 1.0)  &&
                 Sardine.R = Float64(Sardine.R - spawned_en) #(Sardine.R / spawn_period)) 
                 Sardine.spawned += 1.0 #number of times the fish has spawned
                 #here i use ceil since if Nind = 1, half is 0.5 and i want to have at least 1 egg
-                generate_EggMass(ceil((Sardine.Nind/2.0)) , #half of the Nind produce eggs (females)
+                generate_EggMass(1 , #half of the Nind produce eggs (females)
                                             model,
                                             Neggs_val,
                                             EggEn_E0_val,
