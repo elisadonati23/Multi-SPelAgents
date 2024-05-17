@@ -1,134 +1,4 @@
-                                        ###############
-                                        #   wraps     #
-                                        ###############
 
-
-function parallel_sardine_step!(Sardine, model)
-    if Sardine.type == :eggmass
-        parallel_eggmass_step!(Sardine, model) # deb + aging
-    elseif Sardine.type == :juvenile
-        parallel_juvenile_step!(Sardine, model)  # die + deb + mature + aging
-    elseif Sardine.type == :adult
-        parallel_adult_step!(Sardine, model) # die deb aging 
-    end
-end
-
-function sardine_step!(Sardine, model)
-    if Sardine.type == :eggmass
-        eggmass_step!(Sardine, model) # deb + aging + hatch
-    elseif Sardine.type == :juvenile
-        parallel_juvenile_step!(Sardine, model) # die + deb + mature + aging
-    elseif Sardine.type == :adult
-        adult_step!(Sardine, model) # die deb aging + spawn
-    end
-end
-
-                                            ###################
-                                            ## ENVIRONMENT   ##
-                                            ###################
-
-
-function evolve_environment!(model)
-    
-    # day counter
-    if model.day_of_the_year == 365.0
-        model.day_of_the_year = 1.0
-    else
-        model.day_of_the_year += 1.0
-    end
-
-    #increase time checher
-    model.sim_timing += 1
-
-    # update time dependent parameters
-    update_Tc!(model, model.Tc)
-    update_Kappa!(model, model.Kappa)
-    update_Xmax!(model, model.Xmax)
-
-    # calculate Xall
-    # Xall is initialized like X, which is set to Xmax (look at params)
-    # remove the assimilation of all agents:
-
-    Xall = model.Xmax_value - (calculate_real_assimilation(model)/ model.KappaX) / model.Wv
-    #println("real assimilation:", calculate_real_assimilation(model))
-    
-     if Xall < 0.0  
-         Xall = 0.0 
-     end
-    
-    model.Xall = Xall
-
-    ## update response function f 
-
-    if ismissing(calculate_max_assimilation(model)) || calculate_max_assimilation(model) == 0.0 || isnan(calculate_max_assimilation(model))
-        f = 0.0
-    else
-        #rapporto tra quello disponibile e quello che si mangia su base di taglia e Tc!!
-    f = (model.Xmax_value * model.Wv * model.KappaX) / calculate_max_assimilation(model) #take into consideration the Nind of the superindividuals
-    end
-
-    ## Ensure that f is bounded between 0 and 1
-    model.f = max(0, min(f, 1.0)) # not 1 but 0.8
-
-    adults_juve = filter(a -> a.type == :adult || a.type == :juvenile, collect(values(allagents(model))))
-
-    # if there are no adults or juveniles, set f to 0.8.
-    # this prevent numerical instability when there are no agents in the model that feed exogenously
-    # infact, with just eggs, Lw and WW and Volume would go to zero and the population assimilation
-    # cannot be calculated with max and real assimilation functions.
-
-    if isempty(adults_juve)
-        model.f = 0.8 
-    return
-
-end
-end
-
-
-function update_outputs!(model)
-    agents = collect(values(allagents(model)))
-    adults = filter(a -> a.type == :adult, agents)
-
-    # Check if there are any agents that match the criteria
-    if !isempty(adults)
-        interquantiles_prop(model, :Ww, :QWw, :adult)
-    end
-
-    adults_juv = filter(a -> (a.type == :adult || a.type == :juvenile), agents)
-
-    if !isempty(adults_juv)
-        # B plot: take into account Nind
-        model.TotB = calculate_sum_prop(model, "Ww", Nind = true)
-        model.JuvB = calculate_sum_prop(model, "Ww", type = :juvenile, Nind = true)
-        model.AdB = calculate_sum_prop(model, "Ww", type = :adult, Nind = true)
-
-        # mean Ww plot
-        model.meanAdWw = calculate_mean_prop(model, "Ww", type = :adult, age = 3.0)
-        model.sdAdWw =  calculate_sd_prop(model, "Ww", type = :adult)
-        model.meanJuvWw = calculate_mean_prop(model, "Ww", type = :juvenile)
-        model.sdJuvWw = calculate_sd_prop(model, "Ww", type = :juvenile)
-        
-        #mean Lw plot
-        model.meanAdL = calculate_mean_prop(model, "Lw", type = :adult)
-        model.sdAdL = calculate_sd_prop(model, "Lw", type = :adult)
-        model.meanJuvL = calculate_mean_prop(model, "Lw", type = :juvenile)
-        model.sdJuvL = calculate_sd_prop(model, "Lw", type = :juvenile)
-
-        #mean tpuberty plot
-        model.mean_tpuberty = calculate_mean_prop(model, "t_puberty", type = :adult)
-        model.sd_tpuberty = calculate_sd_prop(model, "t_puberty", type = :adult)
-        #mean tpuberty plot
-        model.mean_Hjuve = calculate_mean_prop(model, "H", type = :juvenile)
-        model.sd_Hjuve = calculate_sd_prop(model, "H", type = :juvenile)
-    end
-    return
-end
-
-function evolve_environment_noparallel!(model)
-    remove_all!(model, is_dead)
-    evolve_environment!(model)
-    update_outputs!(model)
- end
                                   #####################
                                   #      EGGMASS 
                                   #####################
@@ -345,6 +215,7 @@ function juvemature!(Sardine, model)
          Sardine.pA = Sardine.f_i * model.p_Am * model.Tc_value * Sardine.s_M_i * ((Sardine.Lw * model.del_M)^2.0)
          Sardine.Generation += 1.0
          Sardine.s_M_i = model.s_M
+         Sardine.QWw = interquantiles_prop(model, :Ww, :QWw)
     else
         Sardine.t_puberty += 1.0
     end
@@ -467,6 +338,7 @@ if !Sardine.Dead
     Sardine.H = Hdyn + deltaH
     Sardine.R = Rdyn + deltaR
     Sardine.Ww = (model.w *(model.d_V * V + model.w_E/ model.mu_E * (Sardine.En + Sardine.R)))
+    Sardine.QWw = interquantiles_prop(model, :Ww, :QWw)
     Sardine.Scaled_En= Sardine.En / (model.Em * (( Sardine.Lw * model.del_M)^3.0))
     Sardine.L = Sardine.Lw * model.del_M / model.Lm
 end
@@ -498,27 +370,27 @@ if (!Sardine.Dead && Sardine.Nind >= 1.0)  &&
             multipliers = Dict("Q1" => 450, "Q2" => 500, "Q3" => 550, "Q4" => 600)
             # Determine the number of eggs
             #Neggs_val_single = Float64(multipliers[Sardine.QWw] * Sardine.Ww)
-            Neggs_val = Float64(multipliers[Sardine.QWw] * Sardine.Ww)#* ceil((Sardine.Nind/2.0)) 
-
+            Ninds_val = Float64(multipliers[Sardine.QWw] * Sardine.Ww) * ceil((Sardine.Nind/2.0)) 
+            Neggs_value_single = Float64(multipliers[Sardine.QWw] * Sardine.Ww)
             # Then determine the energy content of the eggs
             EggEn_E0_val = Float64(((model.E0_max - model.E0_min) / (1.0- model.ep_min)) * (Sardine.Scaled_En - model.ep_min)) + model.E0_min
             # spawned energy of the superindividual, so I don't multiply by Nind
-            spawned_en = Neggs_val * EggEn_E0_val #Sardine.R * Kappa_valueR / spawn_period 
+            spawned_en = Neggs_value_single * EggEn_E0_val #Sardine.R * Kappa_valueR / spawn_period 
 
             # and if the energy to be spawned is lower than the energy available, spawn!
             if (spawned_en < Sardine.R ) #* Kappa_valueR)    
                 En_val = Float64(spawned_en) 
-                Gen_val = Float64(Sardine.Generation)
+                Gen_val = Float64(Sardine.Generation) +1.0
                 #Nind males and females lose the same amount of spawned energy
                 Sardine.R = Float64(Sardine.R - spawned_en) #(Sardine.R / spawn_period)) 
                 Sardine.spawned += 1.0 #number of times the fish has spawned
                 #here i use ceil since if Nind = 1, half is 0.5 and i want to have at least 1 egg
-                generate_EggMass( ceil((Sardine.Nind/2.0)), #half of the Nind produce eggs (females)
+                generate_EggMass(1, #half of the Nind produce eggs (females)
                                             model,
-                                            Neggs_val,
-                                            EggEn_E0_val,
-                                            En_val,
-                                            Gen_val)
+                                            Ninds_val,
+                                            EggEn_E0_val, #EggEn
+                                            En_val, #En
+                                            Gen_val) #Genration
             end
 
     end
