@@ -64,7 +64,7 @@ function eggDEB!(Sardine, model)
             deltaV = 0.0
         end
     
-        Sardine.En = Sardine.En + deltaEggEn * Sardine.Nind
+        Sardine.En = Sardine.En + deltaEggEn
         Sardine.EggEn = Sardine.EggEn + deltaEggEn
         Sardine.H = Sardine.H + deltaH 
         Sardine.L = (V + deltaV)^(1/3)
@@ -369,17 +369,20 @@ if (!Sardine.Dead && Sardine.Nind >= 1.0)  &&
             # Define a dictionary to map QWw values to multipliers
             multipliers = Dict("Q1" => 450, "Q2" => 500, "Q3" => 550, "Q4" => 600)
             # Determine the number of eggs
-            #Neggs_val_single = Float64(multipliers[Sardine.QWw] * Sardine.Ww)
+
+            #eggs from all females
             Ninds_val = Float64(multipliers[Sardine.QWw] * Sardine.Ww) * ceil((Sardine.Nind/2.0)) 
+            #eggs from one female
             Neggs_value_single = Float64(multipliers[Sardine.QWw] * Sardine.Ww)
-            # Then determine the energy content of the eggs
+
+
+            # Then determine the energy content of the eggs from maternal effects
             EggEn_E0_val = Float64(((model.E0_max - model.E0_min) / (1.0- model.ep_min)) * (Sardine.Scaled_En - model.ep_min)) + model.E0_min
-            # spawned energy of the superindividual, so I don't multiply by Nind
+            # spawned energy of a single female, we assume it's the same for all female and male
             spawned_en = Neggs_value_single * EggEn_E0_val #Sardine.R * Kappa_valueR / spawn_period 
 
             # and if the energy to be spawned is lower than the energy available, spawn!
-            if (spawned_en < Sardine.R ) #* Kappa_valueR)    
-                En_val = Float64(spawned_en) 
+            if (spawned_en < Sardine.R ) #* Kappa_valueR)
                 Gen_val = Float64(Sardine.Generation) +1.0
                 #Nind males and females lose the same amount of spawned energy
                 Sardine.R = Float64(Sardine.R - spawned_en) #(Sardine.R / spawn_period)) 
@@ -389,7 +392,7 @@ if (!Sardine.Dead && Sardine.Nind >= 1.0)  &&
                                             model,
                                             Ninds_val,
                                             EggEn_E0_val, #EggEn
-                                            En_val, #En
+                                            EggEn_E0_val, #Reserve of the eggmass now is scaled to the single egg
                                             Gen_val) #Genration
             end
 

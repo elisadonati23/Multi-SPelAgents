@@ -46,7 +46,7 @@ function generate_EggMass(No_Egg, model, Nind = missing, EggEn = missing, En = m
         end
 
         if ismissing(En)
-            agent_En = Float64(Nind * model.E0)
+            agent_En = model.E0
         else
             agent_En = Float64(En)
         end
