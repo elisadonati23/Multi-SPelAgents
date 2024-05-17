@@ -210,7 +210,7 @@ function juvemature!(Sardine, model)
          Sardine.pA = Sardine.f_i * model.p_Am * model.Tc_value * Sardine.s_M_i * ((Sardine.Lw * model.del_M)^2.0)
          Sardine.Generation += 1.0
          Sardine.s_M_i = model.s_M
-         Sardine.QWw = interquantiles_prop(model, :Ww, :QWw)
+         Sardine.QWw = interquantiles_prop_single(Sardine, model, :Ww, :QWw)
     else
         Sardine.t_puberty += 1.0
     end
@@ -333,7 +333,7 @@ if !Sardine.Dead
     Sardine.H = Hdyn + deltaH
     Sardine.R = Rdyn + deltaR
     Sardine.Ww = (model.w *(model.d_V * V + model.w_E/ model.mu_E * (Sardine.En + Sardine.R)))
-    Sardine.QWw = interquantiles_prop(model, :Ww, :QWw)
+    Sardine.QWw = interquantiles_prop_single(Sardine, model, :Ww, :QWw)
     Sardine.Scaled_En= Sardine.En / (model.Em * (( Sardine.Lw * model.del_M)^3.0))
     Sardine.L = Sardine.Lw * model.del_M / model.Lm
 end

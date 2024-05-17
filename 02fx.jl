@@ -82,6 +82,22 @@ function interquantiles_prop(model, prop, class_prop, agent_type = missing, assi
     end
 end
 
+function interquantiles_prop_single(agent, model, prop, class_prop, assign = true, Wwquant = model.Ww_quantiles)
+    #Calculate quantiles
+    # Wwquant are calculated at the beginning of the Simulation
+    #if specified they are the reference quantiles, otherwise the quantiles are calculated on the specified property
+    quantiles = ismissing(Wwquant) ? quantile([getproperty(a, prop) for a in filtered_agents], [0.25, 0.5, 0.75]) : Wwquant
+
+    if assign
+            class = getproperty(agent, prop) <= quantiles[1] ? "Q1" :
+                    getproperty(agent, prop) <= quantiles[2] ? "Q2" :
+                    getproperty(agent, prop) <= quantiles[3] ? "Q3" : "Q4"
+            setproperty!(agent, class_prop, class)
+    else
+        return quantiles
+    end
+end
+
 function get_bigger_agent(agent_type, model, feature)
     all_agents = collect(values(allagents(model)))
     all_agents = filter(agent -> hasid(model, agent.id), all_agents)
