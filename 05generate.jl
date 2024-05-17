@@ -202,6 +202,8 @@ function generate_Adult(No_A, model, Nind = missing, Age = missing, t_puberty = 
 
         agent_En = if ismissing(En)
             agent_En = agent_f_i * model.Em * ((agent_Lw * model.del_M)^3.0)
+        else
+            En
         end
 
 
