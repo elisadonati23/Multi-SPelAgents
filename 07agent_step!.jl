@@ -9,11 +9,6 @@ function parallel_eggmass_step!(Sardine, model)
     egghatch!(Sardine, model) # egghatch non comporta più un generate_fx() con i superindividui quindi può andare in paralelo
 end #-- it follows hatch! in complex step so same order of eggmass_step!()
 
-function eggmass_step!(Sardine, model)
-    eggDEB!(Sardine, model)
-    eggaging!(Sardine, model)
-    egghatch!(Sardine, model)
-end
 
 function eggaging!(Sardine, model)
     if !Sardine.Dead

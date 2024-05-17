@@ -13,7 +13,7 @@ end
 
 function sardine_step!(Sardine, model)
     if Sardine.type == :eggmass
-        eggmass_step!(Sardine, model) # deb + aging + hatch
+        parallel_eggmass_step!(Sardine, model) # deb + aging + hatch
     elseif Sardine.type == :juvenile
         parallel_juvenile_step!(Sardine, model) # die + deb + mature + aging
     elseif Sardine.type == :adult
