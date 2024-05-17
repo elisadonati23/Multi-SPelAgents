@@ -8,7 +8,7 @@ include("06initialize.jl")
 include("07agent_step!.jl")
 include("08simulation_step.jl")
 
-modello = model_initialize_parallel(1.0, 0.0, 0.0, 0.0, 1.7e14, 1.0, 0.550, 0.945, 15.0) 
+modello = model_initialize_parallel(0.0, 0.0, 1.0, 0.0, 1.7e14, 1.0, 0.550, 0.945, 15.0) 
 
 # running -----------------
 
