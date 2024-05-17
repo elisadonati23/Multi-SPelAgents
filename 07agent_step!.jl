@@ -116,18 +116,18 @@ end
 function juvedie!(Sardine, model)
 
     #single individual die
-    if !Sardine.Dead && Sardine.Nind >= 1.0
-            for i in 1:Sardine.Nind #loop on Nind to check how many should die
+    if !Sardine.Dead && Sardine.Nind >= 1000.0
+            for i in (1:Sardine.Nind/1000.0) #loop on Nind to check how many should die
                 if ((1- exp(- model.M_j))) >=  rand()
-                    model.deadJ_nat += 1.0 #update the counters
-                    Sardine.Nind -= 1.0
+                    model.deadJ_nat += 1000.0 #update the counters
+                    Sardine.Nind -= 1000.0
                 end
             end
     end
 #if less than 1 ind, superindividual dies
-    if  Sardine.Nind < 1.0 && !Sardine.Dead
+    if  Sardine.Nind < 1000.0 && !Sardine.Dead
             Sardine.Dead = true
-            model.deadJ_nat += 1.0
+            model.deadJ_nat += 1000.0
     end
 return
 end
@@ -256,24 +256,25 @@ function adultdie!(Sardine, model)
          else
              M = model.M4 + (model.M_f/365.0)
          end
- 
-         for i in 1:Sardine.Nind
+        
+         #1 dead = 1000 deads
+         for i in 1:(Sardine.Nind/1000.0) #loop on Nind to check how many should die
              randomnumber = rand()
              if (1.0 - exp(-M)) >= randomnumber # if dying... why? fishing or natural?
                  #if the fish would not have died without fishing:
                   if (((1.0 - exp(-M))) >= randomnumber) && (randomnumber > (1.0 - exp(-(M - (model.M_f/365.0))))) # the fish would not have died without fishing
-                      model.fished += 1.0 #then it is fished
+                      model.fished += 1000.0 #then it is fished
                   else
-                      model.deadA_nat += 1.0 # it has died of natural mortality
+                      model.deadA_nat += 1000.0 # it has died of natural mortality
                   end
-                 Sardine.Nind -= 1.0
+                 Sardine.Nind -= (1000.0)
              end
          end
      end
 
-    if Sardine.Nind < 1.0
+    if Sardine.Nind < 1000.0
         Sardine.Dead = true
-        model.deadA_nat += 1.0
+        model.deadA_nat += 1000.0
     end
     return
 end
@@ -349,7 +350,7 @@ end
 
 function adultspawn!(Sardine, model)
 #1st condition to reproduce not being dead
-if (!Sardine.Dead && Sardine.Nind >= 1.0)  &&
+if (!Sardine.Dead && Sardine.Nind >= 1000.0)  &&
 
     #2nd condition: being in the repro period
     #do not check if they are dead since all deads are removed before repro
