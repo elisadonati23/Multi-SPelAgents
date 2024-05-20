@@ -8,7 +8,7 @@ include("06initialize.jl")
 include("07agent_step!.jl")
 include("08simulation_step.jl")
 
-modello = model_initialize_parallel(1.0, 0.0, .0, 0.0, 1.7e14, 1.0, 0.550, 0.945, 15.0) 
+modello = model_initialize_parallel(5.0, 5.0, 0.0, 0.3, 1.7e14, 1.0, 0.550, 0.945, 15.0) 
 
 # running -----------------
 
@@ -23,7 +23,7 @@ for i in 1:num_runs
 
     # Initialize model and data
     #adata = [(is_adult, count), (is_juvenile, count), (is_eggmass, count)]
-    adata = [:type, :Nind, :Lw, :Ww, :Age, :L, :s_M_i, :pA, :Lb_i,:EggEn, :En, :f_i, :QWw, :Scaled_En,  :t_puberty,  :R, :H, :Dead, :Generation]
+    adata = [:type, :Nind]
 
     mdata = [:day_of_the_year,
             :TotB,:JuvB,:AdB, :f, 
@@ -41,8 +41,8 @@ for i in 1:num_runs
     df_model = init_model_dataframe(modello, mdata)
     
     # Run the model
-    run!(modello,365*1; adata, mdata)
-    df_agent = run!(modello, 365*1; adata, mdata)
+    run!(modello,365*8; adata, mdata)
+    df_agent = run!(modello, 365*2; adata, mdata)
     # Store the result in the results array
     push!(results, df_agent)
     end_time = Dates.now()
