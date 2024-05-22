@@ -28,6 +28,9 @@ end
                                                 ###############
                                                 # is xx_agent #
                                                 ###############
+
+sardine(a) = a isa Sardine
+                                   
 function is_eggmass(a)
     return a.type == :eggmass
 end
