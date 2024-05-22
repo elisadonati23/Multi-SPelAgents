@@ -4,7 +4,8 @@
     Age::Float64 # EggMass, Juvenile, Adult
     L::Float64 # Scaled length -- in eggs is assumed to be close to 0 from DEB Theory
     H::Float64 # Maturation energy
-    EggEn::Float64 # Egg energy
+    maternal_EggEn::Float64
+    superind_Neggs::Float64 # Egg energy
     En::Float64 # Reseve energy
     Generation::Float64 # EggMass, Juvenile, Adult
     Dead::Bool 
