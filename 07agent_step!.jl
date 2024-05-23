@@ -369,29 +369,29 @@ if (!Sardine.Dead && Sardine.Nind >= 1000000.0)  &&
             # Determine the number of eggs
 
             #eggs from all females
-            Ninds_val = Float64(multipliers[Sardine.QWw] * Sardine.Ww) * ceil((Sardine.Nind/2.0)) 
+            Sardine.superind_Neggs = Float64(multipliers[Sardine.QWw] * Sardine.Ww) * ceil((Sardine.Nind/2.0)) 
             #eggs from one female
             Neggs_value_single = Float64(multipliers[Sardine.QWw] * Sardine.Ww)
 
 
             # Then determine the energy content of the eggs from maternal effects
-            EggEn_E0_val = Float64(((model.E0_max - model.E0_min) / (1.0- model.ep_min)) * (Sardine.Scaled_En - model.ep_min)) + model.E0_min
+            Sardine.maternal_EggEn = Float64(((model.E0_max - model.E0_min) / (1.0- model.ep_min)) * (Sardine.Scaled_En - model.ep_min)) + model.E0_min
             # spawned energy of a single female, we assume it's the same for all female and male
             spawned_en = Neggs_value_single * EggEn_E0_val #Sardine.R * Kappa_valueR / spawn_period 
 
             # and if the energy to be spawned is lower than the energy available, spawn!
             if (spawned_en < Sardine.R ) #* Kappa_valueR)
-                Gen_val = Float64(Sardine.Generation) +1.0
                 #Nind males and females lose the same amount of spawned energy
+                Sardine.reproduction = :spawner
                 Sardine.R = Float64(Sardine.R - spawned_en) #(Sardine.R / spawn_period)) 
                 Sardine.spawned += 1.0 #number of times the fish has spawned
                 #here i use ceil since if Nind = 1, half is 0.5 and i want to have at least 1 egg
-                generate_EggMass(1, #half of the Nind produce eggs (females)
-                                            model,
-                                            Ninds_val,
-                                            EggEn_E0_val, #EggEn
-                                            EggEn_E0_val, #Reserve of the eggmass now is scaled to the single egg
-                                            Gen_val) #Genration
+                #generate_EggMass(1, #half of the Nind produce eggs (females)
+                #                            model,
+                #                            Ninds_val,
+                #                            EggEn_E0_val, #EggEn
+                #                            EggEn_E0_val, #Reserve of the eggmass now is scaled to the single egg
+                #                            Gen_val) #Genration
             end
 
     end

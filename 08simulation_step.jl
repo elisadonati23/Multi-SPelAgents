@@ -27,7 +27,7 @@ end
 
 
 function evolve_environment!(model)
-    
+
     # day counter
     if model.day_of_the_year == 365.0
         model.day_of_the_year = 1.0
@@ -148,10 +148,21 @@ function complex_step!(model)
     sEA_ids = sEA(model)
     adult_ids = filter!(id -> hasid(model, id) && model[id].type == :adult, copy(sEA_ids))
 
-    remove_all!(model, is_dead) # remove eggs which trantitioned to juveniles
-
     for sardine in adult_ids
-        adultspawn!(model[sardine], model) #generate new agents with add!
+        adultspawn!(model[sardine], model) # set if the sardine spawner or not, determinine the Nind to cluster in a new superindividual which is an egg
+    end
+
+    #create new born daily superindividuals
+    spawners = filter!(id -> model[id].reproduction == :spawners, adult_ids)
+    prop_values = [getfield(agent, superind_Neggs for agent in spanwers)]
+    mean_Egg_energy = mean([getfield(agent, maternal_EggEn) for agent in spawners])
+    tot_Neggs = sum(prop_values)
+    max_generation = maximum([getfield(agent, Generation) for agent in spawners]) + 1.0
+    generate_EggMass(1, model, tot_Neggs,mean_Egg_energy, mean_Egg_energy, max_generation)
+    #reset the reproduction variable
+    for id in spawners
+        agent = model[id]
+        set!(agent, :reproduction, :nonspawner)
     end
     
     evolve_environment!(model)
