@@ -30,7 +30,7 @@ function eggDEB!(Sardine, model)
                 #Somatic maintenance
         pS = (model.p_M * model.Tc_value) * V  #p_M_T*V
         # Mobilized energy
-        pC = ((Sardine.EggEn / V) * (model.Eg * (model.v_rate * model.Tc_value) * (V ^ (2/3)) + pS)/(model.Kappa_value * (Sardine.EggEn / V) + model.Eg))
+        pC = ((Sardine.maternal_EggEn / V) * (model.Eg * (model.v_rate * model.Tc_value) * (V ^ (2/3)) + pS)/(model.Kappa_value * (Sardine.maternal_EggEn / V) + model.Eg))
 
 
         #Maturity maintenance
@@ -59,7 +59,7 @@ function eggDEB!(Sardine, model)
         end
     
         Sardine.En = Sardine.En + deltaEggEn
-        Sardine.EggEn = Sardine.EggEn + deltaEggEn
+        Sardine.maternal_EggEn = Sardine.maternal_EggEn + deltaEggEn
         Sardine.H = Sardine.H + deltaH 
         Sardine.L = (V + deltaV)^(1/3)
     end
@@ -377,7 +377,7 @@ if (!Sardine.Dead && Sardine.Nind >= 1000000.0)  &&
             # Then determine the energy content of the eggs from maternal effects
             Sardine.maternal_EggEn = Float64(((model.E0_max - model.E0_min) / (1.0- model.ep_min)) * (Sardine.Scaled_En - model.ep_min)) + model.E0_min
             # spawned energy of a single female, we assume it's the same for all female and male
-            spawned_en = Neggs_value_single * EggEn_E0_val #Sardine.R * Kappa_valueR / spawn_period 
+            spawned_en = Neggs_value_single *  Sardine.maternal_EggEn #Sardine.R * Kappa_valueR / spawn_period 
 
             # and if the energy to be spawned is lower than the energy available, spawn!
             if (spawned_en < Sardine.R ) #* Kappa_valueR)

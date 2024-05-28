@@ -4,7 +4,7 @@
     
 # module Generate_Agents
 
-function generate_EggMass(No_Egg, model, Nind = missing, EggEn = missing, En = missing, Generation = missing)
+function generate_EggMass(No_Egg, model, Nind = missing, maternal_EggEn = missing, En = missing, Generation = missing)
     agent_type = :eggmass
     agent_Age = 0.0
     agent_L = model.L0
@@ -14,10 +14,10 @@ function generate_EggMass(No_Egg, model, Nind = missing, EggEn = missing, En = m
     agent_Dead = false
     agent_reproduction = :nonspawner
 
-    if ismissing(agent_maternal_EggEn)
+    if ismissing(maternal_EggEn)
         agent_maternal_EggEn = Float64(model.E0)
     else
-        agent_maternal_EggEn = Float64(EggEn)
+        agent_maternal_EggEn = Float64(maternal_EggEn)
     end
 
     if ismissing(Generation)

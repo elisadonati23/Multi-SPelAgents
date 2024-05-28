@@ -8,7 +8,7 @@ include("06initialize.jl")
 include("07agent_step!.jl")
 include("08simulation_step.jl")
 
-modello = model_initialize_parallel(1000.0, 0.0, 0.0, 0.7, 1.7e14, 1.0, 158.0 , 0.945, 15.0) 
+modello = model_initialize_parallel(100.0, 0.0, 0.0, 0.7, 1.7e14, 1.0, 1.0 , 0.945, 15.0) 
 
 # running -----------------
 
@@ -23,16 +23,16 @@ for i in 1:num_runs
 
     # Initialize model and data
     #adata = [(is_adult, count), (is_juvenile, count), (is_eggmass, count)]
-    adata =  [(sardine, count)]
+    adata =  [:type, :Nind]
 
-    mdata = [:day_of_the_year]
-            #:TotB,:JuvB,:AdB, :f, 
-            #:deadJ_nat, :deadJ_old, :deadJ_starved,
-            #:deadA_nat, :deadA_old, :deadA_starved,
-            #:meanJuvL, :sdJuvL, :meanAdL, :sdAdL,
-            #:mean_tpuberty, :sd_tpuberty,
-            #:meanJuvWw, :sdJuvWw, :meanAdWw, :sdAdWw,
-            #:mean_Hjuve, :sd_Hjuve]
+    mdata = [:day_of_the_year,
+                :TotB,:JuvB,:AdB, :f, 
+                :deadJ_nat, :deadJ_old, :deadJ_starved,
+                :deadA_nat, :deadA_old, :deadA_starved,
+                :meanJuvL, :sdJuvL, :meanAdL, :sdAdL,
+                :mean_tpuberty, :sd_tpuberty,
+                :meanJuvWw, :sdJuvWw, :meanAdWw, :sdAdWw,
+                :mean_Hjuve, :sd_Hjuve]
 
 
     
@@ -42,7 +42,7 @@ for i in 1:num_runs
     
     # Run the model
     #run!(modello,365*1; adata, mdata)
-    df_agent = run!(modello, 365*2; adata, mdata)
+    df_agent = run!(modello, 365*1; adata, mdata)
     # Store the result in the results array
     push!(results, df_agent)
     end_time = Dates.now()
@@ -54,8 +54,6 @@ end
 
 results[1][1]
 diagnostic_plots(results[1][1], results[1][2])
-
-
 
 #-#-#-#-#-#-#
 #parto vicina allo stato stazionario così faccio meno run
