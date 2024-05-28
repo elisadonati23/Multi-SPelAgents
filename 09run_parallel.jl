@@ -8,7 +8,7 @@ include("06initialize.jl")
 include("07agent_step!.jl")
 include("08simulation_step.jl")
 
-modello = model_initialize_parallel(100.0, 0.0, 0.0, 0.7, 1.7e14, 1.0, 1.0 , 0.945, 15.0) 
+modello = model_initialize_parallel(100.0, 0.0, 0.0, 0.0, 1.7e14, 1.0, 4.5 , 0.945, 15.0) 
 
 # running -----------------
 
@@ -42,7 +42,7 @@ for i in 1:num_runs
     
     # Run the model
     #run!(modello,365*1; adata, mdata)
-    df_agent = run!(modello, 365*1; adata, mdata)
+    df_agent = run!(modello, 365*30; adata, mdata)
     # Store the result in the results array
     push!(results, df_agent)
     end_time = Dates.now()
