@@ -114,16 +114,29 @@ end
 
 function juvedie!(Sardine, model)
 
-    #single individual die
-    if !Sardine.Dead && Sardine.Nind >= 1000000.0
-            #Threads.@threads for i in 1:ceil(Sardine.Nind/10000.0) #loop on Nind to check how many should die
-            #    if ((1- exp(- model.M_j))) >=  rand()
-            #        model.deadJ_nat += 10000.0 #update the counters
-            #        Sardine.Nind -= 10000.0
-            #    end
-            #end
-            Sardine.Nind -= Float64(rand(Binomial(Int64(Sardine.Nind), 1-exp(-model.M_j))))
+    #set mortality: adding fishing mortality if lenght is higher than 10cm (recruitment)
+    if Sardine.Lw < 10.0
+        M = model.M_j
+        if !Sardine.Dead && Sardine.Nind >= 1000000.0
+            Sardine.Nind -= Float64(rand(Binomial(Int64(Sardine.Nind), 1-exp(-M))))
+        end
+
+    else
+        M = model.M_j + (model.M_f/365.0)
+        if !Sardine.Dead && Sardine.Nind >= 1000000.0
+        total_deaths = Float64(rand(Binomial(Int64(Sardine.Nind), 1-exp(-M))))
+        natural_deaths = Float64(rand(Binomial(Int64(Sardine.Nind), 1-exp(-(model.M_j)))))
+        fishing_deaths = total_deaths - natural_deaths
+            if natural_deaths > total_deaths
+                natural_deaths = total_deaths
+            end
+        model.fished += fishing_deaths
+        model.deadJ_nat += natural_deaths
+        Sardine.Nind -= total_deaths
+        end
     end
+
+
 #if less than 1 ind, superindividual dies
     if  Sardine.Nind < 1000000.0 && !Sardine.Dead
             Sardine.Dead = true
@@ -256,22 +269,29 @@ function adultdie!(Sardine, model)
          else
              M = model.M4 + (model.MF_value/365.0)
          end
-        
-         #1 dead = 1000 deads
-         #Threads.@threads for i in 1:ceil(Sardine.Nind/10000.0) #loop on Nind to check how many should die
-         #    randomnumber = rand()
-         #    if (1.0 - exp(-M)) >= randomnumber # if dying... why? fishing or natural?
-         #        #if the fish would not have died without fishing:
-         #         if (((1.0 - exp(-M))) >= randomnumber) && (randomnumber > (1.0 - exp(-(M - (model.M_f/365.0))))) # the fish would not have died without fishing
-         #             model.fished += 10000.0 #then it is fished
-         #         else
-         #             model.deadA_nat += 10000.0 # it has died of natural mortality
-         #         end
-         #        Sardine.Nind -= (10000.0)
-         #    end
-         #end
 
-         Sardine.Nind -= Float64(rand(Binomial(Int64(Sardine.Nind), 1-exp(-M))))
+            # Calculate the total number of deaths
+            total_deaths = Float64(rand(Binomial(Int64(Sardine.Nind), 1-exp(-M))))
+
+            # Calculate the number of deaths due to natural causes
+            natural_deaths = Float64(rand(Binomial(Int64(Sardine.Nind), 1-exp(-(M - (model.M_f/365.0))))))
+
+            # Ensure natural_deaths does not exceed total_deaths
+            if natural_deaths > total_deaths
+                natural_deaths = total_deaths
+            end
+
+            # The number of deaths due to fishing is the total deaths minus the natural deaths
+            fishing_deaths = total_deaths - natural_deaths
+
+            # Update Sardine.Nind
+            Sardine.Nind -= total_deaths
+
+            # Update model.fished and model.deadA_nat
+            model.fished += fishing_deaths
+            model.deadA_nat += natural_deaths
+
+         Sardine.Nind -= total_deaths
      end
 
     if Sardine.Nind < 1000000.0
