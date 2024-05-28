@@ -11,6 +11,7 @@ function create_params(
 
     #fixed parameters
     Kappa_value = Kappa[1]
+    MF_value = M_f[1]
     f = 1.0 
     r_food = 0.5
     DEB_timing = 1.0
@@ -142,7 +143,8 @@ model_parameters = Dict(
         :No_Egg => Float64(No_Egg),
         :Temp => Temp,
         :Tc_value => Tc_value,
-        :Kappa_value => Kappa_value,  
+        :Kappa_value => Kappa_value,
+        :MF_value => MF_value,
         :Wv => Wv,
         :day_of_the_year => day_of_the_year,
         :f => f,

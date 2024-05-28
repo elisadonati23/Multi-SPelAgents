@@ -246,15 +246,15 @@ function adultdie!(Sardine, model)
     if !Sardine.Dead
          #set the new AGE DEPENDENT MORTALITIES -- If Mf is not 0, it is added to M
          if floor(Sardine.Age / 365.0 ) == 0.0
-             M = model.M0 + (model.M_f/365.0)
+             M = model.M0 + (model.MF_value/365.0)
          elseif floor(Sardine.Age / 365.0 ) == 1.0
-             M = model.M1 + (model.M_f/365.0)
+             M = model.M1 + (model.MF_value/365.0)
          elseif floor(Sardine.Age / 365.0 ) == 2.0
-             M = model.M2 + (model.M_f/365.0)
+             M = model.M2 + (model.MF_value/365.0)
          elseif floor(Sardine.Age / 365.0 ) == 3.0
-             M = model.M3 + (model.M_f/365.0)
+             M = model.M3 + (model.MF_value/365.0)
          else
-             M = model.M4 + (model.M_f/365.0)
+             M = model.M4 + (model.MF_value/365.0)
          end
         
          #1 dead = 1000 deads
@@ -338,7 +338,7 @@ if !Sardine.Dead
     Sardine.Ww = (model.w *(model.d_V * V + model.w_E/ model.mu_E * (Sardine.En + Sardine.R)))
     Sardine.QWw = interquantiles_prop_single(Sardine, model, :Ww, :QWw)
     Sardine.Scaled_En= Sardine.En / (model.Em * (( Sardine.Lw * model.del_M)^3.0))
-    Sardine.L = Sardine.Lw * model.del_M / model.Lm
+    #Sardine.L = Sardine.Lw .* model.del_M ./ model.Lm silenced atm because of problems when K is a vector
 end
 return
 end

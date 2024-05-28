@@ -10,6 +10,14 @@ function update_Kappa!(model, Kappa::Vector{Float64})
     model.Kappa_value = Kappa[model.sim_timing]
 end
 
+function update_MF!(model, M_f::Float64)
+    model.MF_value = M_f
+end
+
+function update_MF!(model, M_f::Vector{Float64})
+    model.MF_value = M_f[model.sim_timing]
+end
+
 function update_Tc!(model, Tc::Float64)
     model.Tc_value = Tc
 end
