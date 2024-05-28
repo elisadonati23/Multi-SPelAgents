@@ -120,7 +120,6 @@ function juvedie!(Sardine, model)
         if !Sardine.Dead && Sardine.Nind >= 1000000.0
             Sardine.Nind -= Float64(rand(Binomial(Int64(Sardine.Nind), 1-exp(-M))))
         end
-
     else
         M = model.M_j + (model.M_f/365.0)
         if !Sardine.Dead && Sardine.Nind >= 1000000.0
