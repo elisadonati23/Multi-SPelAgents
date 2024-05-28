@@ -269,6 +269,11 @@ function adultdie!(Sardine, model)
              M = model.M4 + (model.MF_value/365.0)
          end
 
+         #double mortality for too old fish
+         if floor(Sardine.Age / 365.0 ) > 6.0
+            M = model.M4*2
+         end
+         
             # Calculate the total number of deaths
             total_deaths = Float64(rand(Binomial(Int64(Sardine.Nind), 1-exp(-M))))
 

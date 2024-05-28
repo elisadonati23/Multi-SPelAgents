@@ -402,7 +402,7 @@ function diagnostic_plots(out_agent, out_model)
     
     # Plot the number of agents over time
     p1 = plot_population_timeseries(out_agent)
-    p2 = plot_param_timeseries(out_model,[:deadA_starved, :deadA_nat, :deadA_old,:deadJ_starved, :deadJ_nat, :deadJ_old])
+    p2 = plot_param_timeseries(out_model,[:deadA_starved, :deadA_nat, :deadA_old,:deadJ_starved, :deadJ_nat, :deadJ_old, :fished])
     p3 = plot_param_timeseries(out_model,[:TotB, :JuvB, :AdB])
     p4 = plot_param_timeseries(out_model, [:f])
     p5 = plot_means_with_std(out_model, [:meanAdL, :meanJuvL], [:sdAdL, :sdJuvL])
@@ -440,7 +440,7 @@ function diagnostic_plots_pt1(out_agent, out_model)
     
     # Plot the number of agents over time
     p1 = plot_population_timeseries(out_agent)
-    p2 = plot_param_timeseries(out_model,[:deadA_starved, :deadA_nat, :deadA_old,:deadJ_starved, :deadJ_nat, :deadJ_old])
+    p2 = plot_param_timeseries(out_model,[:deadA_starved, :deadA_nat, :deadA_old,:deadJ_starved, :deadJ_nat, :deadJ_old, :fished])
     p3 = plot_param_timeseries(out_model,[:TotB, :JuvB, :AdB])
     p4 = plot_param_timeseries(out_model, [:f])
 
