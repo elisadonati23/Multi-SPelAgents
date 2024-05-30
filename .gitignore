@@ -6,3 +6,6 @@ output/march2024/steady_K_20y.csv
 output/march2024/steady_temp&K_20y.csv
 d_modello.csv
 d.csv
+mf_stockass_timeseries_100y_23y_agents.csv
+mf_stockass_timeseries_100y_23y_model.csv
+steady_100y_Xmax1_100agents.jlso

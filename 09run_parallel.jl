@@ -8,7 +8,6 @@ include("06initialize.jl")
 include("07agent_step!.jl")
 include("08simulation_step.jl")
 
-modello = model_initialize_parallel(1000.0, 0.0, 0.0, 0.5, 1.7e14, 1.0, 1.5 , 0.945, 15.0) 
 
 # running -----------------
 
@@ -16,7 +15,43 @@ results = []
 num_runs = 1
 
 
-# Array to store the results
+zeros_vector = fill(0.0, 100)
+# STAR_PIL_17_18_Ref 2022
+Mf_star_pil1718_ref2022 = [
+0.13,
+0.11,
+0.11,
+0.1,
+0.08,
+0.06,
+0.06,
+0.07,
+0.08,
+0.09,
+0.1,
+0.15,
+0.17,
+0.24,
+0.25,
+0.27,
+0.29,
+0.28,
+0.3,
+0.3,
+0.3,
+0.29,
+0.29
+]
+
+Mf_timeseries = vcat(zeros_vector, Mf_star_pil1718_ref2022)
+Mf_timeseries = repeat(Mf_timeseries, inner=365)
+Mf_timeseries_run = vcat(0.0, Mf_timeseries)
+steady = model_initialize_parallel(100.0, 0.0, 0.0, Mf_timeseries_run, 1.7e14, 1.0, 1.0 , 0.945, 15.0) 
+
+#load 100y steady state
+#steady = AgentsIO.load_checkpoint("steady_100y_Xmax1_100agents.jlso")
+
+#run modello for the length of the timeseries
 
 for i in 1:num_runs
     start_time = Dates.now()
@@ -35,12 +70,12 @@ for i in 1:num_runs
                 :mean_Hjuve, :sd_Hjuve]
 
     # Initialize dataframes
-    df_agent = init_agent_dataframe(modello, adata)
-    df_model = init_model_dataframe(modello, mdata)
+    df_agent = init_agent_dataframe(steady, adata)
+    df_model = init_model_dataframe(steady, mdata)
     
     # Run the model
-    #run!(modello,365*1; adata, mdata)
-    df_agent = run!(modello, 365*40; adata, mdata)
+    run!(steady, 365*100; adata, mdata)
+    df_agent = run!(steady, 365*23; adata, mdata)
     # Store the result in the results array
     push!(results, df_agent)
     end_time = Dates.now()
@@ -50,8 +85,17 @@ for i in 1:num_runs
     println("Simulation $i took: ", minutes, " minutes")
 end
 
-results[1][1]
-diagnostic_plots(results[1][1], results[1][2])
+show(last(last_23y_model,1), allcols=true)
+
+CSV.write("mf_stockass_timeseries_100y_23y_model.csv", results[1][2])
+CSV.write("mf_stockass_timeseries_100y_23y_agents.csv", results[1][1])
+
+model_results = results[1][2] 
+last_23y_model = last(model_results, 365*23)
+
+
+ diagnostic_plots(results[1][1], results[1][2])
+
 
 #-#-#-#-#-#-#
 #parto vicina allo stato stazionario così faccio meno run
@@ -66,21 +110,3 @@ temp_revert_vector = vcat(repeat([15.0], 365*5), collect(range(15.0, stop = 18.0
 #
 Mf_increase_vector = vcat(collect(range(0.6, stop = 1.2,length=(365*20 +1) )))
 
-#temp increase 15 to 18 degree ------------
-modello = model_initialize_parallel(100.0, 0.0, 0.0, 0.7, 1.7e14, 1.0, 4.5 , 0.945, temp_increase_vector) 
-#
-## Mf values --------
-
-modello = model_initialize_parallel(100.0, 0.0, 0.0, Mf_increase_vector, 1.7e14, 1.0, 4.5 , 0.945, 15.0) 
-
-##K values --------
-#modello = model_initialize_parallel(60000.0, 80000.0, 20000.0, 0.0, 50000.0, 1.0, 115.0,  K_decrease_vector, 15.0)
-#
-## k values + temp effect -----------------
-#modello = model_initialize_parallel(6000.0, 8000.0, 2000.0, 0.0, 5000.0, 1.0, 115.0,
-#                                                        K_decrease_vector,
-#                                                        temp_increase_vector)
-## k values + revert temp effect -----------------
-#modello = model_initialize_parallel(60000.0, 80000.0, 20000.0, 0.0, 50000.0, 1.0, 115.0,
-#                                                        K_decrease_vector,
-#                                                        temp_revert_vector)

@@ -121,7 +121,7 @@ function juvedie!(Sardine, model)
             Sardine.Nind -= Float64(rand(Binomial(Int64(Sardine.Nind), 1-exp(-M))))
         end
     else
-        M = model.M_j + (model.M_f/365.0)
+        M = model.M_j + (model.MF_value/365.0)
         if !Sardine.Dead && Sardine.Nind >= 1000000.0
         total_deaths = Float64(rand(Binomial(Int64(Sardine.Nind), 1-exp(-M))))
         natural_deaths = Float64(rand(Binomial(Int64(Sardine.Nind), 1-exp(-(model.M_j)))))
@@ -278,7 +278,7 @@ function adultdie!(Sardine, model)
             total_deaths = Float64(rand(Binomial(Int64(Sardine.Nind), 1-exp(-M))))
 
             # Calculate the number of deaths due to natural causes
-            natural_deaths = Float64(rand(Binomial(Int64(Sardine.Nind), 1-exp(-(M - (model.M_f/365.0))))))
+            natural_deaths = Float64(rand(Binomial(Int64(Sardine.Nind), 1-exp(-(M - (model.MF_value/365.0))))))
 
             # Ensure natural_deaths does not exceed total_deaths
             if natural_deaths > total_deaths
