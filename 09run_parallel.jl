@@ -63,7 +63,7 @@ for i in 1:num_runs
     mdata = [:day_of_the_year,
                 :TotB,:JuvB,:AdB, :f, 
                 :deadJ_nat, :deadJ_old, :deadJ_starved,
-                :deadA_nat, :deadA_old, :deadA_starved, :fished,
+                :deadA_nat, :deadA_old, :deadA_starved, :fished, :fishedW,
                 :meanJuvL, :sdJuvL, :meanAdL, :sdAdL,
                 :mean_tpuberty, :sd_tpuberty,
                 :meanJuvWw, :sdJuvWw, :meanAdWw, :sdAdWw,
