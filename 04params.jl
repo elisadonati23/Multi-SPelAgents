@@ -103,6 +103,7 @@ function create_params(
     prob_dict = Dict(zip(repro_period, daily_repro_probabilities))
 
     # outputs
+    year = 0
     dead_eggmass = 0
     deadJ_nat = 0
     deadA_nat = 0
@@ -147,6 +148,7 @@ model_parameters = Dict(
         :MF_value => MF_value,
         :Wv => Wv,
         :day_of_the_year => day_of_the_year,
+        :year => year,
         :f => f,
         :Xmax_value => Xmax_value, 
         :r_food => r_food,

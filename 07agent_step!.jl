@@ -130,6 +130,7 @@ function juvedie!(Sardine, model)
                 natural_deaths = total_deaths
             end
         model.fished += fishing_deaths
+        model.fishedW += fishing_deaths * Sardine.Ww
         model.deadJ_nat += natural_deaths
         Sardine.Nind -= total_deaths
         end
@@ -293,6 +294,7 @@ function adultdie!(Sardine, model)
 
             # Update model.fished and model.deadA_nat
             model.fished += fishing_deaths
+            model.fishedW += fishing_deaths * Sardine.Ww
             model.deadA_nat += natural_deaths
 
          Sardine.Nind -= total_deaths
