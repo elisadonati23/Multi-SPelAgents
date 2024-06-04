@@ -31,14 +31,13 @@ function evolve_environment!(model)
     # day counter
     if model.day_of_the_year == 365.0
         model.day_of_the_year = 1.0
+        model.year += 1.0
     else
         model.day_of_the_year += 1.0
     end
 
-    model.fishedW = 0.0 # reset at each step.
     #increase time checher
     model.sim_timing += 1
-    model.year = floor(Int, model.sim_timing / 365.0) + 1 # year counter
 
     # update time dependent parameters
     update_Tc!(model, model.Tc)

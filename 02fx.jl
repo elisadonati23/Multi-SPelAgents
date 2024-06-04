@@ -423,7 +423,8 @@ function diagnostic_plots_pt2(out_model)
     
     Plots.default(legendfontsize = 4)  # Set the plot size
     
-    p5 = plot_means_with_std(out_model, [:meanAdL, :meanJuvL], [:sdAdL, :sdJuvL])
+    #p5 = plot_means_with_std(out_model, [:meanAdL, :meanJuvL], [:sdAdL, :sdJuvL])
+    p5 = plot_param_timeseries(out_model, [:fishedW])
     p6 = plot_means_with_std(out_model, [:mean_tpuberty], [:sd_tpuberty])
     p7 = plot_means_with_std(out_model, [:meanAdWw, :meanJuvWw], [:sdAdWw, :sdJuvWw])
     p8 = plot_means_with_std(out_model, [:mean_Hjuve], [:sd_Hjuve])
@@ -431,8 +432,7 @@ function diagnostic_plots_pt2(out_model)
 
     # Combine the plots in a 3x3 grid
     combined_plot2 = Plots.plot(p5,p6,p7,p8, layout = (2,2))
-    display(combined_plot2)
-    Plots.default()
+return combined_plot2
 end
 
 function diagnostic_plots_pt1(out_agent, out_model)
@@ -448,7 +448,6 @@ function diagnostic_plots_pt1(out_agent, out_model)
 
     # Combine the plots in a 3x3 grid
     combined_plot1 = Plots.plot(p1,p2,p3,p4, layout = (2,2))
-    display(combined_plot1)
-    Plots.default()
+    return combined_plot1
 end
 

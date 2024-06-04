@@ -42,7 +42,7 @@ function generate_EggMass(No_Egg, model, Nind = missing, maternal_EggEn = missin
     for _ in 1:No_Egg
 
         if ismissing(Nind)
-            agent_Nind = (1e8/2) * (40*400)
+            agent_Nind = (1e6/2) * (40*400)
         else
             agent_Nind = Float64(floor(Nind))
         end
@@ -81,7 +81,7 @@ function generate_Juvenile(No_J, model, Nind = missing, Generation = 0.0, En = m
     for _ in 1:No_J
 
         if ismissing(Nind)
-            agent_Nind = 1e8
+            agent_Nind = 1e6
         else
             agent_Nind = Float64(floor(Nind))
         end
@@ -172,7 +172,7 @@ function generate_Adult(No_A, model, Nind = missing, Age = missing, t_puberty = 
     for _ in 1:No_A
 
         if ismissing(Nind)
-            agent_Nind = 1e8
+            agent_Nind = 1e6
         else
             agent_Nind = Float64(floor(Nind))
         end

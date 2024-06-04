@@ -117,12 +117,12 @@ function juvedie!(Sardine, model)
     #set mortality: adding fishing mortality if lenght is higher than 10cm (recruitment)
     if Sardine.Lw < 10.0
         M = model.M_j
-        if !Sardine.Dead && Sardine.Nind >= 1000000.0
+        if !Sardine.Dead && Sardine.Nind >= 10000.0
             Sardine.Nind -= Float64(rand(Binomial(Int64(Sardine.Nind), 1-exp(-M))))
         end
     else
-        M = model.M_j + (model.MF_value/365.0)
-        if !Sardine.Dead && Sardine.Nind >= 1000000.0
+        M = model.M_j + ((model.MF_value/2.0)/365.0)
+        if !Sardine.Dead && Sardine.Nind >= 10000.0
         total_deaths = Float64(rand(Binomial(Int64(Sardine.Nind), 1-exp(-M))))
         natural_deaths = Float64(rand(Binomial(Int64(Sardine.Nind), 1-exp(-(model.M_j)))))
         fishing_deaths = total_deaths - natural_deaths
@@ -138,9 +138,9 @@ function juvedie!(Sardine, model)
 
 
 #if less than 1 ind, superindividual dies
-    if  Sardine.Nind < 1000000.0 && !Sardine.Dead
+    if  Sardine.Nind < 10000.0 && !Sardine.Dead
             Sardine.Dead = true
-            model.deadJ_nat += 1000000.0
+            model.deadJ_nat += 10000.0
     end
 return
 end
@@ -300,9 +300,9 @@ function adultdie!(Sardine, model)
          Sardine.Nind -= total_deaths
      end
 
-    if Sardine.Nind < 1000000.0
+    if Sardine.Nind < 10000.0
         Sardine.Dead = true
-        model.deadA_nat += 1000000.0
+        model.deadA_nat += 10000.0
     end
     return
 end
@@ -378,7 +378,7 @@ end
 
 function adultspawn!(Sardine, model)
 #1st condition to reproduce not being dead
-if (!Sardine.Dead && Sardine.Nind >= 1000000.0)  &&
+if (!Sardine.Dead && Sardine.Nind >= 10000.0)  &&
 
     #2nd condition: being in the repro period
     #do not check if they are dead since all deads are removed before repro

@@ -58,14 +58,11 @@ function create_params(
     W0 = 0.00021
     L0 = 0.001 #0.001 cm
     M_egg = 0.9995 #o.998 what if not only instant mort?
-    M_j = 1.071/365.0
-    M_ae = 0.61/365.0
-    M_a = 0.38 /365.0
-    M0 = 1.06/365.0
-    M1 = 0.83/365.0
-    M2 = 0.69/365.0
-    M3 = 0.61/365.0
-    M4 = 0.48/365.0
+    M0 = 1.3/365.0 #1.06/365.0
+    M1 = 1.0/365.0 #   0.83/365.0
+    M2 = 0.8/365.0 #0.69/365.0
+    M3 = 0.7/365.0 #0.61/365.0
+    M4 = 0.38/365.0 #0.48/365.0
     Ta = 8000.0
     Tr = 293.0 
 
@@ -103,7 +100,7 @@ function create_params(
     prob_dict = Dict(zip(repro_period, daily_repro_probabilities))
 
     # outputs
-    year = 0
+    year = 1.0
     dead_eggmass = 0
     deadJ_nat = 0
     deadA_nat = 0
@@ -114,7 +111,7 @@ function create_params(
     mean_batch_eggs = 0.0
     mean_spawning_events = 0.0
     fished = 0
-    fishedW = 0
+    fishedW = 0.0
     TotB = 0.0
     JuvB = 0.0
     AdB = 0.0
@@ -208,9 +205,6 @@ model_parameters = Dict(
         :W0 => W0,
         :L0 => L0,
         :M_egg => M_egg,
-        :M_j => M_j,
-        :M_ae => M_ae,
-        :M_a => M_a,
         :M_f => M_f,
         :M0 => M0,
         :M1 => M1,
