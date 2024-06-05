@@ -411,13 +411,6 @@ if (!Sardine.Dead && Sardine.Nind >= 10000.0)  &&
                 Sardine.reproduction = :spawner
                 Sardine.R = Float64(Sardine.R - spawned_en) #(Sardine.R / spawn_period)) 
                 Sardine.spawned += 1.0 #number of times the fish has spawned
-                #here i use ceil since if Nind = 1, half is 0.5 and i want to have at least 1 egg
-                #generate_EggMass(1, #half of the Nind produce eggs (females)
-                #                            model,
-                #                            Ninds_val,
-                #                            EggEn_E0_val, #EggEn
-                #                            EggEn_E0_val, #Reserve of the eggmass now is scaled to the single egg
-                #                            Gen_val) #Genration
             end
 
     end

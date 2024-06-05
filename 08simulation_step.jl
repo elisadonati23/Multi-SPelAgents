@@ -157,17 +157,30 @@ function complex_step!(model)
     spawners = filter!(id -> hasid(model, id) && model[id].reproduction == :spawner, copy(sEA_ids))
 
     if !isempty(spawners)
-            #create new born daily superindividuals
-            prop_values = [getfield(model[agent], :superind_Neggs) for agent in spawners]
-            mean_Egg_energy = mean([getfield(model[agent], :maternal_EggEn) for agent in spawners])
-            max_generation = maximum([getfield(model[agent], :Generation) for agent in spawners]) + 1.0
-            tot_Neggs = sum(prop_values)
-            generate_EggMass(1, model, tot_Neggs,mean_Egg_energy, mean_Egg_energy, max_generation)
+        #create new born daily superindividuals
+        prop_values = [getfield(model[agent], :superind_Neggs) for agent in spawners]
+        mean_Egg_energy = mean([getfield(model[agent], :maternal_EggEn) for agent in spawners])
+        max_generation = maximum([getfield(model[agent], :Generation) for agent in spawners]) + 1.0
+        tot_Neggs = sum(prop_values)
+
+        #mutation on Krule
+            if rand() < 0.0001
+                # Define the distribution
+                    β = 1.938
+                    α = 19.0
+                    dist = Beta(α, β) # skewed on 1 and peak at 0.95
+                    Krule = rand(dist)
+            println("mutation occured. Krule is", Krule)
+            else
+                Krule = model.Kappa_value
+            end
+        
+        generate_EggMass(1, model, tot_Neggs, Krule, mean_Egg_energy, mean_Egg_energy, max_generation)
     #reset the reproduction variable
-    for id in spawners
-        agent = model[id]
-        agent.reproduction = :nonspawner
-    end
+        for id in spawners
+            agent = model[id]
+            agent.reproduction = :nonspawner
+        end
     end
 
     evolve_environment!(model)
