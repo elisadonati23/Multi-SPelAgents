@@ -9,7 +9,7 @@ include("5agent_step!.jl")
 include("complex_step.jl")
 
 # test in parallelo ----
-modello = model_initialize(7500.0, 15000.0, 7500.0, 0.0, 50000.0, 1.0, 110.0)
+modello = model_initialize(10000.0, 0.0, 0.0, 0.0, 50000.0, 1.0, 1.0)
 #agent_ids = [agent.id for agent in values(allagents(modello))]
 results = []
 num_runs = 1
