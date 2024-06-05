@@ -7,9 +7,24 @@ function create_params(
     day_of_the_year,
     Xmax::Union{Float64, Vector{Float64}},
     Kappa::Union{Float64, Vector{Float64}},
-    Temp::Union{Float64, Vector{Float64}})
+    Temp::Union{Float64, Vector{Float64}},
+    M_egg::Float64,
+    M0::Float64,
+    M1::Float64,
+    M2::Float64,
+    M3::Float64,
+    M4::Float64)
 
     #fixed parameters
+    M_egg = M_egg
+    M_j = M0/365.0
+    M0 = M0/365.0
+    M1 = M1/365.0
+    M2 = M2/365.0
+    M3 = M3/365.0
+    M4 = M4/365.0
+
+    #variable parameters
     Kappa_value = Kappa[1]
     MF_value = M_f[1]
     f = 1.0 
@@ -57,12 +72,12 @@ function create_params(
     E0_max = 0.967
     W0 = 0.00021
     L0 = 0.001 #0.001 cm
-    M_egg = 0.9995 #o.998 what if not only instant mort?
-    M0 = 1.3/365.0 #1.06/365.0
-    M1 = 1.0/365.0 #   0.83/365.0
-    M2 = 0.8/365.0 #0.69/365.0
-    M3 = 0.7/365.0 #0.61/365.0
-    M4 = 0.38/365.0 #0.48/365.0
+    #M_egg = 0.9995 #o.998 what if not only instant mort?
+    #M0 = 1.3/365.0 #1.06/365.0
+    #M1 = 1.0/365.0 #   0.83/365.0
+    #M2 = 0.8/365.0 #0.69/365.0
+    #M3 = 0.7/365.0 #0.61/365.0
+    #M4 = 0.38/365.0 #0.48/365.0
     Ta = 8000.0
     Tr = 293.0 
 
@@ -148,6 +163,14 @@ model_parameters = Dict(
         :year => year,
         :f => f,
         :Xmax_value => Xmax_value, 
+        :M_egg => M_egg,
+        :M_f => M_f,
+        :M_j => M_j,
+        :M0 => M0,
+        :M1 => M1,
+        :M2 => M2,
+        :M3 => M3,
+        :M4 => M4,
         :r_food => r_food,
         :DEB_timing => DEB_timing,
         :day_of_the_year => day_of_the_year,
@@ -204,13 +227,6 @@ model_parameters = Dict(
         :E0_max => E0_max,
         :W0 => W0,
         :L0 => L0,
-        :M_egg => M_egg,
-        :M_f => M_f,
-        :M0 => M0,
-        :M1 => M1,
-        :M2 => M2,
-        :M3 => M3,
-        :M4 => M4,
         :Ta => Ta,
         :Tr => Tr,
         :Tc => Tc,

@@ -7,7 +7,13 @@ function model_initialize_parallel(
     day_of_the_year,
     Xmax,
     Kappa,
-    Temp
+    Temp,
+    M_egg,
+    M0,
+    M1,
+    M2,
+    M3,
+    M4
 ) 
     properties = create_params(
         No_A,
@@ -18,7 +24,13 @@ function model_initialize_parallel(
         day_of_the_year,
         Xmax,
         Kappa,
-        Temp
+        Temp,
+        M_egg,
+        M0,
+        M1,
+        M2,
+        M3,
+        M4
     )
 
     # create the model
@@ -64,7 +76,13 @@ function model_initialize_noparallel(
     day_of_the_year,
     Xmax,
     Kappa,
-    Temp
+    Temp,
+    M_egg,
+    M0,
+    M1,
+    M2,
+    M3,
+    M4
 
 )  
 
@@ -77,7 +95,13 @@ function model_initialize_noparallel(
         day_of_the_year,
         Xmax,
         Kappa,
-        Temp
+        Temp,
+        M_egg,
+        M0,
+        M1,
+        M2,
+        M3,
+        M4
     )
 
     # create the model
