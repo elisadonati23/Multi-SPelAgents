@@ -113,39 +113,35 @@ function parallel_juvenile_step!(Sardine, model)
 end
 
 function juvedie!(Sardine, model)
-# Initialize deaths
-natural_deaths = 0.0
-total_deaths = 0.0
-fishing_deaths = 0.0
     #set mortality: adding fishing mortality if lenght is higher than 10cm (recruitment)
-    if Sardine.Lw < 10.0
-        M = model.M_j
-        if !Sardine.Dead && Sardine.Nind >= 10000.0
-            natural_deaths = Float64(rand(Binomial(Int64(Sardine.Nind), 1-exp(-M))))
+    # Initialize deaths
+    natural_deaths = 0.0
+    total_deaths = 0.0
+    fishing_deaths = 0.0
+    
+    if !Sardine.Dead && Sardine.Nind >= 100000.0
+        if Sardine.Lw < 10.0 
+            natural_deaths = Float64(rand(Binomial(Int64(Sardine.Nind), 1-exp(-(model.M_j))))))
             Sardine.Nind -= natural_deaths
             model.deadJ_nat += natural_deaths
-        end
-    else
-        M = model.M_j + ((model.MF_value/2.0)/365.0)
-        if !Sardine.Dead && Sardine.Nind >= 10000.0
-        total_deaths = Float64(rand(Binomial(Int64(Sardine.Nind), 1-exp(-M))))
-        natural_deaths = Float64(rand(Binomial(Int64(Sardine.Nind), 1-exp(-(model.M_j)))))
-        fishing_deaths = total_deaths - natural_deaths
-            if natural_deaths > total_deaths
-                natural_deaths = total_deaths
-            end
-        model.fished += fishing_deaths
-        model.fishedW += fishing_deaths * Sardine.Ww
-        model.deadJ_nat += natural_deaths
-        Sardine.Nind -= total_deaths
+        else
+            M = model.M_j + ((model.MF_value/2.0)/365.0)
+            total_deaths = Float64(rand(Binomial(Int64(Sardine.Nind), 1-exp(-M))))
+            natural_deaths = Float64(rand(Binomial(Int64(Sardine.Nind), 1-exp(-(model.M_j)))))
+            fishing_deaths = total_deaths - natural_deaths
+                if natural_deaths > total_deaths
+                    natural_deaths = total_deaths
+                end
+            model.fished += fishing_deaths
+            model.fishedW += fishing_deaths * Sardine.Ww
+            model.deadJ_nat += natural_deaths
+            Sardine.Nind -= total_deaths
         end
     end
-
-
 #if less than 1 ind, superindividual dies
-    if  Sardine.Nind < 10000.0 && !Sardine.Dead
+    if  Sardine.Nind < 100000.0 && !Sardine.Dead
             Sardine.Dead = true
-            model.deadJ_nat += 10000.0
+            model.deadJ_nat += 100000.0
     end
 return
 end
