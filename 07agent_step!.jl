@@ -342,7 +342,7 @@ if !Sardine.Dead
     #starvation
     if ((model.Kappa_value * pC) < pS)
         if (Rdyn < ((pS - (model.Kappa_value * pC)) * model.DEB_timing))
-            model.deadA_starved += 1.0
+            model.deadA_starved += Sardine.Nind
             Sardine.Dead = true
             return
         else
