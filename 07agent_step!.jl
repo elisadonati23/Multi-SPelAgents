@@ -113,7 +113,10 @@ function parallel_juvenile_step!(Sardine, model)
 end
 
 function juvedie!(Sardine, model)
-
+# Initialize deaths
+natural_deaths = 0.0
+total_deaths = 0.0
+fishing_deaths = 0.0
     #set mortality: adding fishing mortality if lenght is higher than 10cm (recruitment)
     if Sardine.Lw < 10.0
         M = model.M_j
@@ -257,6 +260,11 @@ end
 
 
 function adultdie!(Sardine, model)
+
+    # Initialize deaths
+    natural_deaths = 0.0
+    total_deaths = 0.0
+    fishing_deaths = 0.0
 
     if !Sardine.Dead
          #set the new AGE DEPENDENT MORTALITIES -- If Mf is not 0, it is added to M
