@@ -2,6 +2,7 @@
     type::Symbol # :eggmass, :juvenile, :adult
     reproduction::Symbol #spawner, nonspawner
     Nind::Float64 # number of individuals in the superindividuals
+    Krule::Float64
     Age::Float64 # EggMass, Juvenile, Adult
     L::Float64 # Scaled length -- in eggs is assumed to be close to 0 from DEB Theory
     H::Float64 # Maturation energy

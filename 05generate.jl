@@ -4,7 +4,7 @@
     
 # module Generate_Agents
 
-function generate_EggMass(No_Egg, model, Nind = missing, maternal_EggEn = missing, En = missing, Generation = missing)
+function generate_EggMass(No_Egg, model, Nind = missing, Krule = missing, maternal_EggEn = missing, En = missing, Generation = missing)
     agent_type = :eggmass
     agent_Age = 0.0
     agent_L = model.L0
@@ -13,6 +13,12 @@ function generate_EggMass(No_Egg, model, Nind = missing, maternal_EggEn = missin
     agent_QWw = "Q1"
     agent_Dead = false
     agent_reproduction = :nonspawner
+
+    if ismissing(Krule)
+        agent_Krule = model.Kappa_value
+    else
+        agent_Krule = Krule
+    end
 
     if ismissing(maternal_EggEn)
         agent_maternal_EggEn = Float64(model.E0)
@@ -53,14 +59,14 @@ function generate_EggMass(No_Egg, model, Nind = missing, maternal_EggEn = missin
             agent_En = Float64(En)
         end
 
-        add_agent!(Sardine, model, agent_type, agent_reproduction, agent_Nind, agent_Age, agent_L, agent_H, agent_maternal_EggEn, agent_superind_Neggs, agent_En, agent_Generation, agent_Dead,
+        add_agent!(Sardine, model, agent_type, agent_reproduction, agent_Nind, agent_Krule, agent_Age, agent_L, agent_H, agent_maternal_EggEn, agent_superind_Neggs, agent_En, agent_Generation, agent_Dead,
         agent_f_i, agent_t_puberty, agent_Lw, agent_Ww, agent_QWw, agent_R, agent_Scaled_En,
                    agent_s_M_i, agent_pA, agent_Lb_i, agent_spawned,
                    )
     end
 end
 
-function generate_Juvenile(No_J, model, Nind = missing, Generation = 0.0, En = missing, Lb_i = model.Lb, Lw = missing, Ww = missing, Scaled_En = missing)
+function generate_Juvenile(No_J, model, Nind = missing, Krule = missing, Generation = 0.0, En = missing, Lb_i = model.Lb, Lw = missing, Ww = missing, Scaled_En = missing)
     
     agent_type = :juvenile
     agent_f_i = 0.8
@@ -75,6 +81,12 @@ function generate_Juvenile(No_J, model, Nind = missing, Generation = 0.0, En = m
     # silenced features
     agent_maternal_EggEn = model.E0
     agent_superind_Neggs = 0.0 # EggMass
+
+    if ismissing(Krule)
+        agent_Krule = model.Kappa_value
+    else
+        agent_Krule = Krule
+    end
 
     # Features from Adult
 
@@ -128,14 +140,14 @@ function generate_Juvenile(No_J, model, Nind = missing, Generation = 0.0, En = m
         #CI = 100 * Ww / (Lw^3)
         #Variability = randn() .* 0.05 .+ 0
 
-        add_agent!(Sardine, model, agent_type, agent_reproduction, agent_Nind, agent_Age, agent_L, agent_H, agent_maternal_EggEn, agent_superind_Neggs , agent_En, agent_Generation, agent_Dead,
+        add_agent!(Sardine, model, agent_type, agent_reproduction, agent_Nind, agent_Krule, agent_Age, agent_L, agent_H, agent_maternal_EggEn, agent_superind_Neggs , agent_En, agent_Generation, agent_Dead,
         agent_f_i, agent_t_puberty, agent_Lw, agent_Ww, agent_QWw, agent_R, agent_Scaled_En,
                    agent_s_M_i, agent_pA, agent_Lb_i, agent_spawned,
                    )
     end
 end
 
-function generate_Adult(No_A, model, Nind = missing, Age = missing, t_puberty = missing, Lw = missing, Ww = missing, H = missing, R = missing, En = missing, Scaled_En = missing, Generation = missing, pA = missing)
+function generate_Adult(No_A, model, Nind = missing, Krule = missing, Age = missing, t_puberty = missing, Lw = missing, Ww = missing, H = missing, R = missing, En = missing, Scaled_En = missing, Generation = missing, pA = missing)
     # silenced features
     agent_L = 0.0
     agent_maternal_EggEn = model.E0
@@ -144,6 +156,12 @@ function generate_Adult(No_A, model, Nind = missing, Age = missing, t_puberty = 
     agent_spawned = 0.0
     agent_QWw = "Q1"
     agent_Dead = false
+
+    if ismissing(Krule)
+        agent_Krule = model.Kappa_value
+    else
+        agent_Krule = Krule
+    end
 
     agent_type = :adult
     agent_f_i = model.f
@@ -238,7 +256,7 @@ function generate_Adult(No_A, model, Nind = missing, Age = missing, t_puberty = 
             pA
         end
 
-        add_agent!(Sardine, model, agent_type, agent_reproduction, agent_Nind, agent_Age, agent_L, agent_H, agent_maternal_EggEn, agent_superind_Neggs, agent_En, agent_Generation, agent_Dead,
+        add_agent!(Sardine, model, agent_type, agent_reproduction, agent_Nind, agent_Krule, agent_Age, agent_L, agent_H, agent_maternal_EggEn, agent_superind_Neggs, agent_En, agent_Generation, agent_Dead,
         agent_f_i, agent_t_puberty, agent_Lw, agent_Ww, agent_QWw, agent_R, agent_Scaled_En,
                    agent_s_M_i, agent_pA, agent_Lb_i, agent_spawned
                    )
