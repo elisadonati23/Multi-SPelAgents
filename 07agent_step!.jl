@@ -121,7 +121,7 @@ function juvedie!(Sardine, model)
     
     if !Sardine.Dead && Sardine.Nind >= 100000.0
         if Sardine.Lw < 10.0 
-            natural_deaths = Float64(rand(Binomial(Int64(Sardine.Nind), 1-exp(-(model.M_j))))))
+            natural_deaths = Float64(rand(Binomial(Int64(Sardine.Nind), 1-exp(-(model.M_j)))))
             Sardine.Nind -= natural_deaths
             model.deadJ_nat += natural_deaths
         else
