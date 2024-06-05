@@ -20,7 +20,7 @@ zeros_100 = repeat([0.0], 100*365)
 Mf_timeseries_run = vcat(0.0,zeros_100,repeat([0.13, 0.11, 0.11, 0.1, 0.08, 0.06, 0.06, 0.07, 0.08, 0.09, 0.1, 0.15, 0.17, 0.24, 0.25, 0.27, 0.29, 0.28, 0.3, 0.3, 0.3, 0.29, 0.29], inner = 365))
 
 #initialize model: Na, Nj,Negg, Mf, Ww, day_of_the_year, Xmax, Kappa, Temp, M_egg, M0, M1, M2, M3, M4)
-m1 = model_initialize_parallel(1000.0, 0.0, 0.0, 0.0, 1.7e14, 1.0, 1.0 , 0.945, 15.0, 0.9998, 1.071,0.87,0.78,0.63,0.48) 
+m1 = model_initialize_parallel(1000.0, 0.0, 0.0, 0.0, 1.7e14, 1.0, 1.0 , 0.945, 15.0, 0.9998, 1.071,0.83,0.68,0.61,0.48) 
 
 #run modello for the length of the timeseries
 
