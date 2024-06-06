@@ -223,13 +223,7 @@ function generate_Adult(No_A, model, Nind = missing, Age = missing, t_puberty = 
         else
             Scaled_En
         end
-
-        #if ismissing(CI)
-        #    CI = 100 * Ww / (Lw ^ 3)
-        #else
-        #    CI = CI
-        #end
-
+        
         Tc_value = isa(model.Tc, Vector{Float64}) ? model.Tc[model.sim_timing] : model.Tc
 
         agent_pA = if ismissing(pA)

@@ -72,12 +72,6 @@ function create_params(
     E0_max = 0.967
     W0 = 0.00021
     L0 = 0.001 #0.001 cm
-    #M_egg = 0.9995 #o.998 what if not only instant mort?
-    #M0 = 1.3/365.0 #1.06/365.0
-    #M1 = 1.0/365.0 #   0.83/365.0
-    #M2 = 0.8/365.0 #0.69/365.0
-    #M3 = 0.7/365.0 #0.61/365.0
-    #M4 = 0.38/365.0 #0.48/365.0
     Ta = 8000.0
     Tr = 293.0 
 
@@ -100,13 +94,13 @@ function create_params(
     Tc = exp.( Ta /Tr .- Ta ./ (Temp .+ 273.0))
     Tc_value = Tc[1]
     
-    # Define the reproduction periods for each size class
-    repro_periods_Q = Dict("Q1" => (1.0, repro_end),
-    "Q2" => (repro_start + 60.0, repro_end),
-    "Q3" => (repro_start + 30.0, repro_end),
-    "Q4" => (repro_start, repro_end))
-
-    Ww_quantiles = [35.23, 61.17, 97.48]
+    ## Define the reproduction periods for each size class
+    #repro_periods_Q = Dict("Q1" => (1.0, repro_end),
+    #"Q2" => (repro_start + 60.0, repro_end),
+    #"Q3" => (repro_start + 30.0, repro_end),
+    #"Q4" => (repro_start, repro_end))
+#
+    #Ww_quantiles = [35.23, 61.17, 97.48]
 
     daily_repro_probabilities = [calculate_daily_prob_repro(day, peak1_sardine, total_repro_sardine, std_dev) for day in repro_period]
     # Normalize the probabilities so that they sum up to total_reproductions
@@ -193,7 +187,7 @@ model_parameters = Dict(
         :total_repro_sardine => total_repro_sardine,
         :std_dev => std_dev,
         :repro_period => repro_period,
-        :repro_periods_Q => repro_periods_Q,
+        #:repro_periods_Q => repro_periods_Q,
         :daily_repro_probabilities => daily_repro_probabilities,
         :p_Am => p_Am,
         :v_rate => v_rate,
@@ -230,7 +224,7 @@ model_parameters = Dict(
         :Ta => Ta,
         :Tr => Tr,
         :Tc => Tc,
-        :Ww_quantiles => Ww_quantiles,
+        #:Ww_quantiles => Ww_quantiles,
         :Em => Em,
         :Lm => Lm,
         :Kx => Kx,

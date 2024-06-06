@@ -50,9 +50,9 @@ function model_initialize_parallel(
 
     # Check if there are any adults assign them the interquantiles
     #interquantiles determines fertility of the adults
-    if !isempty(adults)
-        interquantiles_prop(model, :Ww, :QWw, :adult) #default assign and use model.Ww_quantiles
-    end
+    #if !isempty(adults)
+    #    interquantiles_prop(model, :Ww, :QWw, :adult) #default assign and use model.Ww_quantiles
+    #end
 
     mean_Lw = calculate_mean_prop(model, "Lw")
     # Calculate the value of f using the given formula at the initialization of the model:
@@ -123,9 +123,9 @@ function model_initialize_noparallel(
 
     # Check if there are any adults assign them the interquantiles
     #interquantiles determines fertility of the adults
-    if !isempty(adults)
-        interquantiles_prop(model, :Ww, :QWw, :adult) #default assign and use model.Ww_quantiles
-    end
+    #if !isempty(adults)
+    #    interquantiles_prop(model, :Ww, :QWw, :adult) #default assign and use model.Ww_quantiles
+    #end
 
     mean_Lw = calculate_mean_prop(model, "Lw")
 

@@ -224,7 +224,7 @@ function juvemature!(Sardine, model)
          Sardine.pA = Sardine.f_i * model.p_Am * model.Tc_value * Sardine.s_M_i * ((Sardine.Lw * model.del_M)^2.0)
          Sardine.Generation += 1.0
          Sardine.s_M_i = model.s_M
-         Sardine.QWw = interquantiles_prop_single(Sardine, model, :Ww, :QWw)
+         #Sardine.QWw = interquantiles_prop_single(Sardine, model, :Ww, :QWw)
     else
         Sardine.t_puberty += 1.0
     end
@@ -368,7 +368,7 @@ if !Sardine.Dead
     Sardine.H = Hdyn + deltaH
     Sardine.R = Rdyn + deltaR
     Sardine.Ww = (model.w *(model.d_V * V + model.w_E/ model.mu_E * (Sardine.En + Sardine.R)))
-    Sardine.QWw = interquantiles_prop_single(Sardine, model, :Ww, :QWw)
+    #Sardine.QWw = interquantiles_prop_single(Sardine, model, :Ww, :QWw)
     Sardine.Scaled_En= Sardine.En / (model.Em * (( Sardine.Lw * model.del_M)^3.0))
     #Sardine.L = Sardine.Lw .* model.del_M ./ model.Lm silenced atm because of problems when K is a vector
 end
@@ -391,19 +391,19 @@ if (!Sardine.Dead && Sardine.Nind >= 10000.0)  &&
     ((model.repro_start <= model.day_of_the_year <= 365.0) || (1.0 <= model.day_of_the_year <= model.repro_end)) &&
         
         # 3rd condition:if we are within the reproduction period for the sardine's size class
-         ((model.repro_periods_Q[Sardine.QWw][1] <= model.day_of_the_year <= 365.0) || (1.0 <= model.day_of_the_year <= model.repro_periods_Q[Sardine.QWw][2])) &&
+         #((model.repro_periods_Q[Sardine.QWw][1] <= model.day_of_the_year <= 365.0) || (1.0 <= model.day_of_the_year <= model.repro_periods_Q[Sardine.QWw][2])) &&
            
             # 4th condition: random number between 0 and 1 is smaller than the probability of spawning, then reproduction occurs
             (rand() <= model.prob_dict[model.day_of_the_year])
 
             # Define a dictionary to map QWw values to multipliers
-            multipliers = Dict("Q1" => 450, "Q2" => 500, "Q3" => 550, "Q4" => 600)
+            #multipliers = Dict("Q1" => 450, "Q2" => 500, "Q3" => 550, "Q4" => 600)
             # Determine the number of eggs
 
             #eggs from all females
-            Sardine.superind_Neggs = Float64(multipliers[Sardine.QWw] * Sardine.Ww) * ceil((Sardine.Nind/2.0)) 
+            Sardine.superind_Neggs = Float64(420.0 * Sardine.Ww) * ceil((Sardine.Nind/2.0)) 
             #eggs from one female
-            Neggs_value_single = Float64(multipliers[Sardine.QWw] * Sardine.Ww)
+            Neggs_value_single = Float64(420.0 * Sardine.Ww) #420 standard number of eggs per weight of female
 
 
             # Then determine the energy content of the eggs from maternal effects
@@ -417,13 +417,6 @@ if (!Sardine.Dead && Sardine.Nind >= 10000.0)  &&
                 Sardine.reproduction = :spawner
                 Sardine.R = Float64(Sardine.R - spawned_en) #(Sardine.R / spawn_period)) 
                 Sardine.spawned += 1.0 #number of times the fish has spawned
-                #here i use ceil since if Nind = 1, half is 0.5 and i want to have at least 1 egg
-                #generate_EggMass(1, #half of the Nind produce eggs (females)
-                #                            model,
-                #                            Ninds_val,
-                #                            EggEn_E0_val, #EggEn
-                #                            EggEn_E0_val, #Reserve of the eggmass now is scaled to the single egg
-                #                            Gen_val) #Genration
             end
 
     end

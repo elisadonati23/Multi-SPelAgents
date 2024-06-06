@@ -90,9 +90,9 @@ function update_outputs!(model)
     adults = filter(a -> a.type == :adult, agents)
 
     # Check if there are any agents that match the criteria
-    if !isempty(adults)
-        interquantiles_prop(model, :Ww, :QWw, :adult)
-    end
+    #if !isempty(adults)
+    #    interquantiles_prop(model, :Ww, :QWw, :adult)
+    #end
 
     adults_juv = filter(a -> (a.type == :adult || a.type == :juvenile), agents)
 
