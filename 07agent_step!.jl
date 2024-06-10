@@ -120,11 +120,13 @@ function juvedie!(Sardine, model)
     fishing_deaths = 0.0
     
     if !Sardine.Dead && Sardine.Nind >= 100000.0
-        if Sardine.Lw < 10.0 
+        if Sardine.Lw < 10.0 || model.MF_value == 0.0
             natural_deaths = Float64(rand(Binomial(Int64(Sardine.Nind), 1-exp(-(model.M_j)))))
             Sardine.Nind -= natural_deaths
             model.deadJ_nat += natural_deaths
-        else
+        end
+
+        if Sardine.Lw > 10.0 && !(model.MF_value == 0.0)
             M = model.M_j + ((model.MF_value/2.0)/365.0)
             total_deaths = Float64(rand(Binomial(Int64(Sardine.Nind), 1-exp(-M))))
             natural_deaths = Float64(rand(Binomial(Int64(Sardine.Nind), 1-exp(-(model.M_j)))))
@@ -145,7 +147,6 @@ function juvedie!(Sardine, model)
     end
 return
 end
-
 
 
 function juveDEB!(Sardine, model)
@@ -281,6 +282,10 @@ function adultdie!(Sardine, model)
             M = model.M4*2
          end
          
+         if model.MF_value == 0.0
+            total_deaths = natural_deaths = Float64(rand(Binomial(Int64(Sardine.Nind), 1-exp(-M))))
+            fishing_deaths = 0.0
+         else
             # Calculate the total number of deaths
             total_deaths = Float64(rand(Binomial(Int64(Sardine.Nind), 1-exp(-M))))
 
@@ -294,6 +299,7 @@ function adultdie!(Sardine, model)
 
             # The number of deaths due to fishing is the total deaths minus the natural deaths
             fishing_deaths = total_deaths - natural_deaths
+        end
 
             # Update Sardine.Nind
             Sardine.Nind -= total_deaths
@@ -306,13 +312,12 @@ function adultdie!(Sardine, model)
          Sardine.Nind -= total_deaths
      end
 
-    if Sardine.Nind < 10000.0
+    if Sardine.Nind < 100000.0
         Sardine.Dead = true
-        model.deadA_nat += 10000.0
+        model.deadA_nat += 100000.0
     end
     return
 end
-
 
 function adultDEB!(Sardine, model)
 
