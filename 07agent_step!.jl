@@ -336,7 +336,6 @@ if !Sardine.Dead
     deltaR = 0.0
     
     # Energy fluxes
-    
     pA = (Sardine.f_i * model.p_Am * model.Tc_value * Sardine.s_M_i * (Vdyn ^ (2/3)))
     pS = p_M_T * Vdyn
     pC = ((Endyn/Vdyn) * (model.Eg * (model.v_rate * model.Tc_value) * Sardine.s_M_i * (Vdyn ^ (2/3)) + pS) / (model.Kappa_value * (Endyn/ Vdyn) + model.Eg))
