@@ -64,7 +64,6 @@ function generate_EggMass(No_Egg, model, NrEggs = missing, EggEn = missing, En =
                    agent_s_M_i, agent_pA, agent_Lb_i, agent_spawned, agent_trans_prob
                    )
     end
-    #println("Added $No_Egg agents to $previousmodelid; max_ID now = $(model.max_ID)")
     return
 end
 
