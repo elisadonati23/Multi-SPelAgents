@@ -84,7 +84,6 @@ function generate_Juvenile(No_J, model, Generation = 0.0, En = missing, Lb_i = m
     # silenced features
     agent_EggEn = 0.0  # EggMass
     agent_NrEggs = 0.0  # EggMass
-    # Features from Adult
     agent_trans_prob = 0.0  # males
 
 

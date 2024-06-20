@@ -75,6 +75,12 @@ function create_params(
     Ta = 8000.0
     Tr = 293.0 
 
+    #values for the beta mutations random distribution
+    mode = 0.945
+    beta = 1.5  # You can adjust this parameter
+    alpha = ((mode * (beta - 2)) + 1) / (1 - mode)
+
+
     # agents
     Em = p_Am / v_rate
     #Depending on Kappa, Lm can be a vector
@@ -161,6 +167,9 @@ model_parameters = Dict(
         :DEB_timing => DEB_timing,
         :day_of_the_year => day_of_the_year,
         :sim_timing => sim_timing,
+        :mode => mode,
+        :beta => beta,
+        :alpha => alpha,
         :dead_eggmass => dead_eggmass,
         :deadJ_nat => deadJ_nat,
         :deadA_nat => deadA_nat,
