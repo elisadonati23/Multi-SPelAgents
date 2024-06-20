@@ -312,12 +312,22 @@ function adultspawn!(Sardine, model)
             EggEn_E0_val = Float64(((model.E0_max - model.E0_min) / (1.0- model.ep_min)) * (Sardine.Scaled_En - model.ep_min)) + model.E0_min
             spawned_en = NrEggs_val * EggEn_E0_val #Sardine.R * model.KappaR / spawn_period 
 
-                # if rand() <= prob to mutate
-                #Kappa_val = sample da binomiale
-                #else
-                #Kappa_val = Sardine.Kappa_i
-                #end
-                
+            # mutation on Kappa
+            # NB: i am not sure this is the right place to put a mutation.
+            # because not all the eggs will have the same mutation, but just some of them
+            # that should also then survive. so the probability to have
+            # an egg which will survive and have a mutation is mutation_rate * probability to survive.
+            # this is not implemented here but also the K value should be immediately determinend 
+            #because drives the energy fluxes in the egg_deb module. I cannot simulate the single eggs,
+            # so i would reduce the mutation rate to mutation_rate * probability to survive. It's
+            # like a way around do not dispack the eggs and simulate them one by one.
+            
+            if rand <= model.mutation_rate
+                Kappa_val = rand(Beta(model.alpha, model.beta))
+            else
+                Kappa_val = Sardine.Kappa_i
+            end
+
             if (spawned_en < Sardine.R )   
                 En_val = Float64(spawned_en)
                 Gen_val = Float64(Sardine.Generation)

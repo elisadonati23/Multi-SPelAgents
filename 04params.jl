@@ -79,6 +79,7 @@ function create_params(
     mode = 0.945
     beta = 1.5  # You can adjust this parameter
     alpha = ((mode * (beta - 2)) + 1) / (1 - mode)
+    mutation_rate = 0.0001
 
 
     # agents
@@ -170,6 +171,7 @@ model_parameters = Dict(
         :mode => mode,
         :beta => beta,
         :alpha => alpha,
+        :mutation_rate => mutation_rate,
         :dead_eggmass => dead_eggmass,
         :deadJ_nat => deadJ_nat,
         :deadA_nat => deadA_nat,
