@@ -10,8 +10,8 @@ end
 
 function eggmass_step!(Sardine, model)
     eggDEB!(Sardine, model)
-    eggaging!(Sardine, model)
     egghatch!(Sardine, model)
+    eggaging!(Sardine, model)
 end
 
 function eggaging!(Sardine, model)
@@ -41,8 +41,6 @@ function eggDEB!(Sardine, model)
     if ((model.Kappa * pC) < pS)
         model.dead_eggmass += 1.0
         Sardine.Dead = true
-        #remove_agent!(Sardine, model)
-        #println("Removed agent with ID $(Sardine.id)")
         return
     end
 
@@ -66,7 +64,6 @@ end
 end
 
 function egghatch!(Sardine, model)
-    if Sardine.Dead == false
     if (Sardine.H >= model.Hb)
         Generation_val = Sardine.Generation
         En_val = Sardine.En
@@ -75,26 +72,37 @@ function egghatch!(Sardine, model)
         Ww_val = (model.w * (model.d_V * ((Lw_val * model.del_Ml) ^ 3.0) + model.w_E / model.mu_E *(En_val + 0.0))) #R
         Scaled_En_val = En_val / ( model.Em * ((Lw_val * model.del_Ml)^3))
 
-        
         generate_Juvenile(Float64(ceil((1 - model.M_egg) * Float64(floor(Sardine.NrEggs)))), 
-                             model)
+                           model, 
+                           Generation_val, 
+                           En_val, 
+                           Lb_i_val, 
+                           Lw_val, 
+                           Ww_val, 
+                           Scaled_En_val)
         Sardine.Dead = true
         model.dead_eggmass += 1                                                    
         return
-    end
     end
     return
 end
 
 # juvenile ----
 
-
-function parallel_juvenile_step!(Sardine, model)
+function juvenile_step!(Sardine, model)
     juvedie!(Sardine, model)
     juveDEB!(Sardine, model)
     juvemature!(Sardine,model)
     juveaging!(Sardine, model)
 end
+
+function parallel_juvenile_step!(Sardine, model)
+juvedie!(Sardine, model)
+juveDEB!(Sardine, model)
+juvemature!(Sardine,model)
+juveaging!(Sardine, model)
+end
+
 
 function juveDEB!(Sardine, model)
     if Sardine.Dead == false
@@ -156,17 +164,17 @@ end
 
 function juvemature!(Sardine, model)
     if Sardine.Dead == false
-    Sardine.t_puberty += 1.0
-
-    if Sardine.H >= model.Hp
-     Sardine.type = :adult
-     Sardine.R = 0.0
-     Sardine.del_M_i = model.del_Ma
-     Sardine.pA = Sardine.f_i * model.p_Am * model.Tc * Sardine.s_M_i * ((Sardine.Lw * Sardine.del_M_i)^2.0)
-     Sardine.Generation += 1.0
+        if Sardine.H >= model.Hp
+         Sardine.type = :adult
+         Sardine.R = 0.0
+         Sardine.del_M_i = model.del_Ma
+         Sardine.pA = Sardine.f_i * model.p_Am * model.Tc * Sardine.s_M_i * ((Sardine.Lw * Sardine.del_M_i)^2.0)
+         Sardine.Generation += 1.0
+        else
+            Sardine.t_puberty += 1.0
+        end
     end
-return
-end
+    return
 end
 
 function juvedie!(Sardine, model)
@@ -191,17 +199,17 @@ end
 
 # adult ----
 
-function parallel_adult_step!(Sardine, model)
-    adultdie!(Sardine, model)
-    adultDEB!(Sardine, model)
-    adultaging!(Sardine, model)
+function adult_step!(Anchovy, model)
+    adultdie!(Anchovy, model)
+    adultDEB!(Anchovy, model)
+    adultspawn!(Anchovy, model)
+    adultaging!(Anchovy, model) 
 end
 
-function adult_step!(Sardine, model)
-    adultdie!(Sardine, model)
-    adultDEB!(Sardine, model)
-    adultaging!(Sardine, model)
-    adultspawn!(Sardine, model) #lo tengo nello stesso ordine del parallelo x avere stessi risultati
+function parallel_adult_step!(Anchovy, model)
+    adultdie!(Anchovy, model)
+    adultDEB!(Anchovy, model)
+    adultaging!(Anchovy, model)
 end
 
 function adultDEB!(Sardine, model)
