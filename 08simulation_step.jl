@@ -1,85 +1,101 @@
-
-#########################################################################################
-# wraps --------
-function parallel_sardine_step!(Sardine, model)
+###############
+#   wraps     #
+###############
+function parallel_anchovy_step!(Sardine, model)
     if Sardine.type == :eggmass
-        parallel_eggmass_step!(Sardine, model) # all functions that do not generate or remove agents
+        parallel_eggmass_step!(Sardine, model) # deb + aging + hatch
     elseif Sardine.type == :juvenile
-        parallel_juvenile_step!(Sardine, model)  # all functions that do not generate or remove agents
+        parallel_juvenile_step!(Sardine, model)  # die + deb + mature + aging
     elseif Sardine.type == :adult
-        parallel_adult_step!(Sardine, model) # all functions that do not generate or remove agents
+        parallel_adult_step!(Sardine, model) # die deb aging 
     end
 end
 
-function sardine_step!(Sardine, model)
+function anchovy_step!(Sardine, model)
     if Sardine.type == :eggmass
-        eggmass_step!(Sardine, model)
+        parallel_eggmass_step!(Sardine, model) # deb + aging + hatch
     elseif Sardine.type == :juvenile
-        parallel_juvenile_step!(Sardine, model)
+        parallel_juvenile_step!(Sardine, model) # die + deb + mature + aging
     elseif Sardine.type == :adult
-        adult_step!(Sardine, model)
+        adult_step!(Sardine, model) # die deb aging + spawn
     end
 end
 
-## ENVIRONMENT ----
-#########################################################################################
 
 function evolve_environment!(model)
-    
     # day counter
     if model.day_of_the_year == 365.0
         model.day_of_the_year = 1.0
     else
         model.day_of_the_year += 1.0
     end
+    
+    model.sim_timing += 1
+    # update time dependent parameters
+    update_Tc!(model, model.Tc)
+    update_Kappa!(model, model.Kappa)
+    update_Xmax!(model, model.Xmax)
+    update_MF!(model, model.M_f)
 
-    model.max_ID = maximum([agent.id for agent in values(allagents(model))])
-    #println("Day of the year: $(model.day_of_the_year) and max_ID $(model.max_ID)")
-
-    ##calculate Xall
-    # Xall is initialized like X, which is set to Xmax (look at params)
-    # remove the assimilation of all agents:
-    Xall = model.Xall - (calculate_sum_prop(model, "pA")/ model.KappaX) / model.Wv
-    #
+    Xall = model.Xmax_value - (calculate_real_assimilation(model)/ model.KappaX) / model.Wv
+    #println("real assimilation:", calculate_real_assimilation(model))
+    
      if Xall < 0.0  
          Xall = 0.0 
      end
-    #
-     model.Xall = Xall
-    #
-    ##food update -- MISSING CHEMOSTAT!
-    ######################################
-    ##at each timestep resources are renewed:
-    #
-     model.X = model.Xmax
-    #
-    ## update response function f ---
-    ###############################
-    #
-    if ismissing(calculate_sum_assimilation(model))
+    
+    model.Xall = Xall
+
+    ## update response function f 
+
+    if ismissing(calculate_max_assimilation(model)) || calculate_max_assimilation(model) == 0.0 || isnan(calculate_max_assimilation(model))
         f = 0.0
     else
-    f = (model.X * model.Wv * model.KappaX) / calculate_sum_assimilation(model)
+        #rapporto tra quello disponibile e quello che si mangia su base di taglia e Tc!!
+    f = (model.Xmax_value * model.Wv * model.KappaX) / calculate_max_assimilation(model) #take into consideration the Nind of the superindividuals
     end
-    #
-    ## Ensure that f is bounded between 0 and 1
-    model.f = max(0, min(f, 1.0)) # not 1 but 0.8  ## ????? check haberle
 
+    ## Ensure that f is bounded between 0 and 1
+    model.f = max(0, min(f, 1.0)) # not 1 but 0.8
+
+    adults_juve = filter(a -> a.type == :adult || a.type == :juvenile, collect(values(allagents(model))))
+
+    # if there are no adults or juveniles, set f to 0.8.
+    # this prevent numerical instability when there are no agents in the model that feed exogenously
+    # infact, with just eggs, Lw and WW and Volume would go to zero and the population assimilation
+    # cannot be calculated with max and real assimilation functions.
+
+    if isempty(adults_juve)
+        model.f = 0.8
+    end
     return
 end
-function update_outputs!(model)
-    agents = collect(values(allagents(model)))
-    females = filter(a -> a.type == :adult && a.Sex == "Female", agents)
 
-    # Check if there are any agents that match the criteria
-    if !isempty(females)
-        interquantiles_prop(model, :Ww, :QWw, :adult, "Female")
+function update_outputs!(model)# not 1 but 0.8  ## ????? check haberle
+    agents = collect(values(allagents(model)))
+
+    adults_juve = filter(a -> a.type == :adult || a.type == :juvenile, collect(values(allagents(model))))
+
+    # if there are no adults or juveniles, set f to 0.8.
+    # this prevent numerical instability when there are no agents in the model that feed exogenously
+    # infact, with just eggs, Lw and WW and Volume would go to zero and the population assimilation
+    # cannot be calculated with max and real assimilation functions.
+
+    if isempty(adults_juve)
+        model.f = 0.8 
     end
 
+    agents = collect(values(allagents(model)))
+    adults = filter(a -> a.type == :adult, agents)
+
+    # Check if there are any agents that match the criteria
+    #if !isempty(adults)
+    #    interquantiles_prop(model, :Ww, :QWw, :adult)
+    #end
+
+    adults_juv = filter(a -> (a.type == :adult || a.type == :juvenile), agents)
     #update outputs
     # outputs
-    adults_juv = filter(a -> (a.type == :adult || a.type == :juvenile), agents)  
-    if !isempty(adults_juv)
     # B plot
     model.TotB = calculate_sum_prop(model, "Ww")
     model.JuvB = calculate_sum_prop(model, "Ww", type = :juvenile)
@@ -99,13 +115,15 @@ function update_outputs!(model)
     #mean tpuberty plot
     model.mean_tpuberty = calculate_mean_prop(model, "t_puberty", type = :adult)
     model.sd_tpuberty = calculate_sd_prop(model, "t_puberty", type = :adult)
-    end
     #mean spawnings
     model.mean_batch_eggs = mean_eggs(model)
     model.mean_spawning_events = mean_spawning(model)
     return
 end
 
+
+
+# scheduler
 mutable struct scheduler_EggAdults end
 
 function (sEA::scheduler_EggAdults)(model::ABM)
@@ -118,7 +136,7 @@ sEA = scheduler_EggAdults()
 function complex_step!(model)
     #parallel
     Threads.@threads for sardine in collect(values(allagents(model)))
-        parallel_sardine_step!(sardine, model)
+        parallel_anchovy_step!(sardine, model)
     end 
 
     remove_all!(model, is_dead)
@@ -134,10 +152,10 @@ function complex_step!(model)
     for sardine in adult_ids
         adultspawn!(model[sardine], model) #generate new agents with add!
     end
+
+    remove_all!(model, is_dead)
     
     evolve_environment!(model)
     update_outputs!(model)
 end
  
-
-

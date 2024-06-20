@@ -1,6 +1,7 @@
 @agent struct Sardine(NoSpaceAgent)
     type::Symbol # EggMass, Juvenile, Adult
     Age::Float64 # EggMass, Juvenile, Adult
+    Kappa_i::Float64 # normally 0.945
     L::Float64 # EggMass, Juvenile --?
     H::Float64 # EggMass, Juvenile, Adult
     EggEn::Float64

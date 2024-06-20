@@ -1,7 +1,7 @@
 # module Generate_Agents
 
     
-function generate_EggMass(No_Egg, model, NrEggs = missing, EggEn = missing, En = missing, Generation = missing)
+function generate_EggMass(No_Egg, model, NrEggs = missing, EggEn = missing, En = missing, Kappa = missing, Generation = missing)
 
     agent_type = :eggmass
     agent_Age = 0.0
@@ -10,7 +10,12 @@ function generate_EggMass(No_Egg, model, NrEggs = missing, EggEn = missing, En =
     agent_spawned = 0.0
     agent_QWw = "Q1"
     agent_Dead = false
-
+    if ismissing(Kappa)
+        agent_Kappa_i = model.Kappa_value
+    else
+        agent_Kappa_i = Kappa
+    end
+    agent_Kappa_i = model.Kappa_value
     if ismissing(EggEn)
         agent_EggEn = Float64(model.E0)
     else
@@ -54,7 +59,7 @@ function generate_EggMass(No_Egg, model, NrEggs = missing, EggEn = missing, En =
             agent_En = Float64(En)
         end
 
-        add_agent!(Sardine, model, agent_type, agent_Age, agent_L, agent_H, agent_EggEn, agent_NrEggs, agent_En, agent_Generation, agent_Dead,
+        add_agent!(Sardine, model, agent_type, agent_Age, agent_Kappa_i, agent_L, agent_H, agent_EggEn, agent_NrEggs, agent_En, agent_Generation, agent_Dead,
         agent_f_i, agent_t_puberty, agent_herma, agent_Sex, agent_Lw, agent_Ww, agent_QWw, agent_meta, agent_R, agent_Scaled_En, agent_del_M_i,
                    agent_s_M_i, agent_pA, agent_Lb_i, agent_spawned, agent_trans_prob
                    )
@@ -75,6 +80,7 @@ function generate_Juvenile(No_J, model, Generation = 0.0, En = missing, Lb_i = m
     agent_spawned = 0.0
     agent_QWw = "Q1"
     agent_Dead = false
+    agent_Kappa_i = model.Kappa_value
 
     # silenced features
     agent_EggEn = 0.0  # EggMass
@@ -132,13 +138,12 @@ function generate_Juvenile(No_J, model, Generation = 0.0, En = missing, Lb_i = m
         #CI = 100 * Ww / (Lw^3)
         #Variability = randn() .* 0.05 .+ 0
 
-        add_agent!(Sardine, model, agent_type, agent_Age, agent_L, agent_H, agent_EggEn, agent_NrEggs , agent_En, agent_Generation, agent_Dead,
+        add_agent!(Sardine, model, agent_type, agent_Age, agent_Kappa_i, agent_L, agent_H, agent_EggEn, agent_NrEggs , agent_En, agent_Generation, agent_Dead,
         agent_f_i, agent_t_puberty, agent_herma, agent_Sex, agent_Lw, agent_Ww, agent_QWw, agent_meta, agent_R, agent_Scaled_En, agent_del_M_i,
                    agent_s_M_i, agent_pA, agent_Lb_i, agent_spawned, agent_trans_prob
                    )
         
     end
-    #println("Added $No_J agents to $previousmodelid; max_ID now = $(model.max_ID)")
     return
 end
 
@@ -153,6 +158,7 @@ function generate_Adult(No_A, model, Sex = missing, Age = missing, t_puberty = m
     agent_spawned = 0.0
     agent_QWw = "Q1"
     agent_Dead = false
+    agent_Kappa_i = model.Kappa_value
 
     agent_type = :adult
 
@@ -239,7 +245,7 @@ function generate_Adult(No_A, model, Sex = missing, Age = missing, t_puberty = m
             pA
         end
 
-        add_agent!(Sardine, model, agent_type, agent_Age, agent_L, agent_H, agent_EggEn, agent_NrEggs, agent_En, agent_Generation, agent_Dead,
+        add_agent!(Sardine, model, agent_type, agent_Age, agent_Kappa_i, agent_L, agent_H, agent_EggEn, agent_NrEggs, agent_En, agent_Generation, agent_Dead,
         agent_f_i, agent_t_puberty, agent_herma, agent_Sex, agent_Lw, agent_Ww, agent_QWw, agent_meta, agent_R, agent_Scaled_En, agent_del_M_i,
                    agent_s_M_i, agent_pA, agent_Lb_i, agent_spawned, agent_trans_prob
                    )

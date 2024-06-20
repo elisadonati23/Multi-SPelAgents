@@ -80,8 +80,6 @@ function egghatch!(Sardine, model)
                              model)
         Sardine.Dead = true
         model.dead_eggmass += 1                                                    
-        #remove_agent!(Sardine, model)
-        #println("Removed agent with ID $(Sardine.id)")
         return
     end
     end
@@ -127,8 +125,6 @@ deltaEn = (pA - pC) * model.DEB_timing
 if ((model.Kappa * pC) < pS)
 model.deadJ_starved += 1.0
 Sardine.Dead = true
-#remove_agent!(Sardine, model)
-#println("Removed agent with ID $(Sardine.id)")
 return
 end
 
@@ -152,7 +148,6 @@ Sardine.Lw = (V ^ (1/3)) / Sardine.del_M_i
 Sardine.H = Hdyn + deltaH
 Sardine.R = Rdyn + deltaR
 Sardine.Ww = (model.w *(model.d_V * V + model.w_E/ model.mu_E * (Sardine.En + Sardine.R)))
-#Sardine.CI = 100.0 * Sardine.Ww / (Sardine.Lw ^ 3)
 Sardine.Scaled_En= Sardine.En / (model.Em * (( Sardine.Lw * Sardine.del_M_i)^3.0))
 Sardine.L = Sardine.Lw * Sardine.del_M_i / model.Lm
 end
@@ -164,7 +159,6 @@ function juvemature!(Sardine, model)
     Sardine.t_puberty += 1.0
 
     if Sardine.H >= model.Hp
-     #put adult features
      Sardine.type = :adult
      Sardine.R = 0.0
      Sardine.del_M_i = model.del_Ma
@@ -182,8 +176,6 @@ randomvalue = rand()
 if ((1- exp(- M))) >= randomvalue
 model.deadJ_nat += 1.0
 Sardine.Dead = true
-#remove_agent!(Sardine, model)
-#println("Removed agent with ID $(Sardine.id)")
 return
 end
 end
@@ -219,7 +211,7 @@ function adultDEB!(Sardine, model)
     Endyn = Sardine.En
     Hdyn = model.Hb
     Rdyn = Sardine.R
-    p_M_T = model.p_M * model.Tc # this should be in the update environment module
+    p_M_T = model.p_M * model.Tc
     
     deltaV = 0.0
     deltaEn  = 0.0
@@ -244,8 +236,6 @@ function adultDEB!(Sardine, model)
         if (Rdyn < ((pS - (model.Kappa * pC)) * model.DEB_timing))
             model.deadA_starved += 1.0
             Sardine.Dead = true
-            #remove_agent!(Sardine, model)
-            #println("Removed agent with ID $(Sardine.id)")
             return
         else
             Rdyn = (Rdyn - (pS - (model.Kappa * pC)) * model.DEB_timing)
@@ -266,9 +256,7 @@ function adultDEB!(Sardine, model)
     Sardine.H = Hdyn + deltaH
     Sardine.R = Rdyn + deltaR
     Sardine.Ww = (model.w *(model.d_V * V + model.w_E/ model.mu_E * (Sardine.En + Sardine.R)))
-    #Sardine.CI = 100.0 * Sardine.Ww / (Sardine.Lw ^ 3)
     Sardine.Scaled_En= Sardine.En / (model.Em * (( Sardine.Lw * Sardine.del_M_i)^3.0))
-    #Sardine.l = Sardine.Lw * Sardine.del_M_i / model.Lm
 end
 end
 
@@ -298,8 +286,6 @@ if Sardine.Dead == false
             model.deadA_nat += 1.0
         end
         Sardine.Dead = true 
-        #remove_agent!(Sardine, model)
-        #println("Removed agent with ID $(Sardine.id)")
         return
     end
 end  
@@ -318,31 +304,22 @@ function adultspawn!(Sardine, model)
     if ((model.repro_start <= model.day_of_the_year <= 365.0) || (1.0 <= model.day_of_the_year <= model.repro_end))
     
         # if female
-        if Sardine.Sex == "Female" && 
-            # if we are within the reproduction period for the sardine's size class
-            ((model.repro_periods_Q[Sardine.QWw][1] <= model.day_of_the_year <= 365.0) || 
-             (1.0 <= model.day_of_the_year <= model.repro_periods_Q[Sardine.QWw][2])) &&
+        if Sardine.Sex == "Female" && &&
             # random number between 0 and 1 is smaller than the probability of spawning, then reproduction occurs
             rand() <= model.prob_dict[model.day_of_the_year]
 
-            if (Sardine.QWw == "Q1")
-                NrEggs_val = Float64(400*Sardine.Ww)
-                elseif (Sardine.QWw == "Q2")
-                NrEggs_val = Float64(450*Sardine.Ww)
-                elseif (Sardine.QWw == "Q3")
-                NrEggs_val = Float64(500*Sardine.Ww)
-                elseif (Sardine.QWw == "Q4")
-                NrEggs_val = Float64(550*Sardine.Ww)
-            end
-
+            NrEggs_val = 420.0 * Sardine.Ww
             EggEn_E0_val = Float64(((model.E0_max - model.E0_min) / (1.0- model.ep_min)) * (Sardine.Scaled_En - model.ep_min)) + model.E0_min
             spawned_en = NrEggs_val * EggEn_E0_val #Sardine.R * model.KappaR / spawn_period 
 
-            if (spawned_en < Sardine.R )#* model.KappaR)    
-                #EggEn_E0_val = Float64(((model.E0_max - model.E0_min) / (1.0- model.ep_min)) * (Sardine.Scaled_En - model.ep_min)) + model.E0_min
+                # if rand() <= prob to mutate
+                #Kappa_val = sample da binomiale
+                #else
+                #Kappa_val = Sardine.Kappa_i
+                #end
+                
+            if (spawned_en < Sardine.R )   
                 En_val = Float64(spawned_en)
-                #NrEggs_val = Float64(floor(En_val/ EggEn_E0_val))
-                #print(NrEggs_val)
                 Gen_val = Float64(Sardine.Generation)
                 Sardine.R = Float64(Sardine.R - spawned_en) #(Sardine.R / spawn_period)) 
                 Sardine.spawned += 1.0
@@ -350,7 +327,8 @@ function adultspawn!(Sardine, model)
                                               NrEggs_val,
                                               EggEn_E0_val,
                                               En_val,
-                                              Gen_val)
+                                              Gen_val,
+                                              Kappa_val)
                 
                 
             end
