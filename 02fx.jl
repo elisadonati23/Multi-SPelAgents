@@ -1,8 +1,8 @@
 
-                                          ##############
-                                          # Ouutput fx #
-                                          ##############
-function update_Kappa!(model, Kappa::Float64)
+  ##############
+  # Ouutput fx #
+  ##############
+  function update_Kappa!(model, Kappa::Float64)
     model.Kappa_value = Kappa
 end
 
@@ -305,7 +305,7 @@ try
     end
 end
 
-function plot_population_timeseries(adf, y_limits = missing)
+function plot_population_timeseries(adf, y_limits = missing, thousand = false)
     p = Plots.plot(layout = (1,1))  # Initialize an empty plot with a grid layout
 
     try
@@ -331,6 +331,11 @@ function plot_population_timeseries(adf, y_limits = missing)
             egg_count.count = coalesce.(egg_count.count, 0)
             juvenile_count.Nind_sum = coalesce.(juvenile_count.Nind_sum, 0)
             adult_count.Nind_sum = coalesce.(adult_count.Nind_sum, 0)
+                if thousand
+                egg_count.count = egg_count.count/1000.0
+                juvenile_count.Nind_sum = juvenile_count.Nind_sum/1000.0
+                adult_count.Nind_sum = adult_count.Nind_sum/1000.0
+                end
             # Sort by time
             sort!(egg_count, :time)
             sort!(juvenile_count, :time)
@@ -355,7 +360,7 @@ function plot_population_timeseries(adf, y_limits = missing)
     end
 end
 
-function plot_param_timeseries(adf, params, ids = missing)
+function plot_param_timeseries(adf, params, ids = missing, tonnes = false)
     # Generate a distinct color for each parameter, plus some extras
     colors = distinguishable_colors(length(params) + 10)
     
@@ -378,12 +383,18 @@ function plot_param_timeseries(adf, params, ids = missing)
                 for group in grouped_data
                     id = group[1, :id]
                     param_values = group[:, Symbol(param)]
+                    if tonnes
+                        param_values = param_values / 1e6
+                    end
                     Plots.plot!(p, group[!, :time], param_values, color = color, linewidth = 2, label = "ID $id - $param")
                 end
             end
         else
             for (param, color) in zip(params, colors)
                 param_values = adf[:, Symbol(param)]
+                if tonnes
+                    param_values = param_values / 1e6
+                end
                 Plots.plot!(p, adf[!, :time], param_values, color = color, linewidth = 2, label = "$param")
             end
         end
@@ -396,14 +407,106 @@ function plot_param_timeseries(adf, params, ids = missing)
     end
 end
 
+using Colors
+
+
+function plot_annual_param_timeseries(adf, params, tonnes = false, type = :mean, title = "")
+    p = Plots.plot(title=title)  # Initialize an empty plot with a title # Initialize an empty plot
+    colors = [:blue, :red, :green, :purple, :orange, :black]
+
+    for (i, param) in enumerate(params)
+        # Group the DataFrame by year
+        grouped_data = groupby(adf, [:year])
+
+        # Initialize arrays to hold the years, means, and standard deviations
+        years = Int64[]
+        values = Float64[]
+        std_devs = Float64[]
+
+        for group in grouped_data
+            year = group[1, :year]
+            param_values = group[:, param]
+            if tonnes
+                param_values = param_values / 1e6
+            end
+
+            if type == :mean
+                plot_value = mean(param_values)
+                std_dev = std(param_values)
+            else
+                plot_value = sum(param_values)
+                std_dev = std(param_values)
+            end
+
+            push!(years, year)
+            push!(values, plot_value)
+            push!(std_devs, std_dev)
+        end
+
+        color = colors[(i-1) % length(colors) + 1]
+        Plots.plot!(p, years, values, yerr=std_devs, seriestype=:scatter, label = "$param", color=color)
+        Plots.plot!(p, years, values, linewidth = 2, label = false, color=color)
+    end
+
+    Plots.xlabel!(p, "Year")
+    Plots.ylabel!(p, "Value")
+    return p
+end
+
+
+function plot_timeframe_param_timeseries(adf, params, start_time, end_time, tonnes = false, type = :mean, title = "")
+    p = Plots.plot(title=title)  # Initialize an empty plot with a title
+    colors = [:blue, :red, :green, :purple, :orange, :black]
+
+    # Filter the DataFrame based on the start and end days of the year
+    adf = adf[(adf[!, :day_of_the_year] .>= start_time) .& (adf[!, :day_of_the_year] .<= end_time), :]    
+    for (i, param) in enumerate(params)
+        # Group the DataFrame by year
+        grouped_data = groupby(adf, [:year])
+
+        # Initialize arrays to hold the years, means, and standard deviations
+        years = Int64[]
+        values = Float64[]
+        std_devs = Float64[]
+
+        for group in grouped_data
+            year = group[1, :year]
+            param_values = group[:, param]
+            if tonnes
+                param_values = param_values / 1e6
+            end
+
+            if type == :mean
+                plot_value = mean(param_values)
+                std_dev = std(param_values)
+            else
+                plot_value = sum(param_values)
+                std_dev = std(param_values)
+            end
+
+            push!(years, year)
+            push!(values, plot_value)
+            push!(std_devs, std_dev)
+        end
+
+        color = colors[(i-1) % length(colors) + 1]
+        Plots.plot!(p, years, values, yerr=std_devs, seriestype=:scatter, label = "$param", color=color)
+        Plots.plot!(p, years, values, linewidth = 2, label = false, color=color)
+    end
+
+    Plots.xlabel!(p, "Year")
+    Plots.ylabel!(p, "Value")
+    return p
+end
+
 function diagnostic_plots(out_agent, out_model)
     
     Plots.default(legendfontsize = 4)  # Set the plot size
     
     # Plot the number of agents over time
-    p1 = plot_population_timeseries(out_agent)
+    p1 = plot_population_timeseries(out_agent, true)
     p2 = plot_param_timeseries(out_model,[:deadA_starved, :deadA_nat, :deadA_old,:deadJ_starved, :deadJ_nat, :deadJ_old, :fished])
-    p3 = plot_param_timeseries(out_model,[:TotB, :JuvB, :AdB])
+    p3 = plot_param_timeseries(out_model,[:TotB, :JuvB, :AdB], true)
     p4 = plot_param_timeseries(out_model, [:f])
     #p5 = plot_means_with_std(out_model, [:meanAdL, :meanJuvL], [:sdAdL, :sdJuvL])
     p5 = plot_param_timeseries(out_model, [:fishedW])
@@ -419,35 +522,36 @@ function diagnostic_plots(out_agent, out_model)
     Plots.default()
 end
 
-function diagnostic_plots_pt2(out_model)
+function diagnostic_plots_pt2(out_model, model)
     
     Plots.default(legendfontsize = 4)  # Set the plot size
     
     #p5 = plot_means_with_std(out_model, [:meanAdL, :meanJuvL], [:sdAdL, :sdJuvL])
-    p5 = plot_param_timeseries(out_model, [:fishedW])
+    p5 = plot_param_timeseries(out_model, [:fishedW], true)
     p6 = plot_means_with_std(out_model, [:mean_tpuberty], [:sd_tpuberty])
     p7 = plot_means_with_std(out_model, [:meanAdWw, :meanJuvWw], [:sdAdWw, :sdJuvWw])
     p8 = plot_means_with_std(out_model, [:mean_Hjuve], [:sd_Hjuve])
 
 
     # Combine the plots in a 3x3 grid
-    combined_plot2 = Plots.plot(p5,p6,p7,p8, layout = (2,2))
+    combined_plot2 = Plots.plot(p5,p6,p7,p8, layout = (2,2), plot_title = "$(round(model.M_egg, digits = 4)) /$(round(model.M0*365.0,digits = 4)) /$(round(model.M1*365.0,digits = 4)) /$(round(model.M2*365.0,digits = 4)) / $(round(model.M3*365.0,digits = 4)) /$(round(model.M4*365.0,digits = 4))", titlefont = 3)
 return combined_plot2
 end
 
-function diagnostic_plots_pt1(out_agent, out_model)
+function diagnostic_plots_pt1(out_agent, out_model, model)
     
     Plots.default(legendfontsize = 4)  # Set the plot size
     
     # Plot the number of agents over time
-    p1 = plot_population_timeseries(out_agent)
+    p1 = plot_population_timeseries(out_agent, missing, false)
     p2 = plot_param_timeseries(out_model,[:deadA_starved, :deadA_nat, :deadA_old,:deadJ_starved, :deadJ_nat, :deadJ_old, :fished])
-    p3 = plot_param_timeseries(out_model,[:TotB, :JuvB, :AdB])
+    p3 = plot_param_timeseries(out_model,[:TotB, :JuvB, :AdB], true)
     p4 = plot_param_timeseries(out_model, [:f])
 
 
     # Combine the plots in a 3x3 grid
-    combined_plot1 = Plots.plot(p1,p2,p3,p4, layout = (2,2))
+    combined_plot1 = Plots.plot(p1,p2,p3,p4, layout = (2,2), plot_title = "$(round(model.M_egg, digits = 4)) /$(round(model.M0*365.0,digits = 4)) /$(round(model.M1*365.0,digits = 4)) /$(round(model.M2*365.0,digits = 4)) / $(round(model.M3*365.0,digits = 4)) /$(round(model.M4*365.0,digits = 4))", titlefont = 3)
     return combined_plot1
 end
-
+                                        
+                                        
