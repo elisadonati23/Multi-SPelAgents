@@ -330,7 +330,7 @@ function adultspawn!(Sardine, model)
             if (spawned_en < Sardine.R )   
                 En_val = Float64(spawned_en)
                 Gen_val = Float64(Sardine.Generation)
-                Sardine.R = Float64(Sardine.R - spawned_en) #(Sardine.R / spawn_period)) 
+                Sardine.R = Float64(Sardine.R - spawned_en) 
                 Sardine.spawned += 1.0
                 generate_EggMass(1.0, model,
                                             NrEggs_surviving,
