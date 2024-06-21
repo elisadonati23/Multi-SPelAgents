@@ -20,7 +20,7 @@ modello = model_initialize_parallel(100, 100, 100, 0.0, 50000.0, 1.0, 1.0, 0.990
 
 
 temp = collect(range(15.0, stop=15.0, length=365*5+1))
-Kappa = collect(range(0.9901, stop=0.9901, length=365*5+1))
+Kappa = collect(range(0.945, stop=0.945, length=365*5+1))
 Xmax = collect(range(1.0, stop=1.0, length=365*5+1))
 Mf = collect(range(0.0, stop=0.0, length=365*5+1))
 

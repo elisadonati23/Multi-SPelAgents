@@ -17,7 +17,6 @@
     Ww::Float64
     R::Float64
     Scaled_En::Union{Float64, Vector{Float64}} 
-    del_M_i::Float64
     s_M_i::Float64
     pA::Float64
     Lb_i::Union{Float64, Vector{Float64}} 

@@ -30,8 +30,8 @@ function update_Xmax!(model, Xmax::Vector{Float64})
     model.Xmax_value = Xmax[model.sim_timing]
 end
 
-function is_dead(anchovy::Anchovy)
-    return anchovy.dead == true
+function is_dead(sardine::Sardine)
+    return sardine.dead == true
 end
 
 

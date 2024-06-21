@@ -8,7 +8,6 @@ function generate_EggMass(No_Egg, model, NrEggs = missing, EggEn = missing, En =
     agent_L = model.L0
     agent_H = 0.00
     agent_spawned = 0.0
-    agent_QWw = "Q1"
     agent_Dead = false
 
 
@@ -33,7 +32,6 @@ function generate_EggMass(No_Egg, model, NrEggs = missing, EggEn = missing, En =
     agent_Ww = 0.0
     agent_R = 0.0
     agent_Scaled_En = 0.0
-    agent_del_M_i = 0.0
     agent_s_M_i = 0.0
     agent_pA = 0.0
     agent_Lb_i = 0.0
@@ -54,13 +52,13 @@ function generate_EggMass(No_Egg, model, NrEggs = missing, EggEn = missing, En =
         end
 
         if ismissing(En)
-            agent_En = Float64(agent_NrEggs * model.E0)
+            agent_En = Float64(model.E0)
         else
             agent_En = Float64(En)
         end
 
         add_agent!(Sardine, model, agent_type, agent_Age, agent_Kappa_i, agent_L, agent_H, agent_EggEn, agent_NrEggs, agent_En, agent_Generation, agent_Dead,
-        agent_f_i, agent_t_puberty, agent_Sex, agent_Lw, agent_Ww, agent_R, agent_Scaled_En, agent_del_M_i,
+        agent_f_i, agent_t_puberty, agent_Sex, agent_Lw, agent_Ww, agent_R, agent_Scaled_En,
                    agent_s_M_i, agent_pA, agent_Lb_i, agent_spawned
                    )
     end
@@ -94,45 +92,41 @@ function generate_Juvenile(No_J, model, Generation = 0.0, En = missing, Lb_i = m
             agent_Lw = Lw
         end
 
-        agent_Age = model.Ap * (agent_Lw * model.del_Ma) / model.Lp
-        agent_t_puberty = model.Ap * (agent_Lw * model.del_Ma) / model.Lp
+        agent_Age = model.Ap * (agent_Lw * model.del_M) / model.Lp
+        agent_t_puberty = model.Ap * (agent_Lw * model.del_M) / model.Lp
 
         if ismissing(Ww)
-            agent_Ww = (model.w * (model.d_V * ((agent_Lw * model.del_Ma) ^ 3.0)))
+            agent_Ww = (model.w * (model.d_V * ((agent_Lw * model.del_M) ^ 3.0)))
         else
             agent_Ww = Ww
         end
 
-        agent_H = model.Hp * (agent_Lw * model.del_Ma) / model.Lp
+        agent_H = model.Hp * (agent_Lw * model.del_M) / model.Lp
 
         if ismissing(En)
-            agent_En = agent_f_i * model.Em * ((agent_Lw * model.del_Ma)^3.0)
+            agent_En = agent_f_i * model.Em * ((agent_Lw * model.del_M)^3.0)
         else
             agent_En = En
         end
 
         if ismissing(Scaled_En)
-            agent_Scaled_En = agent_En / (model.Em * ((agent_Lw * model.del_Ma)^3.0))
+            agent_Scaled_En = agent_En / (model.Em * ((agent_Lw * model.del_M)^3.0))
         else
             agent_Scaled_En = Scaled_En
         end
 
-        agent_del_M_i = agent_H >= model.Hj ? model.del_Ma : model.del_Ml
-
         agent_s_M_i = if model.Hb >= agent_H
             1.0
         elseif agent_H > model.Hb && model.Hj > agent_H
-            agent_Lw * agent_del_M_i / agent_Lb_i
+            agent_Lw * model.del_M / agent_Lb_i
         else
             model.s_M
         end
 
-        agent_pA = agent_f_i * model.p_Am * model.Tc * agent_s_M_i * ((agent_Lw * agent_del_M_i)^2.0)
-        #CI = 100 * Ww / (Lw^3)
-        #Variability = randn() .* 0.05 .+ 0
+        agent_pA = agent_f_i * model.p_Am * model.Tc * agent_s_M_i * ((agent_Lw * model.del_M)^2.0)
 
         add_agent!(Sardine, model, agent_type, agent_Age, agent_Kappa_i, agent_L, agent_H, agent_EggEn, agent_NrEggs , agent_En, agent_Generation, agent_Dead,
-        agent_f_i, agent_t_puberty, agent_Sex, agent_Lw, agent_Ww, agent_R, agent_Scaled_En, agent_del_M_i,
+        agent_f_i, agent_t_puberty, agent_Sex, agent_Lw, agent_Ww, agent_R, agent_Scaled_En,
                    agent_s_M_i, agent_pA, agent_Lb_i, agent_spawned
                    )
         
@@ -161,12 +155,10 @@ function generate_Adult(No_A, model, Sex = missing, Age = missing, t_puberty = m
         agent_H = H
     end
 
-    agent_del_M_i = model.del_Ma
-
     agent_s_M_i = if model.Hb >= agent_H
         1.0
     elseif agent_H > model.Hb && model.Hj > agent_H
-        agent_Lw * agent_del_M_i / model.Lb
+        agent_Lw * model.del_M / model.Lb
     else
         model.s_M
     end
@@ -192,13 +184,13 @@ function generate_Adult(No_A, model, Sex = missing, Age = missing, t_puberty = m
         end
 
         agent_Age = if ismissing(Age)
-            model.Am * agent_Lw * model.del_Ma / model.Lm
+            model.Am * agent_Lw * model.del_M / model.Lm
         else
             agent_Age
         end
 
         agent_t_puberty = if ismissing(t_puberty)
-           model.Ap * (agent_Lw * model.del_Ma) / model.Lp
+           model.Ap * (agent_Lw * model.del_M) / model.Lp
         else
             agent_t_puberty
         end
@@ -210,35 +202,34 @@ function generate_Adult(No_A, model, Sex = missing, Age = missing, t_puberty = m
         end
 
         agent_En = if ismissing(En)
-            agent_En = agent_f_i * model.Em * ((agent_Lw * model.del_Ma)^3.0)
+            agent_En = agent_f_i * model.Em * ((agent_Lw * model.del_M)^3.0)
         end
 
 
         agent_Ww = if ismissing(Ww)
-            (model.w * (model.d_V * ((agent_Lw * model.del_Ma) ^ 3.0) + model.w_E / model.mu_E * (agent_En + agent_R)))
+            (model.w * (model.d_V * ((agent_Lw * model.del_M) ^ 3.0) + model.w_E / model.mu_E * (agent_En + agent_R)))
         else
             Ww
         end
 
         agent_Scaled_En = if ismissing(Scaled_En)
-            agent_En / (model.Em * ((agent_Lw * model.del_Ma)^3.0))
+            agent_En / (model.Em * ((agent_Lw * model.del_M)^3.0))
         else
             Scaled_En
         end
 
 
         agent_pA = if ismissing(pA)
-            agent_f_i * model.p_Am * model.Tc * agent_s_M_i * ((agent_Lw * agent_del_M_i)^2.0)
+            agent_f_i * model.p_Am * model.Tc * agent_s_M_i * ((agent_Lw * model.del_M)^2.0)
         else
             pA
         end
 
         add_agent!(Sardine, model, agent_type, agent_Age, agent_Kappa_i, agent_L, agent_H, agent_EggEn, agent_NrEggs, agent_En, agent_Generation, agent_Dead,
-                agent_f_i, agent_t_puberty, agent_Sex, agent_Lw, agent_Ww, agent_R, agent_Scaled_En, agent_del_M_i,
+                agent_f_i, agent_t_puberty, agent_Sex, agent_Lw, agent_Ww, agent_R, agent_Scaled_En,
                    agent_s_M_i, agent_pA, agent_Lb_i, agent_spawned
                    )
                    
     end
-    #println("Added $No_A agents to $previousmodelid; max_ID now = $(model.max_ID)")
     return
 end
