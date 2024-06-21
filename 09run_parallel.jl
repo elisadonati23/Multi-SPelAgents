@@ -24,8 +24,6 @@ Kappa = collect(range(0.945, stop=0.945, length=365*5+1))
 Xmax = collect(range(1.0, stop=1.0, length=365*5+1))
 Mf = collect(range(0.0, stop=0.0, length=365*5+1))
 
-
-
 for i in 1:num_runs
     # Initialize your model and data
     adata = [:type, :Kappa_i]
@@ -44,7 +42,7 @@ for i in 1:num_runs
     
     # Run the model
 
-    df_agent = run!(modello,365*5; adata, mdata)
+    df_agent = run!(modello,365*50; adata, mdata)
     
     # Store the result in the results array
     push!(results, df_agent)

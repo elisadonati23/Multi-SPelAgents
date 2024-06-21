@@ -22,35 +22,24 @@ end
 
 
 function eggDEB!(Sardine, model)
-    # Sardine.Kappa_i is a vector value
+
+
 
     if Sardine.Dead == false
-        V = Sardine.L^3.0
+
+        V = Sardine.L .^ 3.0
+
         deltaV = zeros(length(Sardine.Kappa_i))
         deltaEggEn = zeros(length(Sardine.Kappa_i))
         deltaH = zeros(length(Sardine.Kappa_i))
 
         ## Energy fluxes
-        pS = (model.p_M * model.Tc) * V  #p_M_T*V
+        pS = (model.p_M .* model.Tc) .* V  #p_M_T*V
         pC = ((Sardine.EggEn ./ V) .* (model.Eg .* (model.v_rate .* model.Tc) .* (V .^ (2/3)) .+ pS))./(Sardine.Kappa_i .* (Sardine.EggEn ./ V) .+ model.Eg)
         pJ = model.k_J .* Sardine.H .* model.Tc
 
         ## Variation in the state variables
         deltaEggEn = 0.0 .- pC # must be negative because eggs do not eat 
-
-        #check how many eggs starving
-        for i in 1:length(Sardine.Kappa_i)
-            if ((Sardine.Kappa_i[i] .* pC[i]) < pS)
-                Sardine.NrEggs -= 1.0
-            end    
-        end
-
-        #if all eggs starved, the egg clutch dies
-        if Sardine.NrEggs <= 0.0
-            model.dead_eggmass += 1.0
-            Sardine.Dead = true
-        return
-        end
 
         deltaH =  (( 1.0 .- Sardine.Kappa_i) .* pC .- pJ)
         if deltaH isa Array
@@ -70,6 +59,45 @@ function eggDEB!(Sardine, model)
         Sardine.EggEn = Sardine.EggEn .+ deltaEggEn
         Sardine.H = Sardine.H .+ deltaH 
         Sardine.L = (V .+ deltaV).^(1/3)
+
+
+# Check if lengths are different
+#lengths = [length(Sardine.Kappa_i), length(V), length(pS), length(pC), length(pJ)]
+#if !all(x -> x == lengths[1], lengths)
+#    println("Egg", Sardine.id)
+#    println("Length of Sardine.Kappa_i: ", Sardine.Kappa_i)
+#    println("Length of V: ", V)
+#    println("Length of pS: ", pS)
+#    println("Length of pC: ", pC)
+#    println("Length of pJ: ", pJ)
+#    println("Length of deltaV: ", deltaV)
+#    println("Length of Sardine.L: ", Sardine.L)
+#end
+
+        #L can be a single value or a vector, depending whether K is a vector or not
+        # then V can be a single value or not.
+        #so L maybe it is initialized like a single value and then because of different Kappa
+        # and so different deltaV it becomes a vector.
+        # if it doesnt become a vector the indexing can be a problem for the starvation so i put the
+        #starvation at the end so that V and L have time of becoming a vector 
+
+                #check how many eggs starving
+                for i in 1:length(Sardine.Kappa_i)
+                    #way around at delayed change of pS due to different changes in
+                    #the sizes of the eggs due to the different Kappa_values
+                    #This will ensure that ps_value is always a single number, even if pS is an array with one element.:
+                    ps_value = length(pS) == 1 ? pS[1] : pS[i]
+                    if ((Sardine.Kappa_i[i] * pC[i]) < ps_value)
+                        Sardine.NrEggs -= 1.0
+                    end    
+                end
+        
+                #if all eggs starved, the egg clutch dies
+                if Sardine.NrEggs <= 0.0
+                    model.dead_eggmass += 1.0
+                    Sardine.Dead = true
+                return
+                end
     end
     return
 end
@@ -83,15 +111,17 @@ function egghatch!(Sardine, model)
             Lw_val = (Sardine.L[i] / model.del_M)
             Ww_val = (model.w * (model.d_V * ((Lw_val * model.del_M) ^ 3.0) + model.w_E / model.mu_E *(En_val + 0.0))) #R
             Scaled_En_val = En_val / ( model.Em * ((Lw_val * model.del_M)^3))
+            Kappa_i_value = [Sardine.Kappa_i[i]]
 
-            generate_Juvenile(Float64(ceil((1 - model.M_egg) * Float64(floor(Sardine.NrEggs[i])))), 
+            generate_Juvenile(1, #because i loop over the survivigng eggs, so each time I hatch 1 single juvenile
                                model, 
                                Generation_val, 
                                En_val, 
                                Lb_i_val, 
                                Lw_val, 
                                Ww_val, 
-                               Scaled_En_val)
+                               Scaled_En_val,
+                               Kappa_i_value)
             Sardine.NrEggs -= 1.0
         end
     end
@@ -143,25 +173,25 @@ v_T = model.v_rate * model.Tc
 # Energy fluxes
 pA = (Sardine.f_i * model.p_Am* model.Tc * Sardine.s_M_i * (Vdyn ^ (2/3)))
 pS = p_M_T * Vdyn
-pC = ((Endyn/Vdyn) * (model.Eg * v_T * Sardine.s_M_i * (Vdyn ^ (2/3)) + pS) / (Sardine.Kappa_i * (Endyn/ Vdyn) + model.Eg))
+pC = ((Endyn/Vdyn) * (model.Eg * v_T * Sardine.s_M_i * (Vdyn ^ (2/3)) + pS) / (Sardine.Kappa_i[1] * (Endyn/ Vdyn) + model.Eg))
 pJ = model.k_J * Hdyn * model.Tc
 deltaEn = (pA - pC) * model.DEB_timing
 
 # die due to starvation
-if ((Sardine.Kappa_i * pC) < pS)
+if ((Sardine.Kappa_i[1] * pC) < pS)
 model.deadJ_starved += 1.0
 Sardine.Dead = true
 return
 end
 
-deltaV = ((Sardine.Kappa_i * pC - pS) / model.Eg) * model.DEB_timing
+deltaV = ((Sardine.Kappa_i[1] * pC - pS) / model.Eg) * model.DEB_timing
 if (deltaV < 0.0) 
 deltaV = 0.0
 end
 
 # maturing energy
 if Sardine.H < model.Hp
-deltaH = (((1.0 - Sardine.Kappa_i) * pC - pJ) * model.DEB_timing)
+deltaH = (((1.0 - Sardine.Kappa_i[1]) * pC - pJ) * model.DEB_timing)
 if deltaH < 0.0
     deltaH = 0.0
 end
@@ -264,27 +294,27 @@ function adultDEB!(Sardine, model)
     
     pA = (Sardine.f_i * model.p_Am * model.Tc * Sardine.s_M_i * (Vdyn ^ (2/3)))
     pS = p_M_T * Vdyn
-    pC = ((Endyn/Vdyn) * (model.Eg * (model.v_rate * model.Tc) * Sardine.s_M_i * (Vdyn ^ (2/3)) + pS) / (Sardine.Kappa_i * (Endyn/ Vdyn) + model.Eg))
+    pC = ((Endyn/Vdyn) * (model.Eg * (model.v_rate * model.Tc) * Sardine.s_M_i * (Vdyn ^ (2/3)) + pS) / (Sardine.Kappa_i[1] * (Endyn/ Vdyn) + model.Eg))
     pJ = model.k_J * Hdyn  * model.Tc
     
-    deltaV = ((Sardine.Kappa_i * pC - pS) / model.Eg) * model.DEB_timing #pG
+    deltaV = ((Sardine.Kappa_i[1] * pC - pS) / model.Eg) * model.DEB_timing #pG
     if (deltaV < 0.0) 
         deltaV = 0.0
     end
     
     #starvation
-    if ((Sardine.Kappa_i * pC) < pS)
-        if (Rdyn < ((pS - (Sardine.Kappa_i * pC)) * model.DEB_timing))
+    if ((Sardine.Kappa_i[1] * pC) < pS)
+        if (Rdyn < ((pS - (Sardine.Kappa_i[1] * pC)) * model.DEB_timing))
             model.deadA_starved += 1.0
             Sardine.Dead = true
             return
         else
-            Rdyn = (Rdyn - (pS - (Sardine.Kappa_i * pC)) * model.DEB_timing)
+            Rdyn = (Rdyn - (pS - (Sardine.Kappa_i[1] * pC)) * model.DEB_timing)
         end
     end
 
     #maturing energy
-    deltaR = (((1- Sardine.Kappa_i)* pC - pJ)* model.DEB_timing)  #pr
+    deltaR = (((1- Sardine.Kappa_i[1])* pC - pJ)* model.DEB_timing)  #pr
 
     if (deltaR < 0.0)
         deltaR = 0.0
@@ -359,7 +389,7 @@ function adultspawn!(Sardine, model)
             EggEn_E0_val = Float64(((model.E0_max - model.E0_min) / (1.0- model.ep_min)) * (Sardine.Scaled_En - model.ep_min)) + model.E0_min
             spawned_en = NrEggs_val * EggEn_E0_val #Sardine.R * model.KappaR / spawn_period 
 
-            Kappa_vector = [rand() <= model.mutation_rate ? rand(Beta(model.alpha, model.beta)) : Sardine.Kappa_i for _ in 1:NrEggs_surviving]
+            Kappa_vector = [rand() <= model.mutation_rate ? rand(Beta(model.alpha, model.beta)) : Sardine.Kappa_i[1] for _ in 1:NrEggs_surviving]
 
             if (spawned_en < Sardine.R )   
                 Gen_val = Float64(Sardine.Generation)

@@ -40,7 +40,7 @@ function generate_EggMass(No_Egg, model, NrEggs = missing, EggEn = missing, En =
     if ismissing(Kappa)
         agent_Kappa_i =  [model.Kappa_value]
     else
-        agent_Kappa_i = [Kappa]
+        agent_Kappa_i = Kappa
     end
 
     for _ in 1:No_Egg
@@ -66,7 +66,7 @@ function generate_EggMass(No_Egg, model, NrEggs = missing, EggEn = missing, En =
 end
 
 
-function generate_Juvenile(No_J, model, Generation = 0.0, En = missing, Lb_i = model.Lb, Lw = missing, Ww = missing, Scaled_En = missing)
+function generate_Juvenile(No_J, model, Generation = 0.0, En = missing, Lb_i = model.Lb, Lw = missing, Ww = missing, Scaled_En = missing, Kappa = missing)
 
     agent_type = :juvenile
     agent_f_i = 0.8
@@ -76,7 +76,6 @@ function generate_Juvenile(No_J, model, Generation = 0.0, En = missing, Lb_i = m
     agent_R = 0.0
     agent_spawned = 0.0
     agent_Dead = false
-    agent_Kappa_i = [model.Kappa_value]
 
     # silenced features
     agent_EggEn = 0.0  # EggMass
@@ -121,6 +120,12 @@ function generate_Juvenile(No_J, model, Generation = 0.0, En = missing, Lb_i = m
             agent_Lw * model.del_M / agent_Lb_i
         else
             model.s_M
+        end
+
+        if ismissing(Kappa)
+            agent_Kappa_i = [model.Kappa_value]
+        else
+            agent_Kappa_i = Kappa
         end
 
         agent_pA = agent_f_i * model.p_Am * model.Tc * agent_s_M_i * ((agent_Lw * model.del_M)^2.0)
