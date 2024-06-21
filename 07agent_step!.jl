@@ -282,35 +282,35 @@ end
 end
 
 function adultdie!(Sardine, model)
-
-if Sardine.Dead == false
-    randomnumber = rand()
-
-    #set the new AGE DEPENDENT MORTALITIS
-    if floor(Sardine.Age / 365.0 ) == 0.0
-        M = model.M0 + (model.M_f/365.0)
-    elseif floor(Sardine.Age / 365.0 ) == 1.0
-        M = model.M1 + (model.M_f/365.0)
-    elseif floor(Sardine.Age / 365.0 ) == 2.0
-        M = model.M2 + (model.M_f/365.0)
-    elseif floor(Sardine.Age / 365.0 ) == 3.0
-        M = model.M3 + (model.M_f/365.0)
-    else
-        M = model.M4 + (model.M_f/365.0)
-    end
-
-    if (1.0 - exp(-M)) >= randomnumber
-        if (((1.0 - exp(-M))) >= randomnumber) && (randomnumber > (1.0 - exp(-(M - (model.M_f/365.0))))) # the fish would not have died without fishing
-            model.fished += 1.0
-            #fishedW = fishedW + (model.Ww / 1000)
+    if !Sardine.Dead 
+        randomnumber = rand()
+    
+        #set the new AGE DEPENDENT MORTALITIS
+        if floor(Sardine.Age / 365.0 ) == 0.0
+            M = model.M0 + (model.M_f/365.0)
+        elseif floor(Sardine.Age / 365.0 ) == 1.0
+            M = model.M1 + (model.M_f/365.0)
+        elseif floor(Sardine.Age / 365.0 ) == 2.0
+            M = model.M2 + (model.M_f/365.0)
+        elseif floor(Sardine.Age / 365.0 ) == 3.0
+            M = model.M3 + (model.M_f/365.0)
         else
-            model.deadA_nat += 1.0
+            M = model.M4 + (model.M_f/365.0)
         end
-        Sardine.Dead = true 
-        return
-    end
-end  
+    
+        if (1.0 - exp(-M)) >= randomnumber
+            if (((1.0 - exp(-M))) >= randomnumber) && (randomnumber > (1.0 - exp(-(M - (model.M_f/365.0))))) # the fish would not have died without fishing
+                model.fished += 1.0
+                model.fishedW += Sardine.Ww
+            else
+                model.deadA_nat += 1.0
+            end
+            Sardine.Dead = true 
+        end
+    end 
+return 
 end
+
 
 function adultaging!(Sardine, model)
     if Sardine.Dead == false 
