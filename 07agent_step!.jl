@@ -177,16 +177,30 @@ function juvemature!(Sardine, model)
     return
 end
 
+
 function juvedie!(Sardine, model)
-    if Sardine.Dead == false
-M = model.M_j
-randomvalue = rand()   
-if ((1- exp(- M))) >= randomvalue
-model.deadJ_nat += 1.0
-Sardine.Dead = true
-return
-end
-end
+    random_number = rand()
+ # if the juvenile is too small or there is no fishing mortality, it can only die of natural mortality
+    if !Sardine.Dead && (Sardine.Lw < 10.0 || model.MF_value == 0.0)
+        if random_number <= 1-exp(-model.M_j)
+            Sardine.Dead = true
+            model.deadJ_nat += natural_deaths
+        end
+    end
+#if the fish is big enough and there is fishing mortality, it can die of fishing mortality or natural mortality
+    if Sardine.Lw > 10.0 && !(model.MF_value == 0.0)
+        M = model.M_j + ((model.MF_value/2.0)/365.0)
+        if  randomnumber <= (1.0 - exp(-M)) 
+            if (((1.0 - exp(-M))) >= randomnumber) && (randomnumber > (1.0 - exp(-(M - (model.M_f/365.0))))) # the fish would not have died without fishing
+                model.fished += 1.0
+                model.fishedW += Sardine.Ww
+            else
+                model.deadA_nat += 1.0
+            end
+            Sardine.Dead = true 
+        end
+    end
+    return
 end
 
 function juveaging!(Sardine, model) 
