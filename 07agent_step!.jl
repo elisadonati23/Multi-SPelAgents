@@ -269,9 +269,9 @@ end
 end
 
 function adultdie!(Sardine, model)
-    #fishedW = 0
+
 if Sardine.Dead == false
-    randomnumber = rand()  #controllare che l'estrazione random  sia la stessa     
+    randomnumber = rand()
 
     #set the new AGE DEPENDENT MORTALITIS
     if floor(Sardine.Age / 365.0 ) == 0.0
@@ -300,7 +300,7 @@ end
 end
 
 function adultaging!(Sardine, model)
-    if Sardine.Dead == false #check that the sardine is not dead
+    if Sardine.Dead == false 
         Sardine.Age += 1.0
     end
     return
@@ -316,25 +316,17 @@ function adultspawn!(Sardine, model)
             # random number between 0 and 1 is smaller than the probability of spawning, then reproduction occurs
             rand() <= model.prob_dict[model.day_of_the_year]
 
+            # to generate the mutations and not dispack the eggs, I have to create a vector of Kappa values, some of them mutated, some 
+            # of them not. So i kill immediately the eggs that will not survive (M_egg) and create a reasonable big vector of K values
+            # each of them with rand(beta(aloha, beta)) probability to be mutated.
+            # this means that all the eggs, if reached maturity, will hatch and have different K values.
+            
+            NrEggs_surviving = 420.0 * Sardine.Ww * (1- model.M_egg)
             NrEggs_val = 420.0 * Sardine.Ww
             EggEn_E0_val = Float64(((model.E0_max - model.E0_min) / (1.0- model.ep_min)) * (Sardine.Scaled_En - model.ep_min)) + model.E0_min
             spawned_en = NrEggs_val * EggEn_E0_val #Sardine.R * model.KappaR / spawn_period 
 
-            # mutation on Kappa
-            # NB: i am not sure this is the right place to put a mutation.
-            # because not all the eggs will have the same mutation, but just some of them
-            # that should also then survive. so the probability to have
-            # an egg which will survive and have a mutation is mutation_rate * probability to survive.
-            # this is not implemented here but also the K value should be immediately determinend 
-            #because drives the energy fluxes in the egg_deb module. I cannot simulate the single eggs,
-            # so i would reduce the mutation rate to mutation_rate * probability to survive. It's
-            # like a way around do not dispack the eggs and simulate them one by one.
-            
-            if rand <= model.mutation_rate
-                Kappa_val = rand(Beta(model.alpha, model.beta))
-            else
-                Kappa_val = Sardine.Kappa_i
-            end
+            Kappa_vector = [rand() <= model.mutation_rate ? rand(Beta(model.alpha, model.beta)) : Sardine.Kappa_i for _ in 1:NrEggs_surviving]
 
             if (spawned_en < Sardine.R )   
                 En_val = Float64(spawned_en)
@@ -342,13 +334,11 @@ function adultspawn!(Sardine, model)
                 Sardine.R = Float64(Sardine.R - spawned_en) #(Sardine.R / spawn_period)) 
                 Sardine.spawned += 1.0
                 generate_EggMass(1.0, model,
-                                              NrEggs_val,
-                                              EggEn_E0_val,
-                                              En_val,
-                                              Gen_val,
-                                              Kappa_val)
-                
-                
+                                            NrEggs_surviving,
+                                            EggEn_E0_val,
+                                            En_val,
+                                            Gen_val,
+                                            Kappa_vector)
             end
         end
 
