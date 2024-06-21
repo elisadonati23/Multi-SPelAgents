@@ -55,7 +55,7 @@ function eggDEB!(Sardine, model)
         deltaV = 0.0
     end
 
-    Sardine.En = Sardine.En + deltaEggEn * Sardine.NrEggs
+    Sardine.En = Sardine.En + deltaEggEn
     Sardine.EggEn = Sardine.EggEn + deltaEggEn
     Sardine.H = Sardine.H + deltaH 
     Sardine.L = (V + deltaV)^(1/3)
@@ -231,8 +231,7 @@ function adultDEB!(Sardine, model)
     pA = (Sardine.f_i * model.p_Am * model.Tc * Sardine.s_M_i * (Vdyn ^ (2/3)))
     pS = p_M_T * Vdyn
     pC = ((Endyn/Vdyn) * (model.Eg * (model.v_rate * model.Tc) * Sardine.s_M_i * (Vdyn ^ (2/3)) + pS) / (model.Kappa * (Endyn/ Vdyn) + model.Eg))
-    pJ = model.k_J * Hdyn  * model.Tc# should not take into account the temperature?
-    deltaEn = (pA - pC) * model.DEB_timing
+    pJ = model.k_J * Hdyn  * model.Tc
     
     deltaV = ((model.Kappa * pC - pS) / model.Eg) * model.DEB_timing #pG
     if (deltaV < 0.0) 
@@ -320,7 +319,7 @@ function adultspawn!(Sardine, model)
             # of them not. So i kill immediately the eggs that will not survive (M_egg) and create a reasonable big vector of K values
             # each of them with rand(beta(aloha, beta)) probability to be mutated.
             # this means that all the eggs, if reached maturity, will hatch and have different K values.
-            
+
             NrEggs_surviving = 420.0 * Sardine.Ww * (1- model.M_egg)
             NrEggs_val = 420.0 * Sardine.Ww
             EggEn_E0_val = Float64(((model.E0_max - model.E0_min) / (1.0- model.ep_min)) * (Sardine.Scaled_En - model.ep_min)) + model.E0_min
