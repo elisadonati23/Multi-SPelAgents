@@ -1,5 +1,4 @@
 
-
 ## EGGMASS ----
 #########################################################################################
 
@@ -54,10 +53,18 @@ function eggDEB!(Sardine, model)
         end
 
         deltaH =  (( 1.0 .- Sardine.Kappa_i) .* pC .- pJ)
-        deltaH[deltaH .< 0.0] .= 0.0
+        if deltaH isa Array
+            deltaH[findall(x -> x < 0.0, deltaH)] .= 0.0
+        else
+            deltaH = deltaH < 0.0 ? 0.0 : deltaH
+        end
 
-        deltaV = (( Sardine.Kappa_i .* pC .- pS) ./ model.Eg)
-        deltaV[deltaV .< 0.0] .= 0.0
+        deltaV = ((Sardine.Kappa_i .* pC .- pS) ./ model.Eg)
+        if deltaV isa Array
+            deltaV[findall(x -> x < 0.0, deltaV)] .= 0.0
+        else
+            deltaV = deltaV < 0.0 ? 0.0 : deltaV
+        end
 
         Sardine.En = Sardine.En .+ deltaEggEn
         Sardine.EggEn = Sardine.EggEn .+ deltaEggEn
@@ -194,7 +201,7 @@ function juvedie!(Sardine, model)
     if !Sardine.Dead && (Sardine.Lw < 10.0 || model.MF_value == 0.0)
         if random_number <= 1-exp(-model.M_j)
             Sardine.Dead = true
-            model.deadJ_nat += natural_deaths
+            model.deadJ_nat += 1.0
         end
     end
 #if the fish is big enough and there is fishing mortality, it can die of fishing mortality or natural mortality
@@ -362,8 +369,8 @@ function adultspawn!(Sardine, model)
                                             NrEggs_surviving, 
                                             EggEn_E0_val,
                                             EggEn_E0_val,
-                                            Gen_val,
-                                            Kappa_vector)
+                                            Kappa_vector,
+                                            Gen_val)
             end
         end
 

@@ -28,7 +28,7 @@ Mf = collect(range(0.0, stop=0.0, length=365*5+1))
 
 for i in 1:num_runs
     # Initialize your model and data
-    adata = [(is_adult, count), (is_juvenile, count), (is_eggmass, count)]
+    adata = [:type, :Kappa_i]
 
     mdata = [:day_of_the_year,
             :mean_batch_eggs, :mean_spawning_events, :Xmax, :f, 
@@ -44,7 +44,7 @@ for i in 1:num_runs
     
     # Run the model
 
-    df_agent = run!(modello,365*50; adata, mdata)
+    df_agent = run!(modello,365*5; adata, mdata)
     
     # Store the result in the results array
     push!(results, df_agent)

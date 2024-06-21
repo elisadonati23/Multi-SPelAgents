@@ -1,7 +1,7 @@
 @agent struct Sardine(NoSpaceAgent)
     type::Symbol 
     Age::Float64 
-    Kappa_i::Union{Float64, Vector{Float64}} #eggs will have vectors of kappa values
+    Kappa_i::Vector{Float64} #eggs will have vectors of kappa values
     L::Union{Float64, Vector{Float64}} 
     H::Union{Float64, Vector{Float64}} 
     EggEn::Union{Float64, Vector{Float64}} 

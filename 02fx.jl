@@ -31,7 +31,7 @@ function update_Xmax!(model, Xmax::Vector{Float64})
 end
 
 function is_dead(sardine::Sardine)
-    return sardine.dead == true
+    return sardine.Dead == true
 end
 
 

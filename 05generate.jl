@@ -38,9 +38,9 @@ function generate_EggMass(No_Egg, model, NrEggs = missing, EggEn = missing, En =
     agent_Lb_i = 0.0
 
     if ismissing(Kappa)
-        agent_Kappa_i =  model.Kappa_value
+        agent_Kappa_i =  [model.Kappa_value]
     else
-        agent_Kappa_i = Kappa
+        agent_Kappa_i = [Kappa]
     end
 
     for _ in 1:No_Egg
@@ -76,7 +76,7 @@ function generate_Juvenile(No_J, model, Generation = 0.0, En = missing, Lb_i = m
     agent_R = 0.0
     agent_spawned = 0.0
     agent_Dead = false
-    agent_Kappa_i = model.Kappa_value
+    agent_Kappa_i = [model.Kappa_value]
 
     # silenced features
     agent_EggEn = 0.0  # EggMass
@@ -142,7 +142,7 @@ function generate_Adult(No_A, model, Sex = missing, Age = missing, t_puberty = m
     agent_Lb_i = model.Lb
     agent_spawned = 0.0
     agent_Dead = false
-    agent_Kappa_i = model.Kappa_value
+    agent_Kappa_i = [model.Kappa_value]
 
     agent_type = :adult
 
