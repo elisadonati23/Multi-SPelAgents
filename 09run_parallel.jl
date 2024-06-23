@@ -16,7 +16,7 @@ num_runs = 1
 # Array to store the results
 results = []
 
-modello = model_initialize_parallel(100, 100, 100, 0.0, 50000.0, 1.0, 1.0, 0.9901, 15.0, 0.9995, 1.16, 0.93, 0.79, 0.71, 0.58)
+modello = model_initialize_parallel(100.0, 0.0,0.0, 0.0, 4e6, 1.0, 1.0, 0.945, 15.0, 0.999, 1.06, 0.83, 0.69, 0.63, 0.48)
 
 
 temp = collect(range(15.0, stop=15.0, length=365*5+1))
@@ -26,8 +26,8 @@ Mf = collect(range(0.0, stop=0.0, length=365*5+1))
 
 for i in 1:num_runs
     # Initialize your model and data
+    #adata = [(is_eggmass,count),  (is_juvenile, count), (is_adult,count)]
     adata = [:type, :Kappa_i]
-
     mdata = [:day_of_the_year,
             :mean_batch_eggs, :mean_spawning_events, :Xmax, :f, 
             :deadA_starved, :deadA_nat, :deadA_old,:deadJ_starved, :deadJ_nat, :deadJ_old,
@@ -42,207 +42,55 @@ for i in 1:num_runs
     
     # Run the model
 
-    df_agent = run!(modello,365*50; adata, mdata)
+    df_agent = run!(modello,365*5; adata, mdata)
     
     # Store the result in the results array
     push!(results, df_agent)
 end
-
-
 
 diagnostic_plots(results, results[1][2])
 
+df = results[1][1]
 
+# Step 1: Filter rows where type is either "adult" or "juvenile"
+filtered_df = filter(row -> row.type in [:adult, :juvenile], df)
 
-
-
-# HISTOGRAMS -----------------
-modello = model_initialize(0.0, 0.0, 7500.0, 0.0, 50000.0, 1.0, 110.0)
-
-for i in 1:num_runs
-    # Initialize your model and data
-    adata = [:type, :f_i, :t_puberty, :herma,:Age, :Sex, :Lw, :Ww, :QWw, :meta, :R, :Scaled_En, :del_M_i, :s_M_i, :pA, :Lb_i, :spawned, :trans_prob, :dead]
-    mdata = [:day_of_the_year,
-            :mean_batch_eggs, :mean_spawning_events, :Xmax, :f, 
-            :deadA_starved, :deadA_nat, :deadA_old,:deadJ_starved, :deadJ_nat, :deadJ_old,
-            :TotB,:JuvB,:AdB,:meanAdWw,:sdAdWw,:meanJuvWw,:sdJuvWw,:meanAdL,:sdAdL, :meanFAdWw, :sdFAdWw,
-            :meanJuvL,:sdJuvL,:mean_tpuberty,:sd_tpuberty,:mean_Lw_puberty,:sd_Lw_puberty,
-            :mean_Ww_puberty,:sd_Ww_puberty]
-
-    
-    # Initialize dataframes
-    df_agent = init_agent_dataframe(modello, adata)
-    df_model = init_model_dataframe(modello, mdata)
-    
-    # Run the model
-    df_agent = run!(modello, sardine_step!, evolve_environment!,365*20; adata, mdata)
-    
-    # Store the result in the results array
-    push!(results, df_agent)
-end
-
-describe(results[1][1])
+# Step 2: Transform Kappa_i column to single values
+# Assuming Kappa_i is an array and you want the first element
+transform!(filtered_df, :Kappa_i => (x -> map(xi -> first(xi), x)) => :Kappa_i)
 
 using DataFrames
 
-# Group by step and type, and count the number of agents for each group
-summary_df = groupby(results[1][1], [:step, :type])
-summary_df = combine(summary_df, nrow => :count)
+# Assuming filtered_df is already defined and loaded
 
-summary_df
-using StatsPlots
+# Add a new column `Kappa_bin` to `filtered_df` based on conditions applied to `Kappa_i`
+transform!(filtered_df, :Kappa_i => ByRow(Kappa_i -> begin
+        if Kappa_i <= 0.94
+            "≤ 0.94"
+        elseif Kappa_i > 0.94 && Kappa_i <= 0.95
+            "0.94 < Kappa_i ≤ 0.95"
+        elseif Kappa_i > 0.95
+            "> 0.95"
+        else
+            missing
+        end
+    end) => :Kappa_bin)
 
-# Plot a line for each type of agent
-StatsPlots.@df summary_df StatsPlots.plot(:step, :count, group=:type, xlabel="Step", ylabel="Count", title="Number of Agents by Type", legend=:topleft)
+# Now `filtered_df` has an additional column `Kappa_bin` categorizing `Kappa_i` values
+# Step 2: Calculate proportions
+df_grouped = groupby(filtered_df, [:time, :Kappa_bin])
+df_summarized = combine(df_grouped, nrow => :count)
+# Calculate total counts per time and join back to df_summarized
+totals = combine(groupby(filtered_df, :time), nrow => :total)
+df_summarized = leftjoin(df_summarized, totals, on=:time)
 
-using DataFrames
+# Calculate proportions
+df_summarized.proportion = df_summarized.count ./ df_summarized.total
+df_summarized.proportion = df_summarized.count ./ df_summarized.total
 
-# Group by step and type, and sum the Ww for each group
-summary_Ww = groupby(results[1][1], [:step, :type])
-summary_Ww = combine(summary_Ww, :Ww => sum => :total_Ww)
+# Step 3: Plotting
+using Plots
 
-summary_Ww
-
-StatsPlots.@df summary_Ww StatsPlots.plot(:step, :total_Ww, group=:type, xlabel="Step", ylabel="Total Biomass", title="Ww of Agents by Type", legend=:topleft)
-
-# Group by step and type, and sum the Ww for each group
-summary_f = groupby(results[1][1], [:step, :type])
-summary_f = combine(summary_f, :f_i => mean => :mean_f)
-StatsPlots.@df summary_f StatsPlots.plot(:step, :mean_f, group=:type, xlabel="Step", ylabel="Mean functional responde", title="Mean f by Type", legend=:topleft)
-StatsPlots.ylims!(0.70, 1)
-
-# Death age plots
-grouped_df = groupby(results[1][1], :id)
-last_row_df = combine(grouped_df, names(results[1][1]) .=> last)
-show(last_row_df, allcols = true)
-last_row_df_adults = filter(row -> row.type_last == :adult, last_row_df)
-last_row_df_juvenile = filter(row -> row.type_last == :juvenile, last_row_df)
-last_row_df_eggs = filter(row -> row.type_last == :eggmass, last_row_df)
-histogram(last_row_df_adults[!,:Age_last]/365.0, bins=10, xlabel="Age", ylabel="Frequency", title="Histogram of Adults Age at death")
-histogram(last_row_df_juvenile[!,:Age_last], bins=20, xlabel="Age", ylabel="Frequency", title="Histogram of Juvenile Age at death")
-histogram(last_row_df_eggs[!,:Age_last], bins=20, xlabel="Age", ylabel="Frequency", title="Histogram of EggMass Days at death")
-
-# length frequencies
-
-adults_df = filter(row -> row[:type] == :adult, results[1][1])
-
-# Filter DataFrame
-filtered_df = filter(row -> row[:Age] == row[:t_puberty], adults_df)
-
-# Plot boxplot
-StatsPlots.@df filtered_df StatsPlots.boxplot(:Lw, title="Length at Puberty", fillalpha=0.75, linewidth=2)
-
-
-grouped_df = groupby(adults_df, :id)
-# Filter adults
-# Find the row with maximum size
-max_size_df = combine(grouped_df, :Lw => maximum => :max_Lw)
-histogram(max_size_df[!,:max_Lw], bins=25, xlabel="Max Lw", ylabel="Frequency", title="Histogram of Adults Max Lw")
-min_size_df = combine(grouped_df, :Lw => minimum => :min_Lw)
-histogram(min_size_df[!,:min_Lw], bins=50, xlabel="Max Lw", ylabel="Frequency", title="Histogram of Adults Min Lw")
-
-# size Lw for age classes
-using StatsPlots
-# Assuming `adults_df` is your DataFrame
-adults_df = transform(adults_df, :Age => (x -> floor.(x / 365)) => :Age_year)
-describe(adults_df)
-adults_df[!, :Age_year] = categorical(adults_df[!, :Age_year])
-StatsPlots.@df adults_df StatsPlots.boxplot(:Age_year, :Lw, fillalpha=0.75, linewidth=2)
-StatsPlots.@df adults_df StatsPlots.boxplot(:Age_year, :Ww, fillalpha=0.75, linewidth=2)
-
-#singers boxplot!(string.(:VoicePart), :Height, fillalpha=0.75, linewidth=2)
-
-# Group by Age_year and step
-grouped_adults = groupby(adults_df, [:Age_year, :step])
-
-using CategoricalArrays
-# Calculate mean Ww and Lw for each Age_year and step
-mean_df = combine(grouped_adults, :Ww => mean, :Lw => mean)
-# Convert Age_year to a categorical variable
-mean_df[!, :Age_year] = categorical(mean_df[!, :Age_year])
-Plots.plot(mean_df[!, :step], mean_df[!, :Ww_mean], group = mean_df[!, :Age_year], xlabel="Step", ylabel="Mean Ww", title="Mean Ww by Age_year and Step", legend=:topleft)
-
-# length frequencies juveniles
-
-juve_df = filter(row -> row[:type] == :juvenile, results[1][1])
-grouped_df = groupby(juve_df, :id)
-# Filter Juvenile
-# Find the row with maximum size
-max_size_df = combine(grouped_df, :Lw => maximum => :max_Lw)
-histogram(max_size_df[!,:max_Lw], bins=25, xlabel="Max Lw", ylabel="Frequency", title="Histogram of Juvenile Max Lw")
-min_size_df = combine(grouped_df, :Lw => minimum => :min_Lw)
-histogram(min_size_df[!,:min_Lw], bins=50, xlabel="Max Lw", ylabel="Frequency", title="Histogram of Juvenile Min Lw")
-
-max_age_df = combine(grouped_df, :Age => maximum => :max_Age)
-histogram(max_age_df[!,:max_Age], bins=25, xlabel="Max Age", ylabel="Frequency", title="Histogram of Juvenile Max Age")
-min_age_df = combine(grouped_df, :Age => minimum => :min_Age)
-histogram(min_age_df[!,:min_Age], bins=50, xlabel="Max Age", ylabel="Frequency", title="Histogram of Juvenile Min Age")
-
-# generate the juveniles from eggs only -- 
-# I expect small juvenile with minimumlength
-
-results2 = []
-
-modello2 = model_initialize(15000.0, 0.0, 0.0, 1.0, 50000.0, 1.0, 110.0)
-
-
-for i in 1:num_runs
-    # Initialize your model and data
-    adata = [:type, :f_i, :t_puberty, :herma,:Age, :Sex, :Lw, :Ww, :QWw, :meta, :R, :Scaled_En, :del_M_i, :s_M_i, :pA, :Lb_i, :spawned, :trans_prob, :dead]
-    mdata = [:day_of_the_year,
-            :mean_batch_eggs, :mean_spawning_events, :Xmax, :f, 
-            :deadA_starved, :deadA_nat, :deadA_old,:deadJ_starved, :deadJ_nat, :deadJ_old,
-            :TotB,:JuvB,:AdB,:meanAdWw,:sdAdWw,:meanJuvWw,:sdJuvWw,:meanAdL,:sdAdL, :meanFAdWw, :sdFAdWw,
-            :meanJuvL,:sdJuvL,:mean_tpuberty,:sd_tpuberty,:mean_Lw_puberty,:sd_Lw_puberty,
-            :mean_Ww_puberty,:sd_Ww_puberty]
-
-    
-    # Initialize dataframes
-    df_agent = init_agent_dataframe(modello, adata)
-    df_model = init_model_dataframe(modello, mdata)
-    
-    # Run the model
-    df_agent = run!(modello2, sardine_step!, evolve_environment!,365*3; adata, mdata)
-    
-    # Store the result in the results array
-    push!(results2, df_agent)
-end
-
-# Death age plots
-grouped_df = groupby(results2[1][1], :id)
-last_row_df = combine(grouped_df, names(results2[1][1]) .=> last)
-show(last_row_df, allcols = true)
-last_row_df_adults = filter(row -> row.type_last == :adult, last_row_df)
-last_row_df_juvenile = filter(row -> row.type_last == :juvenile, last_row_df)
-last_row_df_eggs = filter(row -> row.type_last == :eggmass, last_row_df)
-histogram(last_row_df_adults[!,:Age_last]/365.0, bins=10, xlabel="Age", ylabel="Frequency", title="Histogram of Adults Age at death")
-histogram(last_row_df_juvenile[!,:Age_last], bins=20, xlabel="Age", ylabel="Frequency", title="Histogram of Juvenile Age at death")
-histogram(last_row_df_eggs[!,:Age_last], bins=20, xlabel="Age", ylabel="Frequency", title="Histogram of EggMass Days at death")
-
-# length frequencies
-
-adults_df = filter(row -> row[:type] == :adult, results2[1][1])
-grouped_df = groupby(adults_df, :id)
-# Filter adults
-# Find the row with maximum size
-max_size_df = combine(grouped_df, :Lw => maximum => :max_Lw)
-histogram(max_size_df[!,:max_Lw], bins=25, xlabel="Max Lw", ylabel="Frequency", title="Histogram of Adults Max Lw")
-min_size_df = combine(grouped_df, :Lw => minimum => :min_Lw)
-histogram(min_size_df[!,:min_Lw], bins=50, xlabel="Max Lw", ylabel="Frequency", title="Histogram of Adults Min Lw")
-
-# length frequencies juveniles
-
-juve_df = filter(row -> row[:type] == :juvenile, results2[1][1])
-grouped_df = groupby(juve_df, :id)
-
-# Filter Juvenile
-# Find the row with maximum size
-max_size_df = combine(grouped_df, :Lw => maximum => :max_Lw)
-histogram(max_size_df[!,:max_Lw], bins=25, xlabel="Max Lw", ylabel="Frequency", title="Histogram of Juvenile Max Lw")
-min_size_df = combine(grouped_df, :Lw => minimum => :min_Lw)
-histogram(min_size_df[!,:min_Lw], bins=50, xlabel="Max Lw", ylabel="Frequency", title="Histogram of Juvenile Min Lw")
-
-max_age_df = combine(grouped_df, :Age => maximum => :max_Age)
-histogram(max_age_df[!,:max_Age], bins=25, xlabel="Max Age", ylabel="Frequency", title="Histogram of Juvenile Max Age")
-min_age_df = combine(grouped_df, :Age => minimum => :min_Age)
-histogram(min_age_df[!,:min_Age], bins=50, xlabel="Max Age", ylabel="Frequency", title="Histogram of Juvenile Min Age")
+# Plot with customized line styles and colors for each Kappa_bin
+Plots.plot(df_summarized.time, df_summarized.proportion, group=df_summarized.Kappa_bin, 
+     line=(:thin, :solid), marker=(:none), legend=:topleft, palette=:auto)

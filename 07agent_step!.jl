@@ -23,8 +23,6 @@ end
 
 function eggDEB!(Sardine, model)
 
-
-
     if Sardine.Dead == false
 
         V = Sardine.L .^ 3.0
@@ -105,7 +103,7 @@ end
 function egghatch!(Sardine, model)
     for i in 1:length(Sardine.H)
         if (Sardine.H[i] >= model.Hb)
-            Generation_val = Sardine.Generation[i] +1.0
+            Generation_val = Sardine.Generation + 1.0
             En_val = Sardine.En[i]
             Lb_i_val = Sardine.L[i]  
             Lw_val = (Sardine.L[i] / model.del_M)
