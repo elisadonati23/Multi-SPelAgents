@@ -16,13 +16,12 @@ num_runs = 1
 # Array to store the results
 results = []
 
-modello = model_initialize_parallel(100.0, 0.0,0.0, 0.0, 4e6, 1.0, 1.0, 0.945, 15.0, 0.999, 1.06, 0.83, 0.69, 0.63, 0.48)
+#1 sardine every 4000 liters
+modello = model_initialize_parallel(1000.0, 0.0,0.0, 0.0, 4e6, 1.0, 1.0, 0.945, 15.0, 0.9995, 1.06, 0.83, 0.69, 0.63, 0.48)
 
+temp = collect(range(15.0, stop=18.0, length=365*100+1))
+Xmax = collect(range(1.0, stop=1.0, length=365*100+1))
 
-temp = collect(range(15.0, stop=15.0, length=365*5+1))
-Kappa = collect(range(0.945, stop=0.945, length=365*5+1))
-Xmax = collect(range(1.0, stop=1.0, length=365*5+1))
-Mf = collect(range(0.0, stop=0.0, length=365*5+1))
 
 for i in 1:num_runs
     # Initialize your model and data
@@ -42,7 +41,7 @@ for i in 1:num_runs
     
     # Run the model
 
-    df_agent = run!(modello,365*2; adata, mdata)
+    df_agent = run!(modello,365*100; adata, mdata)
     
     # Store the result in the results array
     push!(results, df_agent)
