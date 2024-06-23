@@ -306,27 +306,48 @@ function is_adult(a)
     return a.type == :adult
 end
 
-
-function plot_population_timeseries(adf, nrow, ncol, y_limits = missing)
-    p = Plots.plot(layout = (nrow, ncol))  # Initialize an empty plot with a grid layout
+function plot_population_timeseries(adf, y_limits = missing)
+    p = Plots.plot(layout = (1,1))  # Initialize an empty plot with a grid layout
 
     try
-        for i in 1:nrow*ncol
-            current_adf = adf[i][1]
+            current_adf = adf
 
+            # Create a DataFrame with all time steps
+            all_times = DataFrame(time = minimum(current_adf.time):maximum(current_adf.time))
+
+            # Group by 'type' and 'time' and calculate the sum of 'Nind' for each group
+            #grouped_adf = combine(groupby(current_adf, [:type, :time]), :Nind => sum)
+
+            # Get the counts for each type
+            egg_count = combine(groupby(current_adf[current_adf.type .== :eggmass, :], :time), nrow => :count)
+            juvenile_count = combine(groupby(current_adf[current_adf.type .== :juvenile, :], :time), nrow => :count)
+            adult_count = combine(groupby(current_adf[current_adf.type .== :adult, :], :time), nrow => :count)
+
+            # Merge with all_times to include time steps with no data
+            egg_count = leftjoin(all_times, egg_count, on = :time)
+            juvenile_count = leftjoin(all_times, juvenile_count, on = :time)
+            adult_count = leftjoin(all_times, adult_count, on = :time)
+
+            # Replace missing values with zero
+            egg_count.count = coalesce.(egg_count.count, 0)
+            juvenile_count.count = coalesce.(juvenile_count.count, 0)
+            adult_count.count = coalesce.(adult_count.count, 0)
+            # Sort by time
+            sort!(egg_count, :time)
+            sort!(juvenile_count, :time)
+            sort!(adult_count, :time)
             # Plot the data for each category on a subplot
-            Plots.plot!(p[i], current_adf.time, current_adf.count_is_eggmass, color = :yellow, label = "Eggs")
-            Plots.plot!(p[i], current_adf.time, current_adf.count_is_juvenile, color = :blue, label = "Juveniles")
-            Plots.plot!(p[i], current_adf.time, current_adf.count_is_adult, color = :green, label = "Adults")
+            Plots.plot!(p, egg_count.time, egg_count.count, color = :yellow, label = "Eggs")
+            Plots.plot!(p, juvenile_count.time, juvenile_count.count, color = :blue, label = "Juveniles")
+            Plots.plot!(p, adult_count.time, adult_count.count, color = :green, label = "Adults")
 
             # Set the labels for the subplot
-            Plots.xlabel!(p[i], "time")
-            Plots.ylabel!(p[i], "count")
+            Plots.xlabel!(p, "time")
+            Plots.ylabel!(p, "count")
 
             if !ismissing(y_limits)
-                Plots.ylims!(p[i], y_limits)
+                Plots.ylims!(p, y_limits)
             end
-        end
 
         return p
     catch e
@@ -334,6 +355,7 @@ function plot_population_timeseries(adf, nrow, ncol, y_limits = missing)
         return Plots.plot()  # Return an empty plot in case of error
     end
 end
+
 
 
 function plot_param_timeseries(adf, params, ids = missing)
@@ -464,18 +486,52 @@ function diagnostic_plots(out_agent, out_model)
     Plots.default(legendfontsize = 4)  # Set the plot size
     
     # Plot the number of agents over time
-    p1 = plot_population_timeseries(out_agent,1,1)
+    # Plot the number of agents over time
+    p1 = plot_population_timeseries(out_agent)
     p2 = plot_param_timeseries(out_model,[:deadA_starved, :deadA_nat, :deadA_old,:deadJ_starved, :deadJ_nat, :deadJ_old])
-    p3 = plot_param_timeseries(results[1][2],[:TotB, :JuvB, :AdB])
-    p4 = plot_means_with_std(out_model, [:meanAdWw, :meanJuvWw], [:sdAdWw, :sdJuvWw])
-    p5 = plot_param_timeseries(out_model, [:f])
-    p6 = plot_means_with_std(out_model, [:meanAdL, :meanJuvL], [:sdAdL, :sdJuvL])
-    p7 = plot_means_with_std(out_model, [:mean_tpuberty], [:sd_tpuberty])
-    p8 = plot_means_with_std(out_model, [:meanFAdWw], [:sdFAdWw])
+    p3 = plot_param_timeseries(out_model,[:TotB, :JuvB, :AdB])
+    p4 = plot_param_timeseries(out_model, [:f])
+    p5 = plot_param_timeseries(out_model, [:fishedW])
+    p6 = plot_means_with_std(out_model, [:mean_tpuberty], [:sd_tpuberty])
+    p7 = plot_means_with_std(out_model, [:meanAdWw, :meanJuvWw], [:sdAdWw, :sdJuvWw])
+    p8 = plot_means_with_std(out_model, [:mean_Hjuve], [:sd_Hjuve])
     # Combine the plots in a 3x3 grid
     combined_plot1 = Plots.plot(p1,p2,p3,p5, layout = (2,2))
     combined_plot2 = Plots.plot(p4,p6,p7,p8, layout = (2,2))   
     display(combined_plot1)
     display(combined_plot2)
     Plots.default()
+end
+
+
+function diagnostic_plots_pt2(out_model, model)
+    
+    Plots.default(legendfontsize = 4)  # Set the plot size
+    
+    #p5 = plot_means_with_std(out_model, [:meanAdL, :meanJuvL], [:sdAdL, :sdJuvL])
+    p5 = plot_param_timeseries(out_model, [:fishedW])
+    p6 = plot_means_with_std(out_model, [:mean_tpuberty], [:sd_tpuberty])
+    p7 = plot_means_with_std(out_model, [:meanAdWw, :meanJuvWw], [:sdAdWw, :sdJuvWw])
+    p8 = plot_means_with_std(out_model, [:mean_Hjuve], [:sd_Hjuve])
+
+
+    # Combine the plots in a 3x3 grid
+    combined_plot2 = Plots.plot(p5,p6,p7,p8, layout = (2,2), plot_title = "$(round(model.M_egg, digits = 4)) /$(round(model.M0*365.0,digits = 4)) /$(round(model.M1*365.0,digits = 4)) /$(round(model.M2*365.0,digits = 4)) / $(round(model.M3*365.0,digits = 4)) /$(round(model.M4*365.0,digits = 4))", titlefont = 3)
+return combined_plot2
+end
+
+function diagnostic_plots_pt1(out_agent, out_model, model)
+    
+    Plots.default(legendfontsize = 4)  # Set the plot size
+    
+    # Plot the number of agents over time
+    p1 = plot_population_timeseries(out_agent)
+    p2 = plot_param_timeseries(out_model,[:deadA_starved, :deadA_nat, :deadA_old,:deadJ_starved, :deadJ_nat, :deadJ_old])
+    p3 = plot_param_timeseries(out_model,[:TotB, :JuvB, :AdB])
+    p4 = plot_param_timeseries(out_model, [:f])
+
+
+    # Combine the plots in a 3x3 grid
+    combined_plot1 = Plots.plot(p1,p2,p3,p4, layout = (2,2), plot_title = "$(round(model.M_egg, digits = 4)) /$(round(model.M0*365.0,digits = 4)) /$(round(model.M1*365.0,digits = 4)) /$(round(model.M2*365.0,digits = 4)) / $(round(model.M3*365.0,digits = 4)) /$(round(model.M4*365.0,digits = 4))", titlefont = 3)
+    return combined_plot1
 end

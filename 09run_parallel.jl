@@ -28,12 +28,12 @@ for i in 1:num_runs
     # Initialize your model and data
     #adata = [(is_eggmass,count),  (is_juvenile, count), (is_adult,count)]
     adata = [:type, :Kappa_i]
-    mdata = [:day_of_the_year,
-            :mean_batch_eggs, :mean_spawning_events, :Xmax, :f, 
+    mdata = [:day_of_the_year, :Xmax, :f, 
             :deadA_starved, :deadA_nat, :deadA_old,:deadJ_starved, :deadJ_nat, :deadJ_old,
-            :TotB,:JuvB,:AdB,:meanAdWw,:sdAdWw,:meanJuvWw,:sdJuvWw,:meanAdL,:sdAdL, :meanFAdWw, :sdFAdWw,
-            :meanJuvL,:sdJuvL,:mean_tpuberty,:sd_tpuberty,:mean_Lw_puberty,:sd_Lw_puberty,
-            :mean_Ww_puberty,:sd_Ww_puberty]
+            :TotB,:JuvB,:AdB,:meanAdWw,:sdAdWw,:meanJuvWw,:sdJuvWw,
+            :fishedW,
+            :mean_tpuberty,:sd_tpuberty,
+            :mean_Hjuve, :sd_Hjuve]
 
     
     # Initialize dataframes
@@ -42,17 +42,15 @@ for i in 1:num_runs
     
     # Run the model
 
-    df_agent = run!(modello,365*5; adata, mdata)
+    df_agent = run!(modello,365*2; adata, mdata)
     
     # Store the result in the results array
     push!(results, df_agent)
 end
 
-diagnostic_plots(results, results[1][2])
-
-df = results[1][1]
-
+# proportion of Kappa values
 # Step 1: Filter rows where type is either "adult" or "juvenile"
+df = results[1][1]
 filtered_df = filter(row -> row.type in [:adult, :juvenile], df)
 
 # Step 2: Transform Kappa_i column to single values
@@ -88,9 +86,11 @@ df_summarized = leftjoin(df_summarized, totals, on=:time)
 df_summarized.proportion = df_summarized.count ./ df_summarized.total
 df_summarized.proportion = df_summarized.count ./ df_summarized.total
 
-# Step 3: Plotting
-using Plots
-
 # Plot with customized line styles and colors for each Kappa_bin
-Plots.plot(df_summarized.time, df_summarized.proportion, group=df_summarized.Kappa_bin, 
-     line=(:thin, :solid), marker=(:none), legend=:topleft, palette=:auto)
+p = Plots.plot(df_summarized.time, df_summarized.proportion, group=df_summarized.Kappa_bin, 
+line=(:thin, :solid), marker=(:none), legend=:topleft, palette=:auto)
+Plots.savefig(p, "K_trends.png")
+p1 = diagnostic_plots_pt1(results[1][1], results[1][2], modello)
+Plots.savefig(p1, "p1.png")
+p2 = diagnostic_plots_pt2(results[1][2], modello)
+Plots.savefig(p1, "p2.png")
