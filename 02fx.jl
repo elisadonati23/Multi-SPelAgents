@@ -472,6 +472,7 @@ function plot_timeframe_param_timeseries(adf, params, start_time, end_time, tonn
         for group in grouped_data
             year = group[1, :year]
             param_values = group[:, param]
+            
             if tonnes
                 param_values = param_values / 1e6
             end
