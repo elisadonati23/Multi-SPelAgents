@@ -7,7 +7,7 @@
             #:TotB,:JuvB,:AdB]
 
     # Initialize dataframes
-include("00dependencies.jl")
+
 diagnostic_plots(results, results[1][2])
 
 results = CSV.read("steady_K_20y.csv", DataFrame)
@@ -163,60 +163,3 @@ StatsPlots.@df summary_df_na StatsPlots.bar(:Lw_class, :mean_count, title="Mean 
 
 #year catches. take the 365 rows of the year x and remove the row 1 of the same year for the variable
 #fishedW to see how many annual catches
-
-
-using Plots
-using Distributions
-
-# Define the distribution
-# Define the distribution
-
-β = 2.2
-α = 25.0
-dist = Beta(α, β)
-# Generate x values between 0 and 1
-x = range(0, stop=1, length=1000)
-
-# Compute the PDF at each x value
-y = pdf(dist, x)
-mode = x[argmax(y)]
-# Plot the PDF
-Plots.plot(x, y, label="Beta(α=$α, β=$β)", xlabel="x", ylabel="Density", title="Beta Distribution")
-
-using Distributions
-using Random
-
-# Define the distribution
-β = 1.938
-α = 25.0
-dist = Beta(α, β)
-
-# Initialize a vector to store the mutation values
-mutations = Float64[]
-
-# Simulate the process for a large number of iterations
-for i in 1:100000
-    # Generate a random number between 0 and 1
-    rand_num = rand()
-
-    # If the number is less than 0.001, generate a mutation
-    if rand_num < 0.001
-        # Generate a random value from the distribution
-        mutation = rand(dist)
-
-        # Ensure the value is not 0 or greater than 1
-        while mutation == 0 || mutation >= 1
-            mutation = rand(dist)
-        end
-
-        # Add the mutation to the vector
-        push!(mutations, mutation)
-    end
-end
-
-mutations
-
-using Plots
-
-# Plot the distribution of mutations
-histogram(mutations, bins=50, label="Mutations", xlabel="Mutation Value", ylabel="Frequency", title="Distribution of Mutations")
