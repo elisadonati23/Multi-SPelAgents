@@ -8,32 +8,22 @@
 
     # Initialize dataframes
 
-diagnostic_plots(results, results[1][2])
-
-results = CSV.read("steady_K_20y.csv", DataFrame)
-
+results = results[1][1]
 results[!, :type] = Symbol.(results[!, :type])
 results[!, :id] = Symbol.(results[!, :id])
+
+
 # HISTOGRAMS AND BOXPLOTS ----------
 # Group by step and type, and count the number of agents for each group
 summary_df = groupby(results, [:time, :type])
 summary_df = combine(summary_df, nrow => :count)
 
-# Plot a line for each type of agent
-StatsPlots.@df summary_df StatsPlots.plot(:time, :count, group=:type, xlabel="Step", ylabel="Count", title="Number of Agents by Type", legend=:topleft)
-
-using DataFrames
-
-# Group by step and type, and sum the Ww for each group
-summary_Ww = groupby(results[1][1], [:time, :type])
-summary_Ww = combine(summary_Ww, :Ww => sum => :total_Ww)
-
-StatsPlots.@df summary_Ww StatsPlots.plot(:time, :total_Ww, group=:type, xlabel="Step", ylabel="Total Biomass", title="Ww of Agents by Type", legend=:topleft)
-
 # Death age plots -- Lifespan
 grouped_df = groupby(results, :id)
 last_row_df = combine(grouped_df, names(results) .=> last)
-show(last_row_df, allcols = true)
+
+
+# LIFESPAN YES ----------------
 last_row_df_adults = filter(row -> row.type_last == :adult, last_row_df)
 last_row_df_juvenile = filter(row -> row.type_last == :juvenile, last_row_df)
 last_row_df_eggs = filter(row -> row.type_last == :eggmass, last_row_df)
@@ -41,7 +31,7 @@ histogram(last_row_df_adults[!,:Age_last]/365.0, bins=10, xlabel="Age", ylabel="
 #histogram(last_row_df_juvenile[!,:Age_last], bins=20, xlabel="Age", ylabel="Frequency", title="Histogram of Juvenile Age at death")
 #histogram(last_row_df_eggs[!,:Age_last], bins=20, xlabel="Age", ylabel="Frequency", title="Histogram of EggMass Days at death")
 
-# Length at puberty ---------
+# LENGTH AND TIME TO PUBERTY ---------
 
 adults_df = filter(row -> row[:type] == :adult, results)
 
@@ -60,7 +50,7 @@ p2 = StatsPlots.@df filtered_df StatsPlots.boxplot!(p2, :Ww, ylabel="Weight (g)"
 
 StatsPlots.@df filtered_df StatsPlots.boxplot(:Age, title="Age at Puberty", ylabel="Days", fillalpha=0.75, linewidth=2, legend = false)
 
-# Ultimate size observed in adults --------------
+# ULTIMATE SIZE YES  --------------
 # take the max size for each adult
 grouped_df = groupby(adults_df, :id)
 max_size_df = combine(grouped_df, :Lw => maximum => :max_Lw)
@@ -68,7 +58,7 @@ histogram(max_size_df[!,:max_Lw], bins=25, xlabel="Max Lw (cm)", ylabel="Frequen
 #min_size_df = combine(grouped_df, :Lw => minimum => :min_Lw)
 #histogram(min_size_df[!,:min_Lw], bins=50, xlabel="Max Lw", ylabel="Frequency", title="Histogram of Adults Min Lw")
 
-# Ww and Lw and R for age classes ---------------
+# WW AND LW AGE CLASSES ---------------
 
 using CategoricalArrays
 # Assuming `adults_df` is your DataFrame
@@ -92,25 +82,25 @@ StatsPlots.@df adults_df StatsPlots.boxplot!(:Age_year, :R, line=(1, :black), fi
 grouped_adults = groupby(adults_df, [:Age_year, :time])
 
 # Calculate mean Ww and Lw for each Age_year and step
-mean_df = combine(grouped_adults, :Ww => mean, :Lw => mean)
+#mean_df = combine(grouped_adults, :Ww => mean, :Lw => mean)
 # Convert Age_year to a categorical variable
-mean_df[!, :Age_year] = categorical(mean_df[!, :Age_year])
-Plots.plot(mean_df[!, :time], mean_df[!, :Ww_mean], group = mean_df[!, :Age_year], xlabel="Step", ylabel="Mean Ww", title="Mean Ww by Age_year and Step", legend=:topleft)
+#mean_df[!, :Age_year] = categorical(mean_df[!, :Age_year])
+#Plots.plot(mean_df[!, :time], mean_df[!, :Ww_mean], group = mean_df[!, :Age_year], xlabel="Step", ylabel="Mean Ww", title="Mean Ww by Age_year and Step", legend=:topleft)
 
 # length frequencies juveniles
-juve_df = filter(row -> row[:type] == :juvenile, results)
-grouped_df = groupby(juve_df, :id)
-# Filter Juvenile
-# Find the row with maximum size
-max_size_df = combine(grouped_df, :Lw => maximum => :max_Lw)
-histogram(max_size_df[!,:max_Lw], bins=25, xlabel="Max Lw", ylabel="Frequency", title="Histogram of Juvenile Max Lw")
-min_size_df = combine(grouped_df, :Lw => minimum => :min_Lw)
-histogram(min_size_df[!,:min_Lw], bins=50, xlabel="Max Lw", ylabel="Frequency", title="Histogram of Juvenile Min Lw")
-
-max_age_df = combine(grouped_df, :Age => maximum => :max_Age)
-histogram(max_age_df[!,:max_Age], bins=25, xlabel="Max Age", ylabel="Frequency", title="Histogram of Juvenile Max Age")
-min_age_df = combine(grouped_df, :Age => minimum => :min_Age)
-histogram(min_age_df[!,:min_Age], bins=50, xlabel="Max Age", ylabel="Frequency", title="Histogram of Juvenile Min Age")
+# juve_df = filter(row -> row[:type] == :juvenile, results)
+# grouped_df = groupby(juve_df, :id)
+# # Filter Juvenile
+# # Find the row with maximum size
+# max_size_df = combine(grouped_df, :Lw => maximum => :max_Lw)
+# histogram(max_size_df[!,:max_Lw], bins=25, xlabel="Max Lw", ylabel="Frequency", title="Histogram of Juvenile Max Lw")
+# min_size_df = combine(grouped_df, :Lw => minimum => :min_Lw)
+# histogram(min_size_df[!,:min_Lw], bins=50, xlabel="Max Lw", ylabel="Frequency", title="Histogram of Juvenile Min Lw")
+# 
+# max_age_df = combine(grouped_df, :Age => maximum => :max_Age)
+# histogram(max_age_df[!,:max_Age], bins=25, xlabel="Max Age", ylabel="Frequency", title="Histogram of Juvenile Max Age")
+# min_age_df = combine(grouped_df, :Age => minimum => :min_Age)
+# histogram(min_age_df[!,:min_Age], bins=50, xlabel="Max Age", ylabel="Frequency", title="Histogram of Juvenile Min Age")
 
 # frequencies simil medias -----------
 
@@ -151,7 +141,7 @@ summary_df_na = filter(row -> !any(isnothing, values(row)), summary_df)
 # Assuming :Lw_bin is a column of ranges, extract the second element of each range
 summary_df_na
 # Add the :Lw_class column as a categorical variable
-summary_df_na[!, :Lw_class] = categorical([1,5,6,7,8,9,10,11,12,13])
+summary_df_na[!, :Lw_class] = categorical([1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26])
 
 # Plot bars instead of a histogram
 StatsPlots.@df summary_df_na StatsPlots.bar(:Lw_class, :mean_tot_B, title="Mean Total Biomass by Length over the Year", xlabel="Length Bin (cm)", ylabel="Mean Total Biomass (g)", legend = false)

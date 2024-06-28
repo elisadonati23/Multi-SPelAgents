@@ -92,7 +92,7 @@ function egghatch!(Sardine, model)
         Sardine.pA = Sardine.f_i * model.p_Am * model.Tc_value* Sardine.s_M_i * ((Sardine.Lw * model.del_M)^2.0)
         Sardine.Ww = (model.w * (model.d_V * ((Sardine.Lw * model.del_M) ^ 3.0) + model.w_E / model.mu_E *(Sardine.En + 0.0))) #R
         Sardine.Scaled_En = Sardine.En / ( model.Em * ((Sardine.Lw * model.del_M)^3.0))
-        Sardine.t_puberty = 0.0
+        Sardine.t_puberty = Sardine.Age
         model.dead_eggmass += 1.0                                              
         return
     end
@@ -225,9 +225,6 @@ function juvemature!(Sardine, model)
          Sardine.pA = Sardine.f_i * model.p_Am * model.Tc_value * Sardine.s_M_i * ((Sardine.Lw * model.del_M)^2.0)
          Sardine.Generation += 1.0
          Sardine.s_M_i = model.s_M
-         #Sardine.QWw = interquantiles_prop_single(Sardine, model, :Ww, :QWw)
-    else
-        Sardine.t_puberty += 1.0
     end
     return
 end
@@ -235,6 +232,7 @@ end
 function juveaging!(Sardine, model)
     if !Sardine.Dead
     Sardine.Age += 1.0
+    Sardine.t_puberty += 1.0
     end
 return
 end
