@@ -17,11 +17,42 @@ num_runs = 1
 results = []
 
 #1 sardine every 4000 liters
-modello = model_initialize_parallel(1000.0, 0.0,0.0, 0.0, 4e6, 1.0, 1.0, 0.945, 15.0, 0.9995, 1.06, 0.83, 0.69, 0.63, 0.48)
+modello = model_initialize_parallel(1000.0, 0.0,0.0, 0.0, 1.0, 1.0, 510000.0, 0.945, 15.0, 0.9995, 1.06, 0.83, 0.69, 0.63, 0.48)
 
-temp = collect(range(15.0, stop=18.0, length=365*100+1))
-Xmax = collect(range(1.0, stop=1.0, length=365*100+1))
+mean([0.25*0.25, 0.5*0.25, 0.25, 1.5*0.25, 1.75*0.25])
 
+# fishing mortality timeseries preparation: 100 years of 0.0 + STAR_PIL_17_18_Ref 2022
+zeros_100 = repeat([0.0], 20*365+1) # spin up
+# Read the CSV file
+# Name of the file in the current directory
+
+# Construct the file path
+file_path = "C:/Users/elli2/Documents/PhD/data/timeseries_abm.csv"
+
+# Read the CSV file
+df = CSV.read(file_path, DataFrame; delim=';', decimal=',')
+dropmissing!(df)
+length(df.date)
+Xmax1 = Vector(df[!, :zoo1]) #12784 elements
+Xmax5 = Vector(df[!, :zoo5])
+Xmax10 = Vector(df[!, :zoo10])
+temp = Vector(df[!, :rep_temp])
+Mf = Vector(df[!, :mf])
+
+meanXmax1 = mean(Xmax1)
+meanXmax5 = mean(Xmax5)
+meanXmax10 = mean(Xmax10)
+meanTemp = 15.0
+repXmax1 = repeat([meanXmax1], 20*365+1)
+repXmax5 = repeat([meanXmax5], 20*365+1)
+repXmax10 = repeat([meanXmax10], 20*365+1)
+repTemp = repeat([meanTemp], 20*365+1)
+
+Xmax1_run = vcat(repXmax1, Xmax1)
+Xmax5_run = vcat(repXmax5, Xmax5)
+Xmax10_run = vcat(repXmax10, Xmax10)
+Temp_run = vcat(repTemp, temp)
+Mf_timeseries_run = vcat(zeros_100, Mf)
 
 for i in 1:num_runs
     # Initialize your model and data
