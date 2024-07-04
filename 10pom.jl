@@ -7,8 +7,13 @@
             #:TotB,:JuvB,:AdB]
 
     # Initialize dataframes
+file_name = "agentFINALSIMS_1.csv"
+# Construct the file path
+file_path = joinpath("C:/Users/elli2/Documents/PhD/data/for_validation", file_name)
 
-results = results[1][1]
+# Read the CSV file
+df = CSV.read(file_path, DataFrame; delim=',', decimal='.')
+results = df
 results[!, :type] = Symbol.(results[!, :type])
 results[!, :id] = Symbol.(results[!, :id])
 

@@ -280,6 +280,7 @@ function adultdie!(Sardine, model)
             M = model.M4*2
          end
          
+         # 1-exp(-M) is the exponential decay model to transform annual probability of dying to daily
          if model.MF_value == 0.0
             total_deaths = natural_deaths = Float64(rand(Binomial(Int64(Sardine.Nind), 1-exp(-M))))
             fishing_deaths = 0.0
