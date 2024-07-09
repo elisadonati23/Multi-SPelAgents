@@ -21,13 +21,9 @@
     Scaled_En::Float64
     s_M_i::Float64 #shape parameter
     pA::Float64 #assimilation
-    #CI::Float64 -- not needed atm 
-    #Variability::Float64 -- not needed atm 
-    Lb_i::Float64 # ? 
+    Lb_i::Float64 # 
 
     # Features from Adult
     spawned::Float64 
-    #Kx_i::Float64 not sure what they need -- removed
-    #Xc_i::Float64 not sure what they need -- removed
 end
 

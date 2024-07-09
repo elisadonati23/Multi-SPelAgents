@@ -47,7 +47,8 @@ function generate_EggMass(No_Egg, model, Nind = missing, maternal_EggEn = missin
             agent_Nind = Float64(floor(Nind))
         end
 
-        if ismissing(En)
+        if ismissing(En) # en is the reserve and it is calculated from either the energy from the mother or 
+                        #with the standard information we have from addmypet portal and DEB theory
             agent_En = model.E0
         else
             agent_En = Float64(En)
@@ -63,21 +64,19 @@ end
 function generate_Juvenile(No_J, model, Nind = missing, Generation = 0.0, En = missing, Lb_i = model.Lb, Lw = missing, Ww = missing, Scaled_En = missing)
     
     agent_type = :juvenile
-    agent_f_i = 0.8
-    agent_L = model.L0
+    agent_f_i = 0.8  #-- check this. there was an explanation for this
+    agent_L = model.L0  # L0 is the length at birth from deb params
     agent_Generation = Generation
-    agent_Lb_i = Lb_i
+    agent_Lb_i = Lb_i #inherited from the eggs
     agent_R = 0.0
     agent_spawned = 0.0
     agent_QWw = "Q1"
     agent_Dead = false
     agent_reproduction = :nonspawner
-    # silenced features
-    agent_maternal_EggEn = model.E0
-    agent_superind_Neggs = 0.0 # EggMass
+    agent_maternal_EggEn = model.E0 # if initiliazed, we give standard e0, otherwise it is calculated from the mother
+    agent_superind_Neggs = 0.0 
 
     # Features from Adult
-
     for _ in 1:No_J
 
         if ismissing(Nind)
@@ -87,24 +86,24 @@ function generate_Juvenile(No_J, model, Nind = missing, Generation = 0.0, En = m
         end
 
         if ismissing(Lw)
-            agent_Lw = clamp(round(randn() * 0.5 + 5.0, digits=2), 4.45, 5.5)
+            agent_Lw = clamp(round(randn() * 0.5 + 5.0, digits=2), 4.45, 5.5) # random distributions of lengths
         else
             agent_Lw = Lw
         end
 
-        agent_Age = model.Ap * (agent_Lw * model.del_M) / model.Lp
-        agent_t_puberty = model.Ap * (agent_Lw * model.del_M) / model.Lp
+        agent_Age = model.Ap * (agent_Lw * model.del_M) / model.Lp #but age is calculated from deb with shape coefficients
+        agent_t_puberty = model.Ap * (agent_Lw * model.del_M) / model.Lp #here we assume that time to puberty is the same but actually not
 
         if ismissing(Ww)
-            agent_Ww = (model.w * (model.d_V * ((agent_Lw * model.del_M) ^ 3.0)))
+            agent_Ww = (model.w * (model.d_V * ((agent_Lw * model.del_M) ^ 3.0))) # from the random length we get the weight
         else
             agent_Ww = Ww
         end
 
-        agent_H = model.Hp * (agent_Lw * model.del_M) / model.Lp
+        agent_H = model.Hp * (agent_Lw * model.del_M) / model.Lp # and we get also the individual level of maturity
 
         if ismissing(En)
-            agent_En = agent_f_i * model.Em * ((agent_Lw * model.del_M)^3.0)
+            agent_En = agent_f_i * model.Em * ((agent_Lw * model.del_M)^3.0) # and the reserve energy, which depends on the functional response and Em
         else
             agent_En = En
         end
@@ -124,9 +123,7 @@ function generate_Juvenile(No_J, model, Nind = missing, Generation = 0.0, En = m
         end
 
         Tc_value = isa(model.Tc, Vector{Float64}) ? model.Tc[model.sim_timing] : model.Tc
-        agent_pA = agent_f_i * model.p_Am * Tc_value* agent_s_M_i * ((agent_Lw * model.del_M)^2.0)
-        #CI = 100 * Ww / (Lw^3)
-        #Variability = randn() .* 0.05 .+ 0
+        agent_pA = agent_f_i * model.p_Am * Tc_value* agent_s_M_i * ((agent_Lw * model.del_M)^2.0) #assimilation depends on surface and functional response and temperature
 
         add_agent!(Sardine, model, agent_type, agent_reproduction, agent_Nind, agent_Age, agent_L, agent_H, agent_maternal_EggEn, agent_superind_Neggs , agent_En, agent_Generation, agent_Dead,
         agent_f_i, agent_t_puberty, agent_Lw, agent_Ww, agent_QWw, agent_R, agent_Scaled_En,
@@ -160,7 +157,7 @@ function generate_Adult(No_A, model, Nind = missing, Age = missing, t_puberty = 
     elseif agent_H > model.Hb && model.Hj > agent_H
         agent_Lw * model.del_M / model.Lb
     else
-        model.s_M
+        model.s_M # this is always the case, because since it's an adult, it's always bigger than Hj
     end
 
     if ismissing(Generation)
@@ -177,7 +174,9 @@ function generate_Adult(No_A, model, Nind = missing, Age = missing, t_puberty = 
             agent_Nind = Float64(floor(Nind))
         end
 
-        agent_Lw = if ismissing(Lw)
+        agent_Lw = if ismissing(Lw) #again from the length we get the weight, age and energy reserve and level of maturity
+                                    # using the asymptotic length
+                                    # asymptotic length depends on Kappa and expected lifespan at a constant food conditions
             clamp(round(randn() * 5.0 .+ 20.0, digits=2), 15.0, 25.0)
         else
             agent_Lw

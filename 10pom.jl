@@ -7,7 +7,7 @@
             #:TotB,:JuvB,:AdB]
 
     # Initialize dataframes
-file_name = "agentFINALSIMS_1.csv"
+file_name = "timetopub_agentFINALSIMS_1.csv"
 # Construct the file path
 file_path = joinpath("C:/Users/elli2/Documents/PhD/data/for_validation", file_name)
 
@@ -53,7 +53,10 @@ p2 = twinx()
 # Add a boxplot of :Ww to the right y-axis
 p2 = StatsPlots.@df filtered_df StatsPlots.boxplot!(p2, :Ww, ylabel="Weight (g)", fillalpha=0.75, linewidth=2, fillcolor=:orange, legend = false)
 
-StatsPlots.@df filtered_df StatsPlots.boxplot(:Age, title="Age at Puberty", ylabel="Days", fillalpha=0.75, linewidth=2, legend = false)
+
+p = @df filtered_df StatsPlots.boxplot(:Age, title="Age at Puberty", ylabel="Days", fillalpha=0.75, linewidth=2, legend=false, size=(800, 400))
+
+display(p)
 
 # ULTIMATE SIZE YES  --------------
 # take the max size for each adult
@@ -62,6 +65,9 @@ max_size_df = combine(grouped_df, :Lw => maximum => :max_Lw)
 histogram(max_size_df[!,:max_Lw], bins=25, xlabel="Max Lw (cm)", ylabel="Frequency", title="Adults Max Length (cm)", legend = false)
 #min_size_df = combine(grouped_df, :Lw => minimum => :min_Lw)
 #histogram(min_size_df[!,:min_Lw], bins=50, xlabel="Max Lw", ylabel="Frequency", title="Histogram of Adults Min Lw")
+
+
+
 
 # WW AND LW AGE CLASSES ---------------
 

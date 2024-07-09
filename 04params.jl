@@ -94,14 +94,6 @@ function create_params(
     Tc = exp.( Ta /Tr .- Ta ./ (Temp .+ 273.0))
     Tc_value = Tc[1]
     
-    ## Define the reproduction periods for each size class
-    #repro_periods_Q = Dict("Q1" => (1.0, repro_end),
-    #"Q2" => (repro_start + 60.0, repro_end),
-    #"Q3" => (repro_start + 30.0, repro_end),
-    #"Q4" => (repro_start, repro_end))
-#
-    #Ww_quantiles = [35.23, 61.17, 97.48]
-
     daily_repro_probabilities = [calculate_daily_prob_repro(day, peak1_sardine, total_repro_sardine, std_dev) for day in repro_period]
     # Normalize the probabilities so that they sum up to total_reproductions
     daily_repro_probabilities /= sum(daily_repro_probabilities) / total_repro_sardine
@@ -187,7 +179,6 @@ model_parameters = Dict(
         :total_repro_sardine => total_repro_sardine,
         :std_dev => std_dev,
         :repro_period => repro_period,
-        #:repro_periods_Q => repro_periods_Q,
         :daily_repro_probabilities => daily_repro_probabilities,
         :p_Am => p_Am,
         :v_rate => v_rate,
@@ -224,14 +215,12 @@ model_parameters = Dict(
         :Ta => Ta,
         :Tr => Tr,
         :Tc => Tc,
-        #:Ww_quantiles => Ww_quantiles,
         :Em => Em,
         :Lm => Lm,
         :Kx => Kx,
         :g => g,
         :k_M => k_M,
         :Xall => Xall,
-        #:del_X => del_X,
         :spawn_period => spawn_period,
         :Sex_ratio => Sex_ratio,
         :DEB_timing => DEB_timing,
