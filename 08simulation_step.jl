@@ -159,10 +159,11 @@ function complex_step!(model)
     if !isempty(spawners)
             #create new born daily superindividuals
             prop_values = [getfield(model[agent], :superind_Neggs) for agent in spawners]
+            #mathernal egg energy was just created to keep track of this information  and calculate the mean energy content of the eggs
             mean_Egg_energy = mean([getfield(model[agent], :maternal_EggEn) for agent in spawners])
             max_generation = maximum([getfield(model[agent], :Generation) for agent in spawners]) + 1.0
             tot_Neggs = sum(prop_values)
-            generate_EggMass(1, model, tot_Neggs,mean_Egg_energy, mean_Egg_energy, max_generation)
+            generate_EggMass(1, model, tot_Neggs, mean_Egg_energy, mean_Egg_energy, max_generation)
     #reset the reproduction variable
     for id in spawners
         agent = model[id]
