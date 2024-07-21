@@ -330,7 +330,7 @@ try
     return p
     catch e
         println("Failed to generate plot: ", e)
-        return Plots.plot()  # Return an empty plot in case of error
+        #return Plots.plot()  # Return an empty plot in case of error
     end
 end
 
@@ -385,7 +385,7 @@ function plot_population_timeseries(adf, y_limits = missing, thousand = false)
         return p
     catch e
         println("Failed to generate plot: ", e)
-        return Plots.plot()  # Return an empty plot in case of error
+        #return Plots.plot()  # Return an empty plot in case of error
     end
 end
 
@@ -432,7 +432,7 @@ function plot_param_timeseries(adf, params, ids = missing, tonnes = false)
         return p
     catch e
         println("Failed to generate plot: ", e)
-        return Plots.plot()  # Return an empty plot in case of error
+        #return Plots.plot()  # Return an empty plot in case of error
     end
 end
 
