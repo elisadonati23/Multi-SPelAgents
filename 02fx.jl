@@ -1,8 +1,4 @@
-
-  ##############
-  # Ouutput fx #
-  ##############
-  function update_Kappa!(model, Kappa::Float64)
+function update_Kappa!(model, Kappa::Float64)
     model.Kappa_value = Kappa
 end
 
@@ -10,13 +6,47 @@ function update_Kappa!(model, Kappa::Vector{Float64})
     model.Kappa_value = Kappa[model.sim_timing]
 end
 
-function update_MF!(model, M_f::Float64)
-    model.MF_value = M_f
+function update_MF0!(model, M_f0::Float64)
+    model.MF0_value = M_f0
 end
 
-function update_MF!(model, M_f::Vector{Float64})
-    model.MF_value = M_f[model.sim_timing]
+function update_MF0!(model, M_f0::Vector{Float64})
+    model.MF0_value = M_f0[model.sim_timing]
 end
+
+function update_MF1!(model, M_f1::Float64)
+    model.MF1_value = M_f1
+end
+
+function update_MF1!(model, M_f1::Vector{Float64})
+    model.MF1_value = M_f1[model.sim_timing]
+end
+
+function update_MF2!(model, M_f2::Float64)
+    model.MF2_value = M_f2
+end
+
+function update_MF2!(model, M_f2::Vector{Float64})
+    model.MF2_value = M_f2[model.sim_timing]
+end
+
+function update_MF3!(model, M_f3::Float64)
+    model.MF3_value = M_f3
+end
+
+function update_MF3!(model, M_f3::Vector{Float64})
+    model.MF3_value = M_f3[model.sim_timing]
+end
+
+function update_MF4!(model, M_f4::Float64)
+    model.MF4_value = M_f4
+end
+
+function update_MF4!(model, M_f4::Vector{Float64})
+    model.MF4_value = M_f4[model.sim_timing]
+end
+
+
 
 function update_Tc!(model, Tc::Float64)
     model.Tc_value = Tc
@@ -272,7 +302,6 @@ end
                                         #####################
                                         #    plottings      #
                                         #####################
-
 function plot_means_with_std(df, mean_cols, std_cols)
     # Check if the lengths of mean_cols and std_cols are the same
     if length(mean_cols) != length(std_cols)
@@ -410,7 +439,7 @@ end
 using Colors
 
 
-function plot_annual_param_timeseries(adf, params, tonnes = false, type = :mean, title = "")
+function plot_annual_param_timeseries(adf, params, tonnes = false, type = :mean, title = "", start_year = 0)
     p = Plots.plot(title=title)  # Initialize an empty plot with a title # Initialize an empty plot
     colors = [:blue, :red, :green, :purple, :orange, :black]
 
@@ -444,8 +473,8 @@ function plot_annual_param_timeseries(adf, params, tonnes = false, type = :mean,
         end
 
         color = colors[(i-1) % length(colors) + 1]
-        Plots.plot!(p, years, values, yerr=std_devs, seriestype=:scatter, label = "$param", color=color)
-        Plots.plot!(p, years, values, linewidth = 2, label = false, color=color)
+        Plots.plot!(p, years.+start_year, values, yerr=std_devs, seriestype=:scatter, label = "$param", color=color)
+        Plots.plot!(p, years.+start_year, values, linewidth = 2, label = false, color=color)
     end
 
     Plots.xlabel!(p, "Year")
@@ -454,7 +483,7 @@ function plot_annual_param_timeseries(adf, params, tonnes = false, type = :mean,
 end
 
 
-function plot_timeframe_param_timeseries(adf, params, start_time, end_time, tonnes = false, type = :mean, title = "")
+function plot_timeframe_param_timeseries(adf, params, start_time, end_time, tonnes = false, type = :mean, title = "", start_year = 0)
     p = Plots.plot(title=title)  # Initialize an empty plot with a title
     colors = [:blue, :red, :green, :purple, :orange, :black]
 
@@ -491,8 +520,8 @@ function plot_timeframe_param_timeseries(adf, params, start_time, end_time, tonn
         end
 
         color = colors[(i-1) % length(colors) + 1]
-        Plots.plot!(p, years, values, yerr=std_devs, seriestype=:scatter, label = "$param", color=color)
-        Plots.plot!(p, years, values, linewidth = 2, label = false, color=color)
+        Plots.plot!(p, years.+start_year, values, yerr=std_devs, seriestype=:scatter, label = "$param", color=color)
+        Plots.plot!(p, years.+start_year, values, linewidth = 2, label = false, color=color)
     end
 
     Plots.xlabel!(p, "Year")
@@ -554,5 +583,5 @@ function diagnostic_plots_pt1(out_agent, out_model, model)
     combined_plot1 = Plots.plot(p1,p2,p3,p4, layout = (2,2), plot_title = "$(round(model.M_egg, digits = 4)) /$(round(model.M0*365.0,digits = 4)) /$(round(model.M1*365.0,digits = 4)) /$(round(model.M2*365.0,digits = 4)) / $(round(model.M3*365.0,digits = 4)) /$(round(model.M4*365.0,digits = 4))", titlefont = 3)
     return combined_plot1
 end
-                                        
-                                        
+    
+                                                                        

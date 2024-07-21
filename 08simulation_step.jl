@@ -11,15 +11,6 @@ function parallel_sardine_step!(Sardine, model)
     end
 end
 
-function sardine_step!(Sardine, model)
-    if Sardine.type == :eggmass
-        parallel_eggmass_step!(Sardine, model) # deb + aging + hatch
-    elseif Sardine.type == :juvenile
-        parallel_juvenile_step!(Sardine, model) # die + deb + mature + aging
-    elseif Sardine.type == :adult
-        adult_step!(Sardine, model) # die deb aging + spawn
-    end
-end
 
                                             ###################
                                             ## ENVIRONMENT   ##
@@ -32,6 +23,12 @@ function evolve_environment!(model)
     if model.day_of_the_year == 365.0
         model.day_of_the_year = 1.0
         model.year += 1.0
+        model.fishedW = 0.0
+        model.fished0 = 0.0
+        model.fished1 = 0.0
+        model.fished2 = 0.0
+        model.fished3 = 0.0
+        model.fished4more = 0.0
     else
         model.day_of_the_year += 1.0
     end
@@ -43,8 +40,13 @@ function evolve_environment!(model)
     update_Tc!(model, model.Tc)
     update_Kappa!(model, model.Kappa)
     update_Xmax!(model, model.Xmax)
-    update_MF!(model, model.M_f)
-
+    
+    update_MF0!(model, model.M_f0)
+    update_MF1!(model, model.M_f1)
+    update_MF2!(model, model.M_f2)
+    update_MF3!(model, model.M_f3)
+    update_MF4!(model, model.M_f4)
+    
     # calculate Xall
     # Xall is initialized like X, which is set to Xmax (look at params)
     # remove the assimilation of all agents:
@@ -123,12 +125,9 @@ function update_outputs!(model)
     end
     return
 end
-
-function evolve_environment_noparallel!(model)
-    remove_all!(model, is_dead)
-    evolve_environment!(model)
-    update_outputs!(model)
- end
+                         #############################
+                         ##### scheduler #############
+                         #############################
 
 mutable struct scheduler_Adults end
 
@@ -137,6 +136,7 @@ function (sEA::scheduler_Adults)(model::ABM)
     ids = filter!(id -> hasid(model, id) && (model[id].type == :adult), ids)
     return ids
 end
+
 sEA = scheduler_Adults()
 
 function complex_step!(model)
@@ -159,20 +159,24 @@ function complex_step!(model)
     if !isempty(spawners)
             #create new born daily superindividuals
             prop_values = [getfield(model[agent], :superind_Neggs) for agent in spawners]
-            #mathernal egg energy was just created to keep track of this information  and calculate the mean energy content of the eggs
             mean_Egg_energy = mean([getfield(model[agent], :maternal_EggEn) for agent in spawners])
             max_generation = maximum([getfield(model[agent], :Generation) for agent in spawners]) + 1.0
             tot_Neggs = sum(prop_values)
-            generate_EggMass(1, model, tot_Neggs, mean_Egg_energy, mean_Egg_energy, max_generation)
-    #reset the reproduction variable
-    for id in spawners
-        agent = model[id]
-        agent.reproduction = :nonspawner
-    end
+            generate_EggMass(1, model, tot_Neggs,mean_Egg_energy, mean_Egg_energy, max_generation)
     end
 
-    evolve_environment!(model)
+
     update_outputs!(model)
+
+    evolve_environment!(model)
+
+
+    ##reset the reproduction variable
+    #for id in spawners
+    #    agent = model[id]
+    #    agent.reproduction = :nonspawner
+    #end
+    
 end
 
 

@@ -6,7 +6,8 @@
     eggDEB!(Sardine, model)
     eggaging!(Sardine, model)
     egghatch!(Sardine, model) # egghatch non comporta più un generate_fx() con i superindividui quindi può andare in paralelo
-end 
+end #-- it follows hatch! in complex step so same order of eggmass_step!()
+
 
 function eggaging!(Sardine, model)
     if !Sardine.Dead
@@ -26,7 +27,7 @@ function eggDEB!(Sardine, model)
         deltaH = 0.0
         
         ## Energy fluxes
-        #Somatic maintenance
+                #Somatic maintenance
         pS = (model.p_M * model.Tc_value) * V  #p_M_T*V
         # Mobilized energy
         pC = ((Sardine.maternal_EggEn / V) * (model.Eg * (model.v_rate * model.Tc_value) * (V ^ (2/3)) + pS)/(model.Kappa_value * (Sardine.maternal_EggEn / V) + model.Eg))
@@ -57,10 +58,10 @@ function eggDEB!(Sardine, model)
             deltaV = 0.0
         end
     
-        Sardine.En = Sardine.En + deltaEggEn #decrease reserve
+        Sardine.En = Sardine.En + deltaEggEn
         Sardine.maternal_EggEn = Sardine.maternal_EggEn + deltaEggEn
-        Sardine.H = Sardine.H + deltaH # increase maturity
-        Sardine.L = (V + deltaV)^(1/3) #increase length of the larvae that will hatch
+        Sardine.H = Sardine.H + deltaH 
+        Sardine.L = (V + deltaV)^(1/3)
     end
     return
 end
@@ -70,11 +71,11 @@ function egghatch!(Sardine, model)
         # If egg survived starvation In deb()! and has enough complexity, it becomes a juvenile
         Sardine.type = :juvenile
         Sardine.f_i = model.f # if model is initialized only with eggs, this value is set to 0.8, otherwise from the model
-        Sardine.Lw = (Sardine.L / model.del_M) #convert scaled length of eggs into real length of juvenile -- this is so smal that there is a continuity between the age of the egg and the age of the juvenile
-        Sardine.Lb_i = Sardine.L #length at birth
-        Sardine.Age = model.Ap * (Sardine.Lw * model.del_M) / model.Lp #calculate the age of the juvenile -- shouldnt be the number of days since the eggs was released?
-        Sardine.H = model.Hp * (Sardine.Lw * model.del_M) / model.Lp #calculate the maturity
-        Sardine.Nind = Float64(ceil((1 - model.M_egg) * Float64((Sardine.Nind)))) #mortality of eggs
+        Sardine.Lw = (Sardine.L / model.del_M)
+        Sardine.Lb_i = Sardine.L
+        Sardine.Age = model.Ap * (Sardine.Lw * model.del_M) / model.Lp
+        Sardine.H = model.Hp * (Sardine.Lw * model.del_M) / model.Lp
+        Sardine.Nind = Float64(ceil((1 - model.M_egg) * Float64((Sardine.Nind))))
 
         Sardine.s_M_i = if model.Hb >= Sardine.H
             1.0
@@ -90,8 +91,8 @@ function egghatch!(Sardine, model)
         
         Sardine.pA = Sardine.f_i * model.p_Am * model.Tc_value* Sardine.s_M_i * ((Sardine.Lw * model.del_M)^2.0)
         Sardine.Ww = (model.w * (model.d_V * ((Sardine.Lw * model.del_M) ^ 3.0) + model.w_E / model.mu_E *(Sardine.En + 0.0))) #R
-        Sardine.Scaled_En = Sardine.En / ( model.Em * ((Sardine.Lw * model.del_M)^3.0)) #juvenile inherits the energy from the egg. well fed mother, big egg and well fed juvenile
-        Sardine.t_puberty = Sardine.Age #this will increase with the aging of the juvenile in the age() module and will stop when it becomes adult
+        Sardine.Scaled_En = Sardine.En / ( model.Em * ((Sardine.Lw * model.del_M)^3.0))
+        Sardine.t_puberty = Sardine.Age
         model.dead_eggmass += 1.0                                              
         return
     end
@@ -119,14 +120,15 @@ function juvedie!(Sardine, model)
     fishing_deaths = 0.0
     
     if !Sardine.Dead && Sardine.Nind >= 100000.0
-        if Sardine.Lw < 10.0 || model.MF_value == 0.0
+
+        if Sardine.Lw < 10.0 || model.MF0_value == 0.0
             natural_deaths = Float64(rand(Binomial(Int64(Sardine.Nind), 1-exp(-(model.M_j)))))
             Sardine.Nind -= natural_deaths
             model.deadJ_nat += natural_deaths
         end
 
-        if Sardine.Lw > 10.0 && !(model.MF_value == 0.0)
-            M = model.M_j + ((model.MF_value/2.0)/365.0)
+        if Sardine.Lw > 10.0 && !(model.MF0_value == 0.0)
+            M = model.M_j + ((model.MF0_value)/365.0)
             total_deaths = Float64(rand(Binomial(Int64(Sardine.Nind), 1-exp(-M))))
             natural_deaths = Float64(rand(Binomial(Int64(Sardine.Nind), 1-exp(-(model.M_j)))))
             fishing_deaths = total_deaths - natural_deaths
@@ -134,6 +136,7 @@ function juvedie!(Sardine, model)
                     natural_deaths = total_deaths
                 end
             model.fished += fishing_deaths
+            model.fished0 += fishing_deaths
             model.fishedW += fishing_deaths * Sardine.Ww
             model.deadJ_nat += natural_deaths
             Sardine.Nind -= total_deaths
@@ -142,10 +145,12 @@ function juvedie!(Sardine, model)
 #if less than 1 ind, superindividual dies
     if  Sardine.Nind < 100000.0 && !Sardine.Dead
             Sardine.Dead = true
-            model.deadJ_nat += 100000.0
+            model.deadJ_nat += Sardine.Nind
     end
 return
 end
+
+
 
 
 function juveDEB!(Sardine, model)
@@ -153,6 +158,9 @@ function juveDEB!(Sardine, model)
     if !Sardine.Dead
 
         Sardine.f_i = model.f #if no one is eating (=model initilized with eggs), it is set to 0.8)
+
+        # juvenile store energy into maturation state variable and eventually they mature
+        #println("for agent $(Sardine.id) Lw is ", Sardine.Lw, "and del_M_i is ", model.del_M)
 
         #initialize the state variables before the fluxes
         Vdyn = (Sardine.Lw * model.del_M) ^ 3.0
@@ -207,7 +215,18 @@ function juveDEB!(Sardine, model)
 
         #check whether Lm is a vector or a float
         Lm_value = isa(model.Lm, Vector{Float64}) ? model.Lm[model.sim_timing] : model.Lm
-        Sardine.L = Sardine.Lw * model.del_M / Lm_value 
+        Sardine.L = Sardine.Lw * model.del_M / Lm_value
+
+        Sardine.s_M_i = if model.Hb >= Sardine.H
+            1.0
+        elseif Sardine.H > model.Hb && model.Hj > Sardine.H
+            Sardine.Lw * model.del_M / Sardine.Lb_i
+        else
+            model.s_M
+        end
+
+        Sardine.pA = Sardine.f_i * model.p_Am * model.Tc_value * Sardine.s_M_i * ((Sardine.Lw * model.del_M)^2.0)
+
     end
 return
 end
@@ -218,7 +237,7 @@ function juvemature!(Sardine, model)
          #Keep the same number of individuals which survived up to now in juvenile superind
          Sardine.type = :adult
          Sardine.R = 0.0
-         Sardine.pA = Sardine.f_i * model.p_Am * model.Tc_value * Sardine.s_M_i * ((Sardine.Lw * model.del_M)^2.0)
+         Sardine.pA = Sardine.f_i * model.p_Am * model.Tc_value * Sardine.s_M_i * ((Sardine.Lw * model.del_M)^2.0) #perchè non alla 2/3?
          Sardine.Generation += 1.0
          Sardine.s_M_i = model.s_M
     end
@@ -228,7 +247,7 @@ end
 function juveaging!(Sardine, model)
     if !Sardine.Dead
     Sardine.Age += 1.0
-    Sardine.t_puberty += 1.0 # this keep increasing at each time step until the fish becomes adult
+    Sardine.t_puberty += 1.0
     end
 return
 end
@@ -257,44 +276,46 @@ function adultdie!(Sardine, model)
     total_deaths = 0.0
     fishing_deaths = 0.0
 
+    
     if !Sardine.Dead
+
          #set the new AGE DEPENDENT MORTALITIES -- If Mf is not 0, it is added to M
          if floor(Sardine.Age / 365.0 ) == 0.0
-             M = model.M0 + (model.MF_value/365.0)
+             Mf = (model.MF0_value/365.0)
+             M = model.M0 + Mf
          elseif floor(Sardine.Age / 365.0 ) == 1.0
-             M = model.M1 + (model.MF_value/365.0)
+            Mf = (model.MF1_value/365.0)
+             M = model.M1 + Mf
          elseif floor(Sardine.Age / 365.0 ) == 2.0
-             M = model.M2 + (model.MF_value/365.0)
+            Mf = (model.MF2_value/365.0)
+             M = model.M2 + Mf
          elseif floor(Sardine.Age / 365.0 ) == 3.0
-             M = model.M3 + (model.MF_value/365.0)
+            Mf =  (model.MF3_value/365.0)
+             M = model.M3 + Mf
          else
-             M = model.M4 + (model.MF_value/365.0)
+            Mf = (model.MF4_value/365.0)
+            M = model.M4 + Mf
          end
 
-         #double mortality for too old fish
-         if floor(Sardine.Age / 365.0 ) > 6.0
-            M = model.M4*2
-         end
          
-         # 1-exp(-M) is the exponential decay model to transform annual probability of dying to daily
-         if model.MF_value == 0.0
-            total_deaths = natural_deaths = Float64(rand(Binomial(Int64(Sardine.Nind), 1-exp(-M))))
-            fishing_deaths = 0.0
-         else
-            # Calculate the total number of deaths
-            total_deaths = Float64(rand(Binomial(Int64(Sardine.Nind), 1-exp(-M))))
+            if Mf == 0.0
+                total_deaths = natural_deaths = Float64(rand(Binomial(Int64(Sardine.Nind), 1-exp(-M))))
+                fishing_deaths = 0.0
+            else
+                # Calculate the total number of deaths
+                total_deaths = Float64(rand(Binomial(Int64(Sardine.Nind), 1-exp(-M))))
 
-            # Calculate the number of deaths due to natural causes
-            natural_deaths = Float64(rand(Binomial(Int64(Sardine.Nind), 1-exp(-(M - (model.MF_value/365.0))))))
+                # Calculate the number of deaths due to natural causes
+                natural_deaths = Float64(rand(Binomial(Int64(Sardine.Nind), 1-exp(-(M - (Mf))))))
 
-            # Ensure natural_deaths does not exceed total_deaths
-            if natural_deaths > total_deaths
-                natural_deaths = total_deaths
+                # Ensure natural_deaths does not exceed total_deaths
+                if natural_deaths > total_deaths
+                    natural_deaths = total_deaths
+                end
+
+                # The number of deaths due to fishing is the total deaths minus the natural deaths
+                fishing_deaths = total_deaths - natural_deaths
             end
-
-            # The number of deaths due to fishing is the total deaths minus the natural deaths
-            fishing_deaths = total_deaths - natural_deaths
-        end
 
             # Update Sardine.Nind
             Sardine.Nind -= total_deaths
@@ -304,15 +325,26 @@ function adultdie!(Sardine, model)
             model.fishedW += fishing_deaths * Sardine.Ww
             model.deadA_nat += natural_deaths
 
-         Sardine.Nind -= total_deaths
+            if floor(Sardine.Age / 365.0 ) == 0.0
+                model.fished0 += fishing_deaths
+            elseif floor(Sardine.Age / 365.0 ) == 1.0
+                model.fished1 += fishing_deaths
+            elseif floor(Sardine.Age / 365.0 ) == 2.0
+                model.fished2 += fishing_deaths
+            elseif floor(Sardine.Age / 365.0 ) == 3.0
+                model.fished3 += fishing_deaths
+            else
+                model.fished4more += fishing_deaths
+            end
      end
 
     if Sardine.Nind < 100000.0
         Sardine.Dead = true
-        model.deadA_nat += 100000.0
+        model.deadA_nat += Sardine.Nind
     end
     return
 end
+
 
 function adultDEB!(Sardine, model)
 
@@ -331,6 +363,7 @@ if !Sardine.Dead
     deltaR = 0.0
     
     # Energy fluxes
+    
     pA = (Sardine.f_i * model.p_Am * model.Tc_value * Sardine.s_M_i * (Vdyn ^ (2/3)))
     pS = p_M_T * Vdyn
     pC = ((Endyn/Vdyn) * (model.Eg * (model.v_rate * model.Tc_value) * Sardine.s_M_i * (Vdyn ^ (2/3)) + pS) / (model.Kappa_value * (Endyn/ Vdyn) + model.Eg))
@@ -367,7 +400,9 @@ if !Sardine.Dead
     Sardine.H = Hdyn + deltaH
     Sardine.R = Rdyn + deltaR
     Sardine.Ww = (model.w *(model.d_V * V + model.w_E/ model.mu_E * (Sardine.En + Sardine.R)))
-    Sardine.Scaled_En= Sardine.En / (model.Em * (( Sardine.Lw * model.del_M)^3.0))
+    Sardine.Scaled_En = Sardine.En / (model.Em * (( Sardine.Lw * model.del_M)^3.0))
+    Sardine.L = Sardine.Lw .* model.del_M ./ model.Lm silenced atm because of problems when K is a vector
+    Sardine.pA = Sardine.f_i * model.p_Am * model.Tc_value * Sardine.s_M_i * ((Sardine.Lw * model.del_M)^2.0)
 end
 return
 end
@@ -386,12 +421,19 @@ if (!Sardine.Dead && Sardine.Nind >= 100000.0)  &&
     #2nd condition: being in the repro period
     #do not check if they are dead since all deads are removed before repro
     ((model.repro_start <= model.day_of_the_year <= 365.0) || (1.0 <= model.day_of_the_year <= model.repro_end)) &&
-          
-            # 3th condition: random number between 0 and 1 is smaller than the probability of spawning, then reproduction occurs
+        
+        # 3rd condition:if we are within the reproduction period for the sardine's size class
+         #((model.repro_periods_Q[Sardine.QWw][1] <= model.day_of_the_year <= 365.0) || (1.0 <= model.day_of_the_year <= model.repro_periods_Q[Sardine.QWw][2])) &&
+           
+            # 4th condition: random number between 0 and 1 is smaller than the probability of spawning, then reproduction occurs
             (rand() <= model.prob_dict[model.day_of_the_year])
 
+            # Define a dictionary to map QWw values to multipliers
+            #multipliers = Dict("Q1" => 450, "Q2" => 500, "Q3" => 550, "Q4" => 600)
+            # Determine the number of eggs
+
             #eggs from all females
-            Sardine.superind_Neggs = Float64(420.0 * Sardine.Ww) * ceil((Sardine.Nind/2.0)) 
+            superind_Neggs_value = Float64(420.0 * Sardine.Ww) * ceil((Sardine.Nind/2.0)) 
             #eggs from one female
             Neggs_value_single = Float64(420.0 * Sardine.Ww) #420 standard number of eggs per weight of female
 
@@ -404,11 +446,14 @@ if (!Sardine.Dead && Sardine.Nind >= 100000.0)  &&
             # and if the energy to be spawned is lower than the energy available, spawn!
             if (spawned_en < Sardine.R ) #* Kappa_valueR)
                 #Nind males and females lose the same amount of spawned energy
+                Sardine.superind_Neggs = superind_Neggs_value
                 Sardine.reproduction = :spawner
                 Sardine.R = Float64(Sardine.R - spawned_en) #(Sardine.R / spawn_period)) 
                 Sardine.spawned += 1.0 #number of times the fish has spawned
+            else
+                Sardine.superind_Neggs = 0.0
+                Sardine.reproduction = :nonspawner
             end
-
     end
         return
 end

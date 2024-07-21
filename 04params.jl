@@ -2,7 +2,11 @@ function create_params(
     No_A,  
     No_J, 
     No_Egg, 
-    M_f::Union{Float64, Vector{Float64}}, #fishing mortality (from 0 to 4 /year) 
+    M_f0::Union{Float64, Vector{Float64}},
+    M_f1::Union{Float64, Vector{Float64}},
+    M_f2::Union{Float64, Vector{Float64}},
+    M_f3::Union{Float64, Vector{Float64}},
+    M_f4::Union{Float64, Vector{Float64}}, #fishing mortality (from 0 to 4 /year) 
     Wv,
     day_of_the_year,
     Xmax::Union{Float64, Vector{Float64}},
@@ -24,9 +28,17 @@ function create_params(
     M3 = M3/365.0
     M4 = M4/365.0
 
+
+
     #variable parameters
     Kappa_value = Kappa[1]
-    MF_value = M_f[1]
+    
+    MF0_value = M_f0[1]
+    MF1_value = M_f1[1]
+    MF2_value = M_f2[1]
+    MF3_value = M_f3[1]
+    MF4_value = M_f4[1]
+
     f = 1.0 
     r_food = 0.5
     DEB_timing = 1.0
@@ -93,7 +105,7 @@ function create_params(
     #arrhenius temperature -- it can be a value or a vector depending on Temp
     Tc = exp.( Ta /Tr .- Ta ./ (Temp .+ 273.0))
     Tc_value = Tc[1]
-    
+
     daily_repro_probabilities = [calculate_daily_prob_repro(day, peak1_sardine, total_repro_sardine, std_dev) for day in repro_period]
     # Normalize the probabilities so that they sum up to total_reproductions
     daily_repro_probabilities /= sum(daily_repro_probabilities) / total_repro_sardine
@@ -135,6 +147,12 @@ function create_params(
     mean_Hjuve = 0.0
     sd_Hjuve = 0.0
 
+    fished0 = 0.0
+    fished1 = 0.0
+    fished2 = 0.0
+    fished3 = 0.0
+    fished4more = 0.0
+
 
 model_parameters = Dict(
         :No_A => Float64(No_A),
@@ -143,14 +161,22 @@ model_parameters = Dict(
         :Temp => Temp,
         :Tc_value => Tc_value,
         :Kappa_value => Kappa_value,
-        :MF_value => MF_value,
+        :M_f0 => M_f0,
+        :M_f1 => M_f1,
+        :M_f2 => M_f2,
+        :M_f3 => M_f3,
+        :M_f4 => M_f4,
+        :MF0_value => MF0_value,
+        :MF1_value => MF1_value,
+        :MF2_value => MF2_value,
+        :MF3_value => MF3_value,
+        :MF4_value => MF4_value,
         :Wv => Wv,
         :day_of_the_year => day_of_the_year,
         :year => year,
         :f => f,
         :Xmax_value => Xmax_value, 
         :M_egg => M_egg,
-        :M_f => M_f,
         :M_j => M_j,
         :M0 => M0,
         :M1 => M1,
@@ -248,7 +274,12 @@ model_parameters = Dict(
         :mean_Ww_puberty =>mean_Ww_puberty,
         :sd_Ww_puberty =>sd_Ww_puberty,
         :mean_Hjuve => mean_Hjuve,
-        :sd_Hjuve =>sd_Hjuve)
+        :sd_Hjuve =>sd_Hjuve,
+        :fished0 => fished0,
+        :fished1 => fished1,
+        :fished2 => fished2,
+        :fished3 => fished3,
+        :fished4more => fished4more)
                            
 return model_parameters            
 end

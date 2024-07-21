@@ -21,9 +21,9 @@
     Scaled_En::Float64
     s_M_i::Float64 #shape parameter
     pA::Float64 #assimilation
-    Lb_i::Float64 # 
+    Lb_i::Float64 # ? 
 
     # Features from Adult
-    spawned::Float64 
+    spawned::Float64
 end
 
