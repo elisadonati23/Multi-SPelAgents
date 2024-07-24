@@ -87,7 +87,7 @@ model_initialize_parallel(1000.0, 0.0, 0.0, Mf0_run, Mf1_run, Mf2_run, Mf3_run, 
 ]
 
 # Initialize dataframes
-adata = [:type, :Nind, :t_puberty,:Age, :Lw, :Ww, :En, :R, :pA, :s_M_i, :superind_Neggs, :reproduction, :Dead]
+adata = [:type, :Nind, :t_puberty,:Age, :Lw, :Ww, :En, :R,:H, :pA, :s_M_i, :superind_Neggs, :reproduction, :Dead, :spawned, :CI, :GSI]
 mdata = [:day_of_the_year, :year, :TotB,:JuvB,:AdB, :f, :deadJ_nat, :deadJ_old, 
 :deadJ_starved, :deadA_nat, :deadA_old, :deadA_starved, :fished, :fishedW, :fished0, :fished1, :fished2, :fished3, :fished4more,
 :meanJuvL, :sdJuvL, :meanAdL, :sdAdL, :mean_tpuberty, :sd_tpuberty, :meanJuvWw, :sdJuvWw, :meanAdWw, :sdAdWw, :mean_Hjuve, :sd_Hjuve]

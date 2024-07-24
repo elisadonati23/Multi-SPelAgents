@@ -14,14 +14,16 @@
     # Features from Juvenile, Adults
     f_i::Float64 #individual functional Response
     t_puberty::Float64 #time to puberty
-    Lw::Float64 #Length weight
+    Lw::Float64 #Length 
     Ww::Float64 #Weight
     QWw::String #Quantile weight
     R::Float64 #Reproduction
     Scaled_En::Float64
     s_M_i::Float64 #shape parameter
     pA::Float64 #assimilation
-    Lb_i::Float64 # ? 
+    Lb_i::Float64 #scaled structural length at birth
+    CI::Float64  # condition index
+    GSI::Float64 # gonadosomatic index
 
     # Features from Adult
     spawned::Float64
