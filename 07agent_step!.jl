@@ -347,7 +347,7 @@ if !Sardine.Dead
     Sardine.f_i = model.f
     Vdyn = (Sardine.Lw * model.del_M) ^ 3.0
     Endyn = Sardine.En
-    Hdyn = model.Hb
+    Hdyn = model.Hp
     Rdyn = Sardine.R
 
     p_M_T = model.p_M * model.Tc_value # this should be in the update environment module
@@ -398,7 +398,7 @@ if !Sardine.Dead
     Sardine.Scaled_En = Sardine.En / (model.Em * (( Sardine.Lw * model.del_M)^3.0))
     Sardine.L = Sardine.Lw .* model.del_M ./ model.Lm
     Sardine.pA = Sardine.f_i * model.p_Am * model.Tc_value * Sardine.s_M_i * ((Sardine.Lw * model.del_M)^2.0)
-    Sardine.CI = 100 * Sardine.Ww / (Sardine.L^3)
+    Sardine.CI = 100 * Sardine.Ww / (Sardine.Lw^3)
     Sardine.GSI = (model.w * (model.w_E / model.mu_E) * Sardine.R) / Sardine.Ww * 100
 end
 return
