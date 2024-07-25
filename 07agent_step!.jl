@@ -345,7 +345,7 @@ if !Sardine.Dead
     Sardine.f_i = model.f
     Vdyn = (Sardine.Lw * model.del_M) ^ 3.0
     Endyn = Sardine.En
-    Hdyn = model.Hb
+    Hdyn = model.Hp
     Rdyn = Sardine.R
 
     p_M_T = model.p_M * model.Tc_value # this should be in the update environment module
