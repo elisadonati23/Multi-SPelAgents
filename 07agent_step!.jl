@@ -228,7 +228,7 @@ function juveDEB!(Sardine, model)
         # update pA
         Sardine.pA = Sardine.f_i * model.p_Am * model.Tc_value * Sardine.s_M_i * ((Sardine.Lw * model.del_M)^2.0)
         
-        Sardine.CI = 100 * Sardine.Ww / (Sardine.L^3)
+        Sardine.CI = 100 * Sardine.Ww / (Sardine.Lw^3)
 
     end
 return
