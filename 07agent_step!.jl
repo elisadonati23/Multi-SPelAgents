@@ -27,7 +27,7 @@ function eggDEB!(Sardine, model)
         deltaH = 0.0
         
         ## Energy fluxes
-                #Somatic maintenance
+        #Somatic maintenance
         pS = (model.p_M * model.Tc_value) * V  #p_M_T*V
         # Mobilized energy
         pC = ((Sardine.maternal_EggEn / V) * (model.Eg * (model.v_rate * model.Tc_value) * (V ^ (2/3)) + pS)/(model.Kappa_value * (Sardine.maternal_EggEn / V) + model.Eg))
@@ -47,7 +47,6 @@ function eggDEB!(Sardine, model)
             return
         end
         
-
         deltaH =  (( 1.0 - model.Kappa_value) * pC - pJ)
         if (deltaH < 0.0 )
             deltaH = 0.0
@@ -448,5 +447,3 @@ if (!Sardine.Dead && Sardine.Nind >= 100000.0)  &&
     end
         return
 end
-
-#test
