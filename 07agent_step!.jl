@@ -27,7 +27,7 @@ function eggDEB!(Sardine, model)
         deltaH = 0.0
         
         ## Energy fluxes
-        #Somatic maintenance
+                #Somatic maintenance
         pS = (model.p_M * model.Tc_value) * V  #p_M_T*V
         # Mobilized energy
         pC = ((Sardine.maternal_EggEn / V) * (model.Eg * (model.v_rate * model.Tc_value) * (V ^ (2/3)) + pS)/(model.Kappa_value * (Sardine.maternal_EggEn / V) + model.Eg))
@@ -47,6 +47,7 @@ function eggDEB!(Sardine, model)
             return
         end
         
+
         deltaH =  (( 1.0 - model.Kappa_value) * pC - pJ)
         if (deltaH < 0.0 )
             deltaH = 0.0
@@ -112,19 +113,21 @@ function parallel_juvenile_step!(Sardine, model)
 end
 
 function juvedie!(Sardine, model)
-    #set mortality: adding fishing mortality if lenght is higher than 10cm (recruitment for fishing standards)
+    #set mortality: adding fishing mortality if lenght is higher than 10cm (recruitment)
     # Initialize deaths
     natural_deaths = 0.0
     total_deaths = 0.0
     fishing_deaths = 0.0
     
     if !Sardine.Dead && Sardine.Nind >= 100000.0
-        # if there is no fishing mortality or the fish is too small, only natural mortality is considered
+
         if Sardine.Lw < 10.0 || model.MF0_value == 0.0
             natural_deaths = Float64(rand(Binomial(Int64(Sardine.Nind), 1-exp(-(model.M_j)))))
             Sardine.Nind -= natural_deaths
             model.deadJ_nat += natural_deaths
-        else
+        end
+
+        if Sardine.Lw > 10.0 && !(model.MF0_value == 0.0)
             M = model.M_j + ((model.MF0_value)/365.0)
             total_deaths = Float64(rand(Binomial(Int64(Sardine.Nind), 1-exp(-M))))
             natural_deaths = Float64(rand(Binomial(Int64(Sardine.Nind), 1-exp(-(model.M_j)))))
@@ -138,7 +141,6 @@ function juvedie!(Sardine, model)
             model.deadJ_nat += natural_deaths
             Sardine.Nind -= total_deaths
         end
-
     end
 #if less than 1 ind, superindividual dies
     if  Sardine.Nind < 100000.0 && !Sardine.Dead
@@ -190,13 +192,13 @@ function juveDEB!(Sardine, model)
             return
         end
 
-        #update volume
         deltaV = ((model.Kappa_value * pC - pS) / model.Eg) * model.DEB_timing
         if (deltaV < 0.0) 
         deltaV = 0.0
         end
 
         # maturing energy
+
         deltaH = (((1.0 - model.Kappa_value) * pC - pJ) * model.DEB_timing)
         if deltaH < 0.0
             deltaH = 0.0
@@ -214,8 +216,6 @@ function juveDEB!(Sardine, model)
         #check whether Lm is a vector or a float
         Lm_value = isa(model.Lm, Vector{Float64}) ? model.Lm[model.sim_timing] : model.Lm
         Sardine.L = Sardine.Lw * model.del_M / Lm_value
-
-        #update smi
         Sardine.s_M_i = if model.Hb >= Sardine.H
             1.0
         elseif Sardine.H > model.Hb && model.Hj > Sardine.H
@@ -224,11 +224,8 @@ function juveDEB!(Sardine, model)
             model.s_M
         end
 
-        # update pA
         Sardine.pA = Sardine.f_i * model.p_Am * model.Tc_value * Sardine.s_M_i * ((Sardine.Lw * model.del_M)^2.0)
-        
         Sardine.CI = 100 * Sardine.Ww / (Sardine.Lw^3)
-
     end
 return
 end
@@ -241,7 +238,7 @@ function juvemature!(Sardine, model)
          Sardine.R = 0.0
          Sardine.pA = Sardine.f_i * model.p_Am * model.Tc_value * Sardine.s_M_i * ((Sardine.Lw * model.del_M)^2.0) #perchè non alla 2/3?
          Sardine.Generation += 1.0
-         Sardine.s_M_i = model.s_M #here, sardine.H always higher than Hp, it's the condition to become adults
+         Sardine.s_M_i = model.s_M
     end
     return
 end
@@ -262,6 +259,14 @@ function parallel_adult_step!(Sardine, model)
     adultDEB!(Sardine, model)
     adultaging!(Sardine, model)
 end
+
+function adult_step!(Sardine, model)
+    adultdie!(Sardine, model)
+    adultDEB!(Sardine, model)
+    adultaging!(Sardine, model)
+    adultspawn!(Sardine, model) #same order of parallel step
+end
+
 
 function adultdie!(Sardine, model)
 
@@ -394,8 +399,9 @@ if !Sardine.Dead
     Sardine.H = Hdyn + deltaH
     Sardine.R = Rdyn + deltaR
     Sardine.Ww = (model.w *(model.d_V * V + model.w_E/ model.mu_E * (Sardine.En + Sardine.R)))
-    Sardine.Scaled_En = Sardine.En / (model.Em * (( Sardine.Lw * model.del_M)^3.0))
-    Sardine.L = Sardine.Lw .* model.del_M ./ model.Lm
+    #Sardine.QWw = interquantiles_prop_single(Sardine, model, :Ww, :QWw)
+    Sardine.Scaled_En= Sardine.En / (model.Em * (( Sardine.Lw * model.del_M)^3.0))
+    #Sardine.L = Sardine.Lw .* model.del_M ./ model.Lm silenced atm because of problems when K is a vector
     Sardine.pA = Sardine.f_i * model.p_Am * model.Tc_value * Sardine.s_M_i * ((Sardine.Lw * model.del_M)^2.0)
     Sardine.CI = 100 * Sardine.Ww / (Sardine.Lw^3)
     Sardine.GSI = (model.w * (model.w_E / model.mu_E) * Sardine.R) / Sardine.Ww * 100
@@ -411,6 +417,9 @@ function adultaging!(Sardine, model)
 end
 
 function adultspawn!(Sardine, model)
+
+    Sardine.reproduction = :nonspawner
+    Sardine.superind_Neggs = 0.0
 #1st condition to reproduce not being dead
 if (!Sardine.Dead && Sardine.Nind >= 100000.0)  &&
 
@@ -418,11 +427,17 @@ if (!Sardine.Dead && Sardine.Nind >= 100000.0)  &&
     #do not check if they are dead since all deads are removed before repro
     ((model.repro_start <= model.day_of_the_year <= 365.0) || (1.0 <= model.day_of_the_year <= model.repro_end)) &&
         
+        # 3rd condition:if we are within the reproduction period for the sardine's size class
+         #((model.repro_periods_Q[Sardine.QWw][1] <= model.day_of_the_year <= 365.0) || (1.0 <= model.day_of_the_year <= model.repro_periods_Q[Sardine.QWw][2])) &&
+           
             # 4th condition: random number between 0 and 1 is smaller than the probability of spawning, then reproduction occurs
             (rand() <= model.prob_dict[model.day_of_the_year])
 
+            # Define a dictionary to map QWw values to multipliers
+            #multipliers = Dict("Q1" => 450, "Q2" => 500, "Q3" => 550, "Q4" => 600)
+            # Determine the number of eggs
 
-            #eggs from all females in the superindividual
+            #eggs from all females
             superind_Neggs_value = Float64(420.0 * Sardine.Ww) * ceil((Sardine.Nind/2.0)) 
             #eggs from one female
             Neggs_value_single = Float64(420.0 * Sardine.Ww) #420 standard number of eggs per weight of female
@@ -434,7 +449,7 @@ if (!Sardine.Dead && Sardine.Nind >= 100000.0)  &&
             spawned_en = Neggs_value_single *  Sardine.maternal_EggEn #Sardine.R * Kappa_valueR / spawn_period 
 
             # and if the energy to be spawned is lower than the energy available, spawn!
-            if (spawned_en < Sardine.R ) #* Kappa_valueR)
+            if (spawned_en < Sardine.R * model.KappaR) #* Kappa_valueR)
                 #Nind males and females lose the same amount of spawned energy
                 Sardine.superind_Neggs = superind_Neggs_value
                 Sardine.reproduction = :spawner
