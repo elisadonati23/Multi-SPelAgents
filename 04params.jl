@@ -6,7 +6,7 @@ function create_params(
     M_f1::Union{Float64, Vector{Float64}},
     M_f2::Union{Float64, Vector{Float64}},
     M_f3::Union{Float64, Vector{Float64}},
-    M_f4::Union{Float64, Vector{Float64}}, #fishing mortality (from 0 to 4 /year) 
+    M_f4::Union{Float64, Vector{Float64}},  # Fishing mortality (from 0 to 4 /year)
     Wv,
     day_of_the_year,
     Xmax::Union{Float64, Vector{Float64}},
@@ -17,58 +17,58 @@ function create_params(
     M1::Float64,
     M2::Float64,
     M3::Float64,
-    M4::Float64)
-
-    #fixed parameters
+    M4::Float64
+)
+    # Fixed parameters
     M_egg = M_egg
-    M_j = M0/365.0
-    M0 = M0/365.0
-    M1 = M1/365.0
-    M2 = M2/365.0
-    M3 = M3/365.0
-    M4 = M4/365.0
+    M_j = M0 / 365.0  # Juvenile mortality rate per day
+    M0 = M0 / 365.0   # Mortality rates per day
+    M1 = M1 / 365.0
+    M2 = M2 / 365.0
+    M3 = M3 / 365.0
+    M4 = M4 / 365.0
 
-
-
-    #variable parameters
-    Kappa_value = Kappa[1]
-    
+    # Variable parameters
+    Kappa_value = Kappa[1] #KAppa rule value
     MF0_value = M_f0[1]
     MF1_value = M_f1[1]
     MF2_value = M_f2[1]
     MF3_value = M_f3[1]
     MF4_value = M_f4[1]
 
+    # Default values for various parameters
     f = 1.0 
     r_food = 0.5
     DEB_timing = 1.0
     sim_timing = 1
-    repro_start = 270.0 # sardines repr start in october
-    repro_end = 90.0 # sardines repr end in april
+    repro_start = 270.0  # Sardines reproduction starts in October
+    repro_end = 90.0     # Sardines reproduction ends in April
     peak1_sardine = 1
     peak2_sardine = missing
     total_repro_sardine = 10
     std_dev = 60
-    repro_period = vcat(270.0:365.0, 1.0:90.0)
-    Sex_ratio = 0.5
-    p_Am = 396.002
-    v_rate = 0.0172
-    KappaX = 0.8
-    KappaR = 0.95
-    Fm = 6.5
-    del_M = 0.1152 #equal if juvenile or adult - isomorph
-    k_J = 0.002 #agents juveniles or adults
-    s_M = 3.093 #agent
-    p_M = 396.195 #agent
-    Eg = 5197.37  #agent
-    d_V = 0.2 #agent
-    mu_V = 500000.0 #model
-    mu_E = 550000.0 # model
-    w_V = 23.9 # model
-    w_E = 23.9 # model
-    w = 5.0 # model
+    repro_period = vcat(270.0:365.0, 1.0:90.0)  # Reproduction period covering the year-end
 
-    # GROWTH PUBERTY REPRODUCTION - #tutte negli agents
+    # DEB model parameters
+    Sex_ratio = 0.5
+    p_Am = 396.002  # Maximum assimilation power
+    v_rate = 0.0172  # Energy conductance
+    KappaX = 0.8  # Digestion efficiency
+    KappaR = 0.95  # Repro efficiency
+    Fm = 6.5  # Maximum specific searching rate
+    del_M = 0.1152  # Shape coefficient (isomorph)
+    k_J = 0.002  # Maturity maintenance rate coefficient
+    s_M = 3.093  # Stress coefficient
+    p_M = 396.195  # Volume-specific somatic maintenance
+    Eg = 5197.37  # Cost per unit of structure
+    d_V = 0.2  # Volume-specific density of structure
+    mu_V = 500000.0  # Chemical potential of structure
+    mu_E = 550000.0  # Chemical potential of reserve
+    w_V = 23.9  # Molecular weight of structure
+    w_E = 23.9  # Molecular weight of reserve
+    w = 5.0  # Conversion factor for energy to mass
+
+    # Growth, puberty, and reproduction parameters
     Hb = 0.0112
     Hj = 0.3478
     Hp = 3013.0
@@ -83,36 +83,34 @@ function create_params(
     E0_min = 0.389
     E0_max = 0.967
     W0 = 0.00021
-    L0 = 0.001 #0.001 cm
-    Ta = 8000.0
-    Tr = 293.0 
+    L0 = 0.001  # Initial length in cm
+    Ta = 8000.0  # Arrhenius temperature
+    Tr = 293.0   # Reference temperature
 
-    # agents
-    Em = p_Am / v_rate
-    #Depending on Kappa, Lm can be a vector
-    Lm = Kappa .* p_Am .* s_M ./ p_M
-    # If Kappa is a vector, calculate Lm for each value in Kappa
+    # Derived parameters based on DEB theory
+    Em = p_Am / v_rate  # Maximum reserve density
+    Lm = Kappa .* p_Am .* s_M ./ p_M  # Maximum length (can be a vector if Kappa is a vector)
+    Kx = p_Am * s_M / (KappaX * Fm)  # Half-saturation coefficient
+    g = Eg ./ (Kappa .* Em)  # Energy investment ratio
+    k_M = p_M / Eg  # Somatic maintenance rate coefficient
+    spawn_period = days_between_dates(repro_start, repro_end)  # Duration of the spawning period
 
-    Kx = p_Am * s_M / (KappaX * Fm)
-    g = Eg ./ (Kappa .* Em)
-    k_M = p_M / Eg 
-    spawn_period = days_between_dates(repro_start, repro_end)
-
-    Xall = Xmax[1] #step initialization#
+    # Initial conditions
+    Xall = Xmax[1]
     Xmax_value = Xmax[1]
-    #del_X = r_food * (Xmax - Xall)
 
-    #arrhenius temperature -- it can be a value or a vector depending on Temp
-    Tc = exp.( Ta /Tr .- Ta ./ (Temp .+ 273.0))
+    # Arrhenius temperature function (can be a value or vector depending on Temp)
+    Tc = exp.(Ta / Tr .- Ta ./ (Temp .+ 273.0))
     Tc_value = Tc[1]
 
+    # Calculate daily reproduction probabilities and normalize them
     daily_repro_probabilities = [calculate_daily_prob_repro(day, peak1_sardine, total_repro_sardine, std_dev) for day in repro_period]
-    # Normalize the probabilities so that they sum up to total_reproductions
     daily_repro_probabilities /= sum(daily_repro_probabilities) / total_repro_sardine
-    #so that probabilities can be accessed more easily:
+
+    # Store daily reproduction probabilities in a dictionary for easy access
     prob_dict = Dict(zip(repro_period, daily_repro_probabilities))
 
-    # outputs
+    # Initialize output variables
     year = 1.0
     dead_eggmass = 0
     deadJ_nat = 0
@@ -153,8 +151,8 @@ function create_params(
     fished3 = 0.0
     fished4more = 0.0
 
-
-model_parameters = Dict(
+    # Store all parameters in a dictionary for easy access in the model
+    model_parameters = Dict(
         :No_A => Float64(No_A),
         :No_J => Float64(No_J),
         :No_Egg => Float64(No_Egg),
@@ -216,7 +214,7 @@ model_parameters = Dict(
         :k_J => k_J,
         :s_M => s_M,
         :p_M => p_M,
-        :Eg  => Eg,
+        :Eg => Eg,
         :d_V => d_V,
         :mu_V => mu_V,
         :mu_E => mu_E,
@@ -252,34 +250,33 @@ model_parameters = Dict(
         :DEB_timing => DEB_timing,
         :Xmax => Xmax,
         :prob_dict => prob_dict,
-        :TotB =>TotB,
-        :JuvB =>JuvB,
-        :AdB  =>AdB,
-        :meanAdWw =>meanAdWw,
+        :TotB => TotB,
+        :JuvB => JuvB,
+        :AdB => AdB,
+        :meanAdWw => meanAdWw,
         :sdAdWw => sdAdWw,
-        :meanFAdWw =>meanFAdWw,
+        :meanFAdWw => meanFAdWw,
         :sdFAdWw => sdFAdWw,
-        :meanJuvWw =>meanJuvWw,
+        :meanJuvWw => meanJuvWw,
         :sdJuvWw => sdJuvWw,
-        :meanAdL =>meanAdL,
-        :sdAdL =>sdAdL,
-        :meanAdL =>meanAdL,
-        :sdAdL =>sdAdL,
-        :meanJuvL =>meanJuvL,
-        :sdJuvL =>sdJuvL,
-        :mean_tpuberty =>mean_tpuberty,
-        :sd_tpuberty =>sd_tpuberty,
-        :mean_Lw_puberty =>mean_Lw_puberty,
-        :sd_Lw_puberty =>sd_Lw_puberty,
-        :mean_Ww_puberty =>mean_Ww_puberty,
-        :sd_Ww_puberty =>sd_Ww_puberty,
+        :meanAdL => meanAdL,
+        :sdAdL => sdAdL,
+        :meanJuvL => meanJuvL,
+        :sdJuvL => sdJuvL,
+        :mean_tpuberty => mean_tpuberty,
+        :sd_tpuberty => sd_tpuberty,
+        :mean_Lw_puberty => mean_Lw_puberty,
+        :sd_Lw_puberty => sd_Lw_puberty,
+        :mean_Ww_puberty => mean_Ww_puberty,
+        :sd_Ww_puberty => sd_Ww_puberty,
         :mean_Hjuve => mean_Hjuve,
-        :sd_Hjuve =>sd_Hjuve,
+        :sd_Hjuve => sd_Hjuve,
         :fished0 => fished0,
         :fished1 => fished1,
         :fished2 => fished2,
         :fished3 => fished3,
-        :fished4more => fished4more)
+        :fished4more => fished4more
+    )
                            
-return model_parameters            
+    return model_parameters            
 end

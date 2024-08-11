@@ -1,31 +1,32 @@
-@agent struct Sardine(NoSpaceAgent)
-    type::Symbol # :eggmass, :juvenile, :adult
-    reproduction::Symbol #spawner, nonspawner
-    Nind::Float64 # number of individuals in the superindividuals
-    Age::Float64 # EggMass, Juvenile, Adult
-    L::Float64 # Scaled length -- in eggs is assumed to be close to 0 from DEB Theory
-    H::Float64 # Maturation energy
-    maternal_EggEn::Float64 # Energy of the egg as a result of maternal effect, or E0
-    superind_Neggs::Float64 # Nr of eggs produced by a superind
-    En::Float64 # Reseve energy
-    Generation::Float64 # EggMass, Juvenile, Adult
-    Dead::Bool 
+@agent struct Sardine <: NoSpaceAgent
+    # Basic characteristics
+    type::Symbol              # :eggmass, :juvenile, :adult
+    reproduction::Symbol      # :spawner, :nonspawner
+    Nind::Float64             # Number of individuals in the superindividual
+    Age::Float64              # Age category: EggMass, Juvenile, Adult
+    L::Float64                # Scaled length (assumed to be close to 0 for eggs from DEB Theory)
+    H::Float64                # Maturation energy
+    maternal_EggEn::Float64   # Energy of the egg due to maternal effect (E0)
+    superind_Neggs::Float64   # Number of eggs produced by a superindividual
+    En::Float64               # Reserve energy
+    Generation::Float64       # Generation category: EggMass, Juvenile, Adult
+    Dead::Bool                # Indicates if the sardine is dead
 
-    # Features from Juvenile, Adults
-    f_i::Float64 #individual functional Response
-    t_puberty::Float64 #time to puberty
-    Lw::Float64 #Length weight
-    Ww::Float64 #Weight
-    QWw::String #Quantile weight
-    R::Float64 #Reproduction
-    Scaled_En::Float64
-    s_M_i::Float64 #shape parameter
-    pA::Float64 #assimilation
-    Lb_i::Float64 # ? 
+    # Features for Juveniles and Adults
+    f_i::Float64              # Individual functional response
+    t_puberty::Float64        # Time to puberty
+    Lw::Float64               # Length-weight relationship
+    Ww::Float64               # Weight
+    QWw::String               # Quantile weight category
+    R::Float64                # Reproduction energy
+    Scaled_En::Float64        # Scaled energy reserve
+    s_M_i::Float64            # Shape parameter
+    pA::Float64               # Assimilation rate
+    Lb_i::Float64             # Length at birth (individual)
 
-    CI::Float64
-    GSI::Float64
-    # Features from Adult
-    spawned::Float64
+    CI::Float64               # Condition Index
+    GSI::Float64              # Gonadosomatic Index
+
+    # Features specific to Adults
+    spawned::Float64          # Number of times the sardine has spawned
 end
-

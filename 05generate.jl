@@ -1,10 +1,11 @@
-# module Generate_Agents
-# age at length and parameters are taken from AmP and Deb portal with 20C degrees as reference
-# all rates and then ages at length changes with changing parameters
-    
-# module Generate_Agents
+# Module Generate_Agents
+# Age at length and parameters are taken from AmP and DEB portal with 20°C as reference.
+# All rates and ages at length change with varying parameters.
+
+module Generate_Agents
 
 function generate_EggMass(No_Egg, model, Nind = missing, maternal_EggEn = missing, En = missing, Generation = missing)
+    # Initialize default agent properties for EggMass
     agent_type = :eggmass
     agent_Age = 0.0
     agent_L = model.L0
@@ -16,19 +17,13 @@ function generate_EggMass(No_Egg, model, Nind = missing, maternal_EggEn = missin
     agent_CI = 0.0
     agent_GSI = 0.0
 
-    if ismissing(maternal_EggEn)
-        agent_maternal_EggEn = Float64(model.E0)
-    else
-        agent_maternal_EggEn = Float64(maternal_EggEn)
-    end
+    # Set maternal egg energy
+    agent_maternal_EggEn = ismissing(maternal_EggEn) ? Float64(model.E0) : Float64(maternal_EggEn)
 
-    if ismissing(Generation)
-        agent_Generation = 0.0
-    else
-        agent_Generation = Generation
-    end
+    # Set generation
+    agent_Generation = ismissing(Generation) ? 0.0 : Generation
 
-    # put silenced features
+    # Silenced features
     agent_f_i = 0.8
     agent_t_puberty = 0.0
     agent_Lw = 0.0
@@ -38,32 +33,28 @@ function generate_EggMass(No_Egg, model, Nind = missing, maternal_EggEn = missin
     agent_s_M_i = 0.0
     agent_pA = 0.0
     agent_Lb_i = 0.0
-    agent_Lb_i = 0.0
     agent_superind_Neggs = 0.0
 
+    # Generate EggMass agents
     for _ in 1:No_Egg
+        # Set number of individuals in the superindividual
+        agent_Nind = ismissing(Nind) ? (1e7 / 2) * (40 * 400) : Float64(floor(Nind))
 
-        if ismissing(Nind)
-            agent_Nind = (1e7/2) * (40*400)
-        else
-            agent_Nind = Float64(floor(Nind))
-        end
+        # Set reserve energy
+        agent_En = ismissing(En) ? model.E0 : Float64(En)
 
-        if ismissing(En)
-            agent_En = model.E0
-        else
-            agent_En = Float64(En)
-        end
-
-        add_agent!(Sardine, model, agent_type, agent_reproduction, agent_Nind, agent_Age, agent_L, agent_H, agent_maternal_EggEn, agent_superind_Neggs, agent_En, agent_Generation, agent_Dead,
-        agent_f_i, agent_t_puberty, agent_Lw, agent_Ww, agent_QWw, agent_R, agent_Scaled_En,
-                   agent_s_M_i, agent_pA, agent_Lb_i, agent_CI, agent_GSI, agent_spawned
-                   )
+        # Add agent to the model
+        add_agent!(
+            Sardine, model, agent_type, agent_reproduction, agent_Nind, agent_Age, agent_L, agent_H,
+            agent_maternal_EggEn, agent_superind_Neggs, agent_En, agent_Generation, agent_Dead,
+            agent_f_i, agent_t_puberty, agent_Lw, agent_Ww, agent_QWw, agent_R, agent_Scaled_En,
+            agent_s_M_i, agent_pA, agent_Lb_i, agent_CI, agent_GSI, agent_spawned
+        )
     end
 end
 
 function generate_Juvenile(No_J, model, Nind = missing, Generation = 0.0, En = missing, Lb_i = model.Lb, Lw = missing, Ww = missing, Scaled_En = missing)
-    
+    # Initialize default agent properties for Juvenile
     agent_type = :juvenile
     agent_f_i = 0.8
     agent_L = model.L0
@@ -74,49 +65,36 @@ function generate_Juvenile(No_J, model, Nind = missing, Generation = 0.0, En = m
     agent_QWw = "Q1"
     agent_Dead = false
     agent_reproduction = :nonspawner
-    # silenced features
+
+    # Silenced features
     agent_maternal_EggEn = model.E0
-    agent_superind_Neggs = 0.0 # EggMass
+    agent_superind_Neggs = 0.0  # EggMass
 
-    # Features from Adult
-
+    # Generate Juvenile agents
     for _ in 1:No_J
+        # Set number of individuals in the superindividual
+        agent_Nind = ismissing(Nind) ? 1e7 : Float64(floor(Nind))
 
-        if ismissing(Nind)
-            agent_Nind = 1e7
-        else
-            agent_Nind = Float64(floor(Nind))
-        end
+        # Set length-weight relationship
+        agent_Lw = ismissing(Lw) ? clamp(round(randn() * 0.5 + 5.0, digits=2), 4.45, 5.5) : Lw
 
-        if ismissing(Lw)
-            agent_Lw = clamp(round(randn() * 0.5 + 5.0, digits=2), 4.45, 5.5)
-        else
-            agent_Lw = Lw
-        end
-
+        # Calculate age and time to puberty based on length
         agent_Age = model.Ap * (agent_Lw * model.del_M) / model.Lp
         agent_t_puberty = model.Ap * (agent_Lw * model.del_M) / model.Lp
 
-        if ismissing(Ww)
-            agent_Ww = (model.w * (model.d_V * ((agent_Lw * model.del_M) ^ 3.0)))
-        else
-            agent_Ww = Ww
-        end
+        # Set weight
+        agent_Ww = ismissing(Ww) ? (model.w * (model.d_V * ((agent_Lw * model.del_M) ^ 3.0))) : Ww
 
+        # Calculate maturation energy
         agent_H = model.Hp * (agent_Lw * model.del_M) / model.Lp
 
-        if ismissing(En)
-            agent_En = agent_f_i * model.Em * ((agent_Lw * model.del_M)^3.0)
-        else
-            agent_En = En
-        end
+        # Set reserve energy
+        agent_En = ismissing(En) ? agent_f_i * model.Em * ((agent_Lw * model.del_M)^3.0) : En
 
-        if ismissing(Scaled_En)
-            agent_Scaled_En = agent_En / (model.Em * ((agent_Lw * model.del_M)^3.0))
-        else
-            agent_Scaled_En = Scaled_En
-        end
+        # Calculate scaled energy reserve
+        agent_Scaled_En = ismissing(Scaled_En) ? agent_En / (model.Em * ((agent_Lw * model.del_M)^3.0)) : Scaled_En
 
+        # Determine shape parameter
         agent_s_M_i = if model.Hb >= agent_H
             1.0
         elseif agent_H > model.Hb && model.Hj > agent_H
@@ -125,39 +103,41 @@ function generate_Juvenile(No_J, model, Nind = missing, Generation = 0.0, En = m
             model.s_M
         end
 
+        # Calculate assimilation rate
         Tc_value = isa(model.Tc, Vector{Float64}) ? model.Tc[model.sim_timing] : model.Tc
-        agent_pA = agent_f_i * model.p_Am * Tc_value* agent_s_M_i * ((agent_Lw * model.del_M)^2.0)
+        agent_pA = agent_f_i * model.p_Am * Tc_value * agent_s_M_i * ((agent_Lw * model.del_M)^2.0)
+
+        # Calculate condition index and gonadosomatic index
         agent_CI = 100 * agent_Ww / (agent_Lw^3)
         agent_GSI = 0.0
-        #Variability = randn() .* 0.05 .+ 0
 
-        add_agent!(Sardine, model, agent_type, agent_reproduction, agent_Nind, agent_Age, agent_L, agent_H, agent_maternal_EggEn, agent_superind_Neggs , agent_En, agent_Generation, agent_Dead,
-        agent_f_i, agent_t_puberty, agent_Lw, agent_Ww, agent_QWw, agent_R, agent_Scaled_En,
-                   agent_s_M_i, agent_pA, agent_Lb_i, agent_CI, agent_GSI, agent_spawned
-                   )
+        # Add agent to the model
+        add_agent!(
+            Sardine, model, agent_type, agent_reproduction, agent_Nind, agent_Age, agent_L, agent_H,
+            agent_maternal_EggEn, agent_superind_Neggs, agent_En, agent_Generation, agent_Dead,
+            agent_f_i, agent_t_puberty, agent_Lw, agent_Ww, agent_QWw, agent_R, agent_Scaled_En,
+            agent_s_M_i, agent_pA, agent_Lb_i, agent_CI, agent_GSI, agent_spawned
+        )
     end
 end
 
 function generate_Adult(No_A, model, Nind = missing, Age = missing, t_puberty = missing, Lw = missing, Ww = missing, H = missing, R = missing, En = missing, Scaled_En = missing, Generation = missing, pA = missing)
-    # silenced features
+    # Initialize default agent properties for Adult
+    agent_type = :adult
+    agent_f_i = model.f
+    agent_reproduction = :nonspawner
     agent_L = 0.0
     agent_maternal_EggEn = model.E0
-    agent_superind_Neggs = 0.0 
+    agent_superind_Neggs = 0.0
     agent_Lb_i = model.Lb
     agent_spawned = 0.0
     agent_QWw = "Q1"
     agent_Dead = false
 
-    agent_type = :adult
-    agent_f_i = model.f
-    agent_reproduction = :nonspawner
+    # Set maturation energy
+    agent_H = ismissing(H) ? model.Hp : H
 
-    if ismissing(H)
-        agent_H = model.Hp
-    else
-        agent_H = H
-    end
-
+    # Determine shape parameter
     agent_s_M_i = if model.Hb >= agent_H
         1.0
     elseif agent_H > model.Hb && model.Hj > agent_H
@@ -166,26 +146,18 @@ function generate_Adult(No_A, model, Nind = missing, Age = missing, t_puberty = 
         model.s_M
     end
 
-    if ismissing(Generation)
-        agent_Generation = 0.0
-    else
-        agent_Generation = Generation
-    end
+    # Set generation
+    agent_Generation = ismissing(Generation) ? 0.0 : Generation
 
+    # Generate Adult agents
     for _ in 1:No_A
+        # Set number of individuals in the superindividual
+        agent_Nind = ismissing(Nind) ? 1e7 : Float64(floor(Nind))
 
-        if ismissing(Nind)
-            agent_Nind = 1e7
-        else
-            agent_Nind = Float64(floor(Nind))
-        end
+        # Set length-weight relationship
+        agent_Lw = ismissing(Lw) ? clamp(round(randn() * 5.0 + 20.0, digits=2), 15.0, 25.0) : agent_Lw
 
-        agent_Lw = if ismissing(Lw)
-            clamp(round(randn() * 5.0 .+ 20.0, digits=2), 15.0, 25.0)
-        else
-            agent_Lw
-        end
-
+        # Calculate age based on length
         agent_Age = if ismissing(Age)
             if model.Lm isa Float64
                 model.Am * agent_Lw * model.del_M / model.Lm
@@ -193,55 +165,42 @@ function generate_Adult(No_A, model, Nind = missing, Age = missing, t_puberty = 
                 model.Am * agent_Lw * model.del_M / model.Lm[model.sim_timing]
             end
         else
-            agent_Age
+            Age
         end
 
-        agent_t_puberty = if ismissing(t_puberty)
-           model.Ap * (agent_Lw * model.del_M) / model.Lp
-        else
-            agent_t_puberty
-        end
+        # Set time to puberty
+        agent_t_puberty = ismissing(t_puberty) ? model.Ap * (agent_Lw * model.del_M) / model.Lp : t_puberty
         
-        agent_R = if ismissing(R)
-             0.0
-        else 
-            R
-        end
+        # Set reproduction energy
+        agent_R = ismissing(R) ? 0.0 : R
 
-        agent_En = if ismissing(En)
-            agent_En = agent_f_i * model.Em * ((agent_Lw * model.del_M)^3.0)
-        else
-            En
-        end
+        # Set reserve energy
+        agent_En = ismissing(En) ? agent_f_i * model.Em * ((agent_Lw * model.del_M)^3.0) : En
 
+        # Calculate weight
+        agent_Ww = ismissing(Ww) ? (model.w * (model.d_V * ((agent_Lw * model.del_M) ^ 3.0) + model.w_E / model.mu_E * (agent_En + agent_R))) : Ww
 
-        agent_Ww = if ismissing(Ww)
-            (model.w * (model.d_V * ((agent_Lw * model.del_M) ^ 3.0) + model.w_E / model.mu_E * (agent_En + agent_R)))
-        else
-            Ww
-        end
-
-        agent_Scaled_En = if ismissing(Scaled_En)
-            agent_En / (model.Em * ((agent_Lw * model.del_M)^3.0))
-        else
-            Scaled_En
-        end
+        # Calculate scaled energy reserve
+        agent_Scaled_En = ismissing(Scaled_En) ? agent_En / (model.Em * ((agent_Lw * model.del_M)^3.0)) : Scaled_En
         
+        # Calculate assimilation rate
         Tc_value = isa(model.Tc, Vector{Float64}) ? model.Tc[model.sim_timing] : model.Tc
+        agent_pA = ismissing(pA) ? agent_f_i * model.p_Am * Tc_value * agent_s_M_i * ((agent_Lw * model.del_M)^2.0) : pA
 
-        agent_pA = if ismissing(pA)
-            agent_f_i * model.p_Am * Tc_value * agent_s_M_i * ((agent_Lw * model.del_M)^2.0)
-        else
-            pA
-        end
-
+        # Calculate condition index and gonadosomatic index
         agent_CI = 100 * agent_Ww / (agent_Lw^3)
-        agent_GSI = (model.w * (model.w_E / model.mu_E) * agent_R) / agent_Ww * 100 # weight of the gonads on the total weight
+        agent_GSI = (model.w * (model.w_E / model.mu_E) * agent_R) / agent_Ww * 100  # Weight of the gonads as a percentage of total weight
 
-        add_agent!(Sardine, model, agent_type, agent_reproduction, agent_Nind, agent_Age, agent_L, agent_H, agent_maternal_EggEn, agent_superind_Neggs, agent_En, agent_Generation, agent_Dead,
-        agent_f_i, agent_t_puberty, agent_Lw, agent_Ww, agent_QWw, agent_R, agent_Scaled_En,
-                   agent_s_M_i, agent_pA, agent_Lb_i, agent_CI, agent_GSI, agent_spawned
-                   )
+        # Add agent to the model
+        add_agent!(
+            Sardine, model, agent_type, agent_reproduction, agent_Nind, agent_Age, agent_L, agent_H,
+            agent_maternal_EggEn, agent_superind_Neggs, agent_En, agent_Generation, agent_Dead,
+            agent_f_i, agent_t_puberty, agent_Lw, agent_Ww, agent_QWw, agent_R, agent_Scaled_En,
+            agent_s_M_i, agent_pA, agent_Lb_i, agent_CI, agent_GSI, agent_spawned
+        )
     end
+
     return
 end
+
+end # module Generate_Agents
