@@ -1,4 +1,4 @@
-@agent struct Sardine <: NoSpaceAgent
+@agent struct Sardine(NoSpaceAgent)
     # Basic characteristics
     type::Symbol              # :eggmass, :juvenile, :adult
     reproduction::Symbol      # :spawner, :nonspawner
