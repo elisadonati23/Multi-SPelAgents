@@ -2,8 +2,6 @@
 # Age at length and parameters are taken from AmP and DEB portal with 20°C as reference.
 # All rates and ages at length change with varying parameters.
 
-module Generate_Agents
-
 function generate_EggMass(No_Egg, model, Nind = missing, maternal_EggEn = missing, En = missing, Generation = missing)
     # Initialize default agent properties for EggMass
     agent_type = :eggmass
@@ -203,4 +201,3 @@ function generate_Adult(No_A, model, Nind = missing, Age = missing, t_puberty = 
     return
 end
 
-end # module Generate_Agents
