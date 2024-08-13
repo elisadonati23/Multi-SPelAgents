@@ -1,3 +1,4 @@
+
 # Module Generate_Agents
 # Age at length and parameters are taken from AmP and DEB portal with 20°C as reference.
 # All rates and ages at length change with varying parameters.
@@ -20,8 +21,6 @@ function generate_EggMass(No_Egg, model, Nind = missing, maternal_EggEn = missin
 
     # Set generation
     agent_Generation = ismissing(Generation) ? 0.0 : Generation
-
-    # Silenced features
     agent_f_i = 0.8
     agent_t_puberty = 0.0
     agent_Lw = 0.0
@@ -48,10 +47,12 @@ function generate_EggMass(No_Egg, model, Nind = missing, maternal_EggEn = missin
             agent_f_i, agent_t_puberty, agent_Lw, agent_Ww, agent_QWw, agent_R, agent_Scaled_En,
             agent_s_M_i, agent_pA, agent_Lb_i, agent_CI, agent_GSI, agent_spawned
         )
+
     end
 end
 
 function generate_Juvenile(No_J, model, Nind = missing, Generation = 0.0, En = missing, Lb_i = model.Lb, Lw = missing, Ww = missing, Scaled_En = missing)
+
     # Initialize default agent properties for Juvenile
     agent_type = :juvenile
     agent_f_i = 0.8
@@ -63,6 +64,7 @@ function generate_Juvenile(No_J, model, Nind = missing, Generation = 0.0, En = m
     agent_QWw = "Q1"
     agent_Dead = false
     agent_reproduction = :nonspawner
+
 
     # Silenced features
     agent_maternal_EggEn = model.E0
@@ -93,6 +95,7 @@ function generate_Juvenile(No_J, model, Nind = missing, Generation = 0.0, En = m
         agent_Scaled_En = ismissing(Scaled_En) ? agent_En / (model.Em * ((agent_Lw * model.del_M)^3.0)) : Scaled_En
 
         # Determine shape parameter
+
         agent_s_M_i = if model.Hb >= agent_H
             1.0
         elseif agent_H > model.Hb && model.Hj > agent_H
@@ -100,7 +103,6 @@ function generate_Juvenile(No_J, model, Nind = missing, Generation = 0.0, En = m
         else
             model.s_M
         end
-
         # Calculate assimilation rate
         Tc_value = isa(model.Tc, Vector{Float64}) ? model.Tc[model.sim_timing] : model.Tc
         agent_pA = agent_f_i * model.p_Am * Tc_value * agent_s_M_i * ((agent_Lw * model.del_M)^2.0)
@@ -116,10 +118,12 @@ function generate_Juvenile(No_J, model, Nind = missing, Generation = 0.0, En = m
             agent_f_i, agent_t_puberty, agent_Lw, agent_Ww, agent_QWw, agent_R, agent_Scaled_En,
             agent_s_M_i, agent_pA, agent_Lb_i, agent_CI, agent_GSI, agent_spawned
         )
+
     end
 end
 
 function generate_Adult(No_A, model, Nind = missing, Age = missing, t_puberty = missing, Lw = missing, Ww = missing, H = missing, R = missing, En = missing, Scaled_En = missing, Generation = missing, pA = missing)
+
     # Initialize default agent properties for Adult
     agent_type = :adult
     agent_f_i = model.f
@@ -141,6 +145,7 @@ function generate_Adult(No_A, model, Nind = missing, Age = missing, t_puberty = 
     elseif agent_H > model.Hb && model.Hj > agent_H
         agent_Lw * model.del_M / model.Lb
     else
+
         model.s_M
     end
 
@@ -200,4 +205,3 @@ function generate_Adult(No_A, model, Nind = missing, Age = missing, t_puberty = 
 
     return
 end
-

@@ -19,7 +19,9 @@ function model_initialize_parallel(
     M3,
     M4
 ) 
+
     # Generate model parameters using the provided inputs
+
     properties = create_params(
         No_A,
         No_J,
@@ -42,6 +44,7 @@ function model_initialize_parallel(
         M4
     )
 
+
     # Create the Agent-Based Model (ABM) for Sardines
     model = ABM(
         Sardine;
@@ -53,6 +56,7 @@ function model_initialize_parallel(
     generate_Adult(No_A, model)
     generate_Juvenile(No_J, model)
     generate_EggMass(No_Egg, model)
+
 
     # Calculate the mean length-weight (Lw) for initialization
     mean_Lw = calculate_mean_prop(model, "Lw")
@@ -75,6 +79,5 @@ function model_initialize_parallel(
         # Ensure f is within the range [0, 1]
         model.f = max(0, min(f, 1.0))
     end
-
     return model
 end

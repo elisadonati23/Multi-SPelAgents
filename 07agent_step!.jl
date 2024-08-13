@@ -2,6 +2,7 @@
   #####################
   #      EGGMASS      #
   #####################
+
   function parallel_eggmass_step!(Sardine, model)
     eggDEB!(Sardine, model)
     eggaging!(Sardine, model)
@@ -113,6 +114,7 @@ function parallel_juvenile_step!(Sardine, model)
 end
 
 function juvedie!(Sardine, model)
+
     #set mortality: adding fishing mortality if lenght is higher than 10cm (recruitment)
     # Initialize deaths
     natural_deaths = 0.0
@@ -141,6 +143,7 @@ function juvedie!(Sardine, model)
             model.deadJ_nat += natural_deaths
             Sardine.Nind -= total_deaths
         end
+
     end
 #if less than 1 ind, superindividual dies
     if  Sardine.Nind < 100000.0 && !Sardine.Dead
@@ -192,13 +195,13 @@ function juveDEB!(Sardine, model)
             return
         end
 
+
         deltaV = ((model.Kappa_value * pC - pS) / model.Eg) * model.DEB_timing
         if (deltaV < 0.0) 
         deltaV = 0.0
         end
 
         # maturing energy
-
         deltaH = (((1.0 - model.Kappa_value) * pC - pJ) * model.DEB_timing)
         if deltaH < 0.0
             deltaH = 0.0
@@ -216,6 +219,7 @@ function juveDEB!(Sardine, model)
         #check whether Lm is a vector or a float
         Lm_value = isa(model.Lm, Vector{Float64}) ? model.Lm[model.sim_timing] : model.Lm
         Sardine.L = Sardine.Lw * model.del_M / Lm_value
+
 
         # adjust acceleration factor
         Sardine.s_M_i = if model.Hb >= Sardine.H
@@ -240,6 +244,7 @@ function juvemature!(Sardine, model)
          Sardine.R = 0.0
          Sardine.pA = Sardine.f_i * model.p_Am * model.Tc_value * Sardine.s_M_i * ((Sardine.Lw * model.del_M)^2.0) #perchè non alla 2/3?
          Sardine.Generation += 1.0
+
          Sardine.s_M_i = model.s_M
     end
     return
@@ -262,13 +267,13 @@ function parallel_adult_step!(Sardine, model)
     adultaging!(Sardine, model)
 end
 
+
 function adult_step!(Sardine, model)
     adultdie!(Sardine, model)
     adultDEB!(Sardine, model)
     adultaging!(Sardine, model)
     adultspawn!(Sardine, model) #same order of parallel step
 end
-
 
 function adultdie!(Sardine, model)
 
@@ -401,12 +406,13 @@ if !Sardine.Dead
     Sardine.H = Hdyn + deltaH
     Sardine.R = Rdyn + deltaR
     Sardine.Ww = (model.w *(model.d_V * V + model.w_E/ model.mu_E * (Sardine.En + Sardine.R)))
-    #Sardine.QWw = interquantiles_prop_single(Sardine, model, :Ww, :QWw)
+
     Sardine.Scaled_En= Sardine.En / (model.Em * (( Sardine.Lw * model.del_M)^3.0))
-    #Sardine.L = Sardine.Lw .* model.del_M ./ model.Lm silenced atm because of problems when K is a vector
     Sardine.pA = Sardine.f_i * model.p_Am * model.Tc_value * Sardine.s_M_i * ((Sardine.Lw * model.del_M)^2.0)
     Sardine.CI = 100 * Sardine.Ww / (Sardine.Lw^3)
     Sardine.GSI = (model.w * (model.w_E / model.mu_E) * Sardine.R) / Sardine.Ww * 100
+    Sardine.Scaled_En = Sardine.En / (model.Em * (( Sardine.Lw * model.del_M)^3.0))
+
 end
 return
 end

@@ -481,6 +481,11 @@ git-tree-sha1 = "27415f162e6028e81c72b82ef756bf321213b6ec"
 uuid = "e2ba6199-217a-4e67-a87a-7c52f15ade04"
 version = "0.1.10"
 
+[[deps.ExprTools]]
+git-tree-sha1 = "27415f162e6028e81c72b82ef756bf321213b6ec"
+uuid = "e2ba6199-217a-4e67-a87a-7c52f15ade04"
+version = "0.1.10"
+
 [[deps.Extents]]
 git-tree-sha1 = "2140cd04483da90b2da7f99b2add0750504fc39c"
 uuid = "411431e0-e8b7-467b-b5e0-f676ba4f2910"
@@ -841,6 +846,7 @@ git-tree-sha1 = "77b746b1a0e4a4441072d665c1368704f3b22d85"
 uuid = "ef79a3d2-ae9f-5cd2-ab61-e13847810a6e"
 version = "0.2.11"
 
+
 [[deps.JLD2]]
 deps = ["FileIO", "MacroTools", "Mmap", "OrderedCollections", "Pkg", "PrecompileTools", "Reexport", "Requires", "TranscodingStreams", "UUIDs", "Unicode"]
 git-tree-sha1 = "bdbe8222d2f5703ad6a7019277d149ec6d78c301"
@@ -1135,6 +1141,12 @@ deps = ["ExprTools", "MacroTools", "PrecompileTools", "SumTypes", "Suppressor"]
 git-tree-sha1 = "21080671223d35a2e8839e58057ef1c54c9d7d8c"
 uuid = "3d69f371-6fa5-5add-b11c-3293622cad62"
 version = "0.2.19"
+
+[[deps.MixedStructTypes]]
+deps = ["ExprTools", "MacroTools", "PrecompileTools", "SumTypes"]
+git-tree-sha1 = "4bc06f0cbfd6c01f830924bd328b2c26604320a0"
+uuid = "3d69f371-6fa5-5add-b11c-3293622cad62"
+version = "0.2.13"
 
 [[deps.Mmap]]
 uuid = "a63ad114-7e13-5084-954f-fe012c677804"
@@ -1856,6 +1868,7 @@ deps = ["MacroTools", "PrecompileTools"]
 git-tree-sha1 = "73dbf987e33aeae99a488348780693b758367dd6"
 uuid = "8e1ec7a9-0e02-4297-b0fe-6433085c89f2"
 version = "0.5.6"
+
 
 [[deps.Suppressor]]
 deps = ["Logging"]

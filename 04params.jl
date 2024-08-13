@@ -30,6 +30,7 @@ function create_params(
 
     # Variable parameters
     Kappa_value = Kappa[1] #KAppa rule value
+  
     MF0_value = M_f0[1]
     MF1_value = M_f1[1]
     MF2_value = M_f2[1]
@@ -41,12 +42,14 @@ function create_params(
     r_food = 0.5
     DEB_timing = 1.0
     sim_timing = 1
+
     repro_start = 270.0  # Sardines reproduction starts in October
     repro_end = 90.0     # Sardines reproduction ends in April
     peak1_sardine = 1
     peak2_sardine = missing
     total_repro_sardine = 10
     std_dev = 60
+
     repro_period = vcat(270.0:365.0, 1.0:90.0)  # Reproduction period covering the year-end
 
     # DEB model parameters
@@ -69,6 +72,7 @@ function create_params(
     w = 5.0  # Conversion factor for energy to mass
 
     # Growth, puberty, and reproduction parameters
+
     Hb = 0.0112
     Hj = 0.3478
     Hp = 3013.0
@@ -83,6 +87,7 @@ function create_params(
     E0_min = 0.389
     E0_max = 0.967
     W0 = 0.00021
+
     L0 = 0.001  # Initial length in cm
     Ta = 8000.0  # Arrhenius temperature
     Tr = 293.0   # Reference temperature
@@ -111,6 +116,7 @@ function create_params(
     prob_dict = Dict(zip(repro_period, daily_repro_probabilities))
 
     # Initialize output variables
+
     year = 1.0
     dead_eggmass = 0
     deadJ_nat = 0
@@ -153,6 +159,7 @@ function create_params(
 
     # Store all parameters in a dictionary for easy access in the model
     model_parameters = Dict(
+
         :No_A => Float64(No_A),
         :No_J => Float64(No_J),
         :No_Egg => Float64(No_Egg),

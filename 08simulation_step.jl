@@ -31,6 +31,7 @@ function evolve_environment!(model)
         model.day_of_the_year += 1.0
     end
 
+
     # Increase simulation timing
     model.sim_timing += 1
 
@@ -44,6 +45,7 @@ function evolve_environment!(model)
     update_MF3!(model, model.M_f3)
     update_MF4!(model, model.M_f4)
     
+
     # Calculate Xall
     Xall = model.Xmax_value - (calculate_real_assimilation(model) / model.KappaX) / model.Wv
     
@@ -81,12 +83,12 @@ function update_outputs!(model)
     agents = collect(values(allagents(model)))
     adults = filter(a -> a.type == :adult, agents)
     adults_juv = filter(a -> a.type == :adult || a.type == :juvenile, agents)
-
     if !isempty(adults_juv)
         # B plot: take into account Nind
         model.TotB = calculate_sum_prop(model, "Ww", Nind = true)
         model.JuvB = calculate_sum_prop(model, "Ww", type = :juvenile, Nind = true)
         model.AdB = calculate_sum_prop(model, "Ww", type = :adult, Nind = true)
+
 
         # Mean weight (Ww) plot
         model.meanAdWw = calculate_mean_prop(model, "Ww", type = :adult, age = 3.0)
@@ -94,6 +96,7 @@ function update_outputs!(model)
         model.meanJuvWw = calculate_mean_prop(model, "Ww", type = :juvenile)
         model.sdJuvWw = calculate_sd_prop(model, "Ww", type = :juvenile)
         
+
         # Mean length (Lw) plot
         model.meanAdL = calculate_mean_prop(model, "Lw", type = :adult)
         model.sdAdL = calculate_sd_prop(model, "Lw", type = :adult)
@@ -127,6 +130,7 @@ end
 sEA = scheduler_Adults()
 
 function complex_step!(model)
+
     # Parallel processing for Sardine agents
     Threads.@threads for sardine in collect(values(allagents(model)))
         parallel_sardine_step!(sardine, model)
