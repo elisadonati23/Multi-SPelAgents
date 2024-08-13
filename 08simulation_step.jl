@@ -35,9 +35,9 @@ function evolve_environment!(model)
     model.sim_timing += 1
 
     # Update time-dependent parameters
-    update_Tc!(model, model.Tc)
-    update_Kappa!(model, model.Kappa)
-    update_Xmax!(model, model.Xmax)
+    update_Tc!(model, model.Tc_value)
+    update_Kappa!(model, model.Kappa_value)
+    update_Xmax!(model, model.Xmax_value)
     update_MF0!(model, model.M_f0)
     update_MF1!(model, model.M_f1)
     update_MF2!(model, model.M_f2)
@@ -112,9 +112,9 @@ function update_outputs!(model)
     return
 end
 
-#############################
-##### Scheduler #############
-#############################
+#################
+#     Scheduler #
+#################
 
 mutable struct scheduler_Adults end
 

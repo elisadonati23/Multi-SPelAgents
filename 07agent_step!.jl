@@ -1,7 +1,7 @@
 
   #####################
-  #      EGGMASS 
-  ##############
+  #      EGGMASS      #
+  #####################
   function parallel_eggmass_step!(Sardine, model)
     eggDEB!(Sardine, model)
     eggaging!(Sardine, model)
@@ -216,6 +216,8 @@ function juveDEB!(Sardine, model)
         #check whether Lm is a vector or a float
         Lm_value = isa(model.Lm, Vector{Float64}) ? model.Lm[model.sim_timing] : model.Lm
         Sardine.L = Sardine.Lw * model.del_M / Lm_value
+
+        # adjust acceleration factor
         Sardine.s_M_i = if model.Hb >= Sardine.H
             1.0
         elseif Sardine.H > model.Hb && model.Hj > Sardine.H
@@ -420,22 +422,15 @@ function adultspawn!(Sardine, model)
 
     Sardine.reproduction = :nonspawner
     Sardine.superind_Neggs = 0.0
+
 #1st condition to reproduce not being dead
 if (!Sardine.Dead && Sardine.Nind >= 100000.0)  &&
 
     #2nd condition: being in the repro period
-    #do not check if they are dead since all deads are removed before repro
     ((model.repro_start <= model.day_of_the_year <= 365.0) || (1.0 <= model.day_of_the_year <= model.repro_end)) &&
-        
-        # 3rd condition:if we are within the reproduction period for the sardine's size class
-         #((model.repro_periods_Q[Sardine.QWw][1] <= model.day_of_the_year <= 365.0) || (1.0 <= model.day_of_the_year <= model.repro_periods_Q[Sardine.QWw][2])) &&
-           
+          
             # 4th condition: random number between 0 and 1 is smaller than the probability of spawning, then reproduction occurs
             (rand() <= model.prob_dict[model.day_of_the_year])
-
-            # Define a dictionary to map QWw values to multipliers
-            #multipliers = Dict("Q1" => 450, "Q2" => 500, "Q3" => 550, "Q4" => 600)
-            # Determine the number of eggs
 
             #eggs from all females
             superind_Neggs_value = Float64(420.0 * Sardine.Ww) * ceil((Sardine.Nind/2.0)) 
