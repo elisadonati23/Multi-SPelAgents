@@ -218,7 +218,7 @@ function juveDEB!(Sardine, model)
 
         #check whether Lm is a vector or a float
         Lm_value = isa(model.Lm, Vector{Float64}) ? model.Lm[model.sim_timing] : model.Lm
-        Sardine.L = Sardine.Lw * model.del_M / Lm_value
+        Sardine.L = Sardine.Lw * model.del_M
 
 
         # adjust acceleration factor
