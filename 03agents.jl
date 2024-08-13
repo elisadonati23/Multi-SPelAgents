@@ -4,7 +4,7 @@
     reproduction::Symbol      # :spawner, :nonspawner
     Nind::Float64             # Number of individuals in the superindividual
     Age::Float64              # Age in days
-    L::Float64                # Scaled structural length (assumed to be close to 0 for eggs from DEB Theory)
+    L::Float64                # Structural length (assumed to be close to 0 for eggs from DEB Theory)
     H::Float64                # Maturation energy
     maternal_EggEn::Float64   # Energy of the egg due to maternal effect (E0)
     superind_Neggs::Float64   # Number of eggs produced by a superindividual

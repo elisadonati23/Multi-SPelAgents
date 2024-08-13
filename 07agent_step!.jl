@@ -62,7 +62,7 @@ function eggDEB!(Sardine, model)
         Sardine.En = Sardine.En + deltaEggEn
         Sardine.maternal_EggEn = Sardine.maternal_EggEn + deltaEggEn
         Sardine.H = Sardine.H + deltaH 
-        Sardine.L = (V + deltaV)^(1/3)
+        Sardine.L = (V + deltaV)^(1/3) # structural
     end
     return
 end
@@ -217,12 +217,10 @@ function juveDEB!(Sardine, model)
         Sardine.Scaled_En = Sardine.En / (model.Em * (( Sardine.Lw * model.del_M)^3.0))
 
         #check whether Lm is a vector or a float
-        Lm_value = isa(model.Lm, Vector{Float64}) ? model.Lm[model.sim_timing] : model.Lm
-        Sardine.L = Sardine.Lw * model.del_M / Lm_value
+        Sardine.L = Sardine.Lw * model.del_M
         Sardine.pA = Sardine.f_i * model.p_Am * model.Tc_value * Sardine.s_M_i * ((Sardine.Lw * model.del_M)^2.0)
         
-        if Sardine.H >= model.Hj
-            Sardine.Lj_i = Sardine.Lw * model.del_M
+        if 
         end
 
         # adjust acceleration factor
@@ -230,12 +228,12 @@ function juveDEB!(Sardine, model)
         Sardine.s_M_i = if model.Hb >= Sardine.H
             1.0
             #during the transition phase is the length/ lb
-        elseif Sardine.H > model.Hb && model.Hj > Sardine.H
-            Sardine.Lw * model.del_M / Sardine.Lb_i
+        elseif model.Hb <= Sardine.H <= model.Hj
+            (Sardine.Lw * model.del_M) / Sardine.Lb_i
             #once metamorphosys occurred, it is fixed to Lj_i/Lb_i
-        else
+        elseif Sardine.H >= model.Hj
             Sardine.Lj_i = Sardine.Lw * model.del_M
-            Sardine.Lj_i/ Sardine.Lb_i
+            Sardine.s_M_i = Sardine.Lj_i / Sardine.Lb_i_i
         end
 
         Sardine.pA = Sardine.f_i * model.p_Am * model.Tc_value * Sardine.s_M_i * ((Sardine.Lw * model.del_M)^2.0)
@@ -246,7 +244,6 @@ end
 
 function juvemature!(Sardine, model)
     if !Sardine.Dead && (Sardine.H >= model.Hp)
-
          #Keep the same number of individuals which survived up to now in juvenile superind
          Sardine.type = :adult
          Sardine.R = 0.0

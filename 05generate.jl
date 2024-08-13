@@ -63,9 +63,7 @@ function generate_Juvenile(No_J, model, Nind = missing, Generation = 0.0, En = m
     agent_spawned = 0.0
     agent_Dead = false
     agent_reproduction = :nonspawner
-    agent_Lj_i = 0.0
-
-
+    
     # Silenced features
     agent_maternal_EggEn = model.E0
     agent_superind_Neggs = 0.0  # EggMass
@@ -101,8 +99,9 @@ function generate_Juvenile(No_J, model, Nind = missing, Generation = 0.0, En = m
         elseif agent_H > model.Hb && model.Hj > agent_H
             agent_Lw * model.del_M / agent_Lb_i
         else
-            model.s_M
+            model.Lj / agent_Lb_i
         end
+        
         # Calculate assimilation rate
         Tc_value = isa(model.Tc, Vector{Float64}) ? model.Tc[model.sim_timing] : model.Tc
         agent_pA = agent_f_i * model.p_Am * Tc_value * agent_s_M_i * ((agent_Lw * model.del_M)^2.0)
