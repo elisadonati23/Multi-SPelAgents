@@ -77,14 +77,15 @@ function egghatch!(Sardine, model)
         Sardine.Age = model.Ap * (Sardine.Lw * model.del_M) / model.Lp
         Sardine.H = model.Hp * (Sardine.Lw * model.del_M) / model.Lp
         Sardine.Nind = Float64(ceil((1 - model.M_egg) * Float64((Sardine.Nind))))
-
-        Sardine.s_M_i = if model.Hb >= Sardine.H
-            1.0
-        elseif Sardine.H > model.Hb && model.Hj > Sardine.H
-            Sardine.Lw * model.del_M / Sardine.Lb_i
-        else
-            Sardine.Lj_i/ Sardine.Lb_i
-        end
+        Sardine.s_M_i = 1.0
+        
+        #Sardine.s_M_i = if model.Hb >= Sardine.H
+        #    1.0
+        #elseif Sardine.H > model.Hb && model.Hj > Sardine.H
+        #    Sardine.Lw * model.del_M / Sardine.Lb_i
+        #else
+        #    Sardine.Lj_i/ Sardine.Lb_i
+        #end
 
         # 0.8 is f = functional response: I start juvenile starts exogenous feeding with not limiting capacity;
         # this allow to calculate first pA and then update real and maximum assimilation in the evolve_environment function
@@ -218,7 +219,11 @@ function juveDEB!(Sardine, model)
         #check whether Lm is a vector or a float
         Lm_value = isa(model.Lm, Vector{Float64}) ? model.Lm[model.sim_timing] : model.Lm
         Sardine.L = Sardine.Lw * model.del_M / Lm_value
-
+        Sardine.pA = Sardine.f_i * model.p_Am * model.Tc_value * Sardine.s_M_i * ((Sardine.Lw * model.del_M)^2.0)
+        
+        if Sardine.H >= model.Hj
+            Sardine.Lj_i = Sardine.Lw * model.del_M
+        end
 
         # adjust acceleration factor
         # before birth is 1
@@ -241,13 +246,12 @@ end
 
 function juvemature!(Sardine, model)
     if !Sardine.Dead && (Sardine.H >= model.Hp)
-         #put adult features
+
          #Keep the same number of individuals which survived up to now in juvenile superind
          Sardine.type = :adult
          Sardine.R = 0.0
          Sardine.pA = Sardine.f_i * model.p_Am * model.Tc_value * Sardine.s_M_i * ((Sardine.Lw * model.del_M)^2.0) #perchè non alla 2/3?
          Sardine.Generation += 1.0
-
          Sardine.s_M_i = Sardine.Lj_i / Sardine.Lb_i
     end
     return

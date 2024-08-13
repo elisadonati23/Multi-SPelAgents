@@ -74,8 +74,7 @@ zeros_long = vcat(repeat([0.0], 365*40+1+16071))
 
 # running -----------------
 
-results = []
-num_runs = 1
+
 
 
 #initialize model: Na, Nj,Negg, Mf, Ww, day_of_the_year, Xmax, Kappa, Temp, M_egg, M0, M1, M2, M3, M4)
@@ -85,6 +84,8 @@ num_runs = 1
 #models = [
 #model_initialize_parallel(1000.0, 0.0, 0.0, Mf0_run, Mf1_run, Mf2_run, Mf3_run, Mf4_run, 1.7e14, 1.0, Xmax_run, 0.945, Temp_run, 0.9998,	1.08,	0.86,	0.69,	0.62,	0.48)
 #]
+results = []
+num_runs = 1
 
 models = [
 model_initialize_parallel(10.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.7e14, 1.0, 5.0, 0.945, 15.0, 0.9998,	1.08,	0.86,	0.69,	0.62,	0.48)

@@ -116,7 +116,7 @@ function create_params(
     prob_dict = Dict(zip(repro_period, daily_repro_probabilities))
 
     # Initialize output variables
-
+    Nsuperind = No_A + No_J + No_Egg
     year = 1.0
     dead_eggmass = 0
     deadJ_nat = 0
@@ -282,7 +282,8 @@ function create_params(
         :fished1 => fished1,
         :fished2 => fished2,
         :fished3 => fished3,
-        :fished4more => fished4more
+        :fished4more => fished4more,
+        :Nsuperind => Nsuperind
     )
                            
     return model_parameters            
