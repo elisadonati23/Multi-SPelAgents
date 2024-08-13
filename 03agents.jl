@@ -23,6 +23,7 @@
     s_M_i::Float64            # Shape parameter
     pA::Float64               # Assimilation rate
     Lb_i::Float64             # Length at birth (individual)
+    Lj_i::Float64             # Length at metamorphosys (individual)
 
     CI::Float64               # Condition Index
     GSI::Float64              # Gonadosomatic Index

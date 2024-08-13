@@ -83,7 +83,7 @@ function egghatch!(Sardine, model)
         elseif Sardine.H > model.Hb && model.Hj > Sardine.H
             Sardine.Lw * model.del_M / Sardine.Lb_i
         else
-            model.s_M
+            Sardine.Lj_i/ Sardine.Lb_i
         end
 
         # 0.8 is f = functional response: I start juvenile starts exogenous feeding with not limiting capacity;
@@ -222,12 +222,16 @@ function juveDEB!(Sardine, model)
 
 
         # adjust acceleration factor
+        # before birth is 1
         Sardine.s_M_i = if model.Hb >= Sardine.H
             1.0
+            #during the transition phase is the length/ lb
         elseif Sardine.H > model.Hb && model.Hj > Sardine.H
             Sardine.Lw * model.del_M / Sardine.Lb_i
+            #once metamorphosys occurred, it is fixed to Lj_i/Lb_i
         else
-            model.s_M
+            Sardine.Lj_i = Sardine.Lw * model.del_M
+            Sardine.Lj_i/ Sardine.Lb_i
         end
 
         Sardine.pA = Sardine.f_i * model.p_Am * model.Tc_value * Sardine.s_M_i * ((Sardine.Lw * model.del_M)^2.0)
@@ -245,7 +249,7 @@ function juvemature!(Sardine, model)
          Sardine.pA = Sardine.f_i * model.p_Am * model.Tc_value * Sardine.s_M_i * ((Sardine.Lw * model.del_M)^2.0) #perchè non alla 2/3?
          Sardine.Generation += 1.0
 
-         Sardine.s_M_i = model.s_M
+         Sardine.s_M_i = Sardine.Lj_i / Sardine.Lb_i
     end
     return
 end

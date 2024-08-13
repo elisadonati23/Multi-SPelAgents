@@ -15,6 +15,7 @@ function generate_EggMass(No_Egg, model, Nind = missing, maternal_EggEn = missin
     agent_reproduction = :nonspawner
     agent_CI = 0.0
     agent_GSI = 0.0
+    agent_Lj_i = 0.0
 
     # Set maternal egg energy
     agent_maternal_EggEn = ismissing(maternal_EggEn) ? Float64(model.E0) : Float64(maternal_EggEn)
@@ -45,7 +46,7 @@ function generate_EggMass(No_Egg, model, Nind = missing, maternal_EggEn = missin
             Sardine, model, agent_type, agent_reproduction, agent_Nind, agent_Age, agent_L, agent_H,
             agent_maternal_EggEn, agent_superind_Neggs, agent_En, agent_Generation, agent_Dead,
             agent_f_i, agent_t_puberty, agent_Lw, agent_Ww, agent_QWw, agent_R, agent_Scaled_En,
-            agent_s_M_i, agent_pA, agent_Lb_i, agent_CI, agent_GSI, agent_spawned
+            agent_s_M_i, agent_pA, agent_Lb_i, agent_Lj_i, agent_CI, agent_GSI, agent_spawned
         )
 
     end
@@ -64,6 +65,7 @@ function generate_Juvenile(No_J, model, Nind = missing, Generation = 0.0, En = m
     agent_QWw = "Q1"
     agent_Dead = false
     agent_reproduction = :nonspawner
+    agent_Lj_i = 0.0
 
 
     # Silenced features
@@ -116,13 +118,13 @@ function generate_Juvenile(No_J, model, Nind = missing, Generation = 0.0, En = m
             Sardine, model, agent_type, agent_reproduction, agent_Nind, agent_Age, agent_L, agent_H,
             agent_maternal_EggEn, agent_superind_Neggs, agent_En, agent_Generation, agent_Dead,
             agent_f_i, agent_t_puberty, agent_Lw, agent_Ww, agent_QWw, agent_R, agent_Scaled_En,
-            agent_s_M_i, agent_pA, agent_Lb_i, agent_CI, agent_GSI, agent_spawned
+            agent_s_M_i, agent_pA, agent_Lb_i, agent_Lj_i, agent_CI, agent_GSI, agent_spawned
         )
 
     end
 end
 
-function generate_Adult(No_A, model, Nind = missing, Age = missing, t_puberty = missing, Lw = missing, Ww = missing, H = missing, R = missing, En = missing, Scaled_En = missing, Generation = missing, pA = missing)
+function generate_Adult(No_A, model, Nind = missing, Age = missing, t_puberty = missing, Lw = missing, Ww = missing, H = missing, R = missing, En = missing, Scaled_En = missing, Generation = missing, pA = missing, Lj = missing)
 
     # Initialize default agent properties for Adult
     agent_type = :adult
@@ -171,6 +173,12 @@ function generate_Adult(No_A, model, Nind = missing, Age = missing, t_puberty = 
             Age
         end
 
+        agent_Lj_i = if ismissing(Lj)
+            model.Lj
+        else
+            Lj
+        end
+
         # Set time to puberty
         agent_t_puberty = ismissing(t_puberty) ? model.Ap * (agent_Lw * model.del_M) / model.Lp : t_puberty
         
@@ -199,7 +207,7 @@ function generate_Adult(No_A, model, Nind = missing, Age = missing, t_puberty = 
             Sardine, model, agent_type, agent_reproduction, agent_Nind, agent_Age, agent_L, agent_H,
             agent_maternal_EggEn, agent_superind_Neggs, agent_En, agent_Generation, agent_Dead,
             agent_f_i, agent_t_puberty, agent_Lw, agent_Ww, agent_QWw, agent_R, agent_Scaled_En,
-            agent_s_M_i, agent_pA, agent_Lb_i, agent_CI, agent_GSI, agent_spawned
+            agent_s_M_i, agent_pA, agent_Lb_i, agent_Lj_i, agent_CI, agent_GSI, agent_spawned
         )
     end
 
