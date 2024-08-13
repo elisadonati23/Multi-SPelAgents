@@ -19,6 +19,9 @@ function model_initialize_parallel(
     M3,
     M4
 ) 
+
+    # Generate model parameters using the provided inputs
+
     properties = create_params(
         No_A,
         No_J,
@@ -42,32 +45,39 @@ function model_initialize_parallel(
     )
 
 
-    # create the model
-    model = ABM(Sardine;
-                properties = properties,
-                model_step! = complex_step!)
+    # Create the Agent-Based Model (ABM) for Sardines
+    model = ABM(
+        Sardine;
+        properties = properties,
+        model_step! = complex_step!
+    )
 
-    # ADD EGGS
+    # Add agents to the model: Adults, Juveniles, and EggMass
     generate_Adult(No_A, model)
     generate_Juvenile(No_J, model)
     generate_EggMass(No_Egg, model)
 
+
+    # Calculate the mean length-weight (Lw) for initialization
     mean_Lw = calculate_mean_prop(model, "Lw")
-    # Calculate the value of f using the given formula at the initialization of the model:
-    # If Xmax is a vector,  X is a vector.
-    # f then should be calculated  or as a vector
+
+    # Collect all agents in the model
     agents = collect(values(allagents(model)))
 
-     # Filter the agents based on type and sex
-     adults = filter(a -> a.type == :adult, agents)
-     juveniles = filter(a -> a.type == :juvenile, agents)
- 
-     if isempty(adults) && isempty(juveniles)    
-         model.f = 0.8
-     else
-         #sim_timing = 1 at the initialization so I can directly index Xmax and Tc
-         f = (model.Xmax[model.sim_timing] * model.Wv * model.KappaX) / (model.p_Am * model.Tc[model.sim_timing] * model.s_M * (mean_Lw ^ 2))
-         model.f =  max(0, min(f, 1.0))
-     end
+    # Filter the agents based on type (Adults and Juveniles)
+    adults = filter(a -> a.type == :adult, agents)
+    juveniles = filter(a -> a.type == :juvenile, agents)
+
+    # Determine the initial value of functional response (f)
+    if isempty(adults) && isempty(juveniles)    
+        model.f = 0.8
+    else
+        # sim_timing = 1 at initialization, so directly index Xmax and Tc
+        f = (model.Xmax[model.sim_timing] * model.Wv * model.KappaX) / 
+            (model.p_Am * model.Tc[model.sim_timing] * model.s_M * (mean_Lw ^ 2))
+
+        # Ensure f is within the range [0, 1]
+        model.f = max(0, min(f, 1.0))
+    end
     return model
 end

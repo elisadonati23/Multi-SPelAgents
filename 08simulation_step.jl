@@ -1,25 +1,23 @@
 ###############
-#   wraps     #
+#   Wraps     #
 ###############
+
 function parallel_sardine_step!(Sardine, model)
     if Sardine.type == :eggmass
-        parallel_eggmass_step!(Sardine, model) # deb + aging + hatch
+        parallel_eggmass_step!(Sardine, model)  # DEB + aging + hatch
     elseif Sardine.type == :juvenile
-        parallel_juvenile_step!(Sardine, model)  # die + deb + mature + aging
+        parallel_juvenile_step!(Sardine, model)  # Die + DEB + mature + aging
     elseif Sardine.type == :adult
-        parallel_adult_step!(Sardine, model) # die deb aging 
+        parallel_adult_step!(Sardine, model)    # Die + DEB + aging 
     end
 end
 
-
-                                            ###################
-                                            ## ENVIRONMENT   ##
-                                            ###################
-
+###################
+## ENVIRONMENT   ##
+###################
 
 function evolve_environment!(model)
-
-    # day counter
+    # Day counter
     if model.day_of_the_year == 365.0
         model.day_of_the_year = 1.0
         model.year += 1.0
@@ -33,101 +31,93 @@ function evolve_environment!(model)
         model.day_of_the_year += 1.0
     end
 
-    #increase time checher
+
+    # Increase simulation timing
     model.sim_timing += 1
 
-    # update time dependent parameters
-    update_Tc!(model, model.Tc)
-    update_Kappa!(model, model.Kappa)
-    update_Xmax!(model, model.Xmax)
-    
+    # Update time-dependent parameters
+    update_Tc!(model, model.Tc_value)
+    update_Kappa!(model, model.Kappa_value)
+    update_Xmax!(model, model.Xmax_value)
     update_MF0!(model, model.M_f0)
     update_MF1!(model, model.M_f1)
     update_MF2!(model, model.M_f2)
     update_MF3!(model, model.M_f3)
     update_MF4!(model, model.M_f4)
     
-    # calculate Xall
-    # Xall is initialized like X, which is set to Xmax (look at params)
-    # remove the assimilation of all agents:
 
-    Xall = model.Xmax_value - (calculate_real_assimilation(model)/ model.KappaX) / model.Wv
-    #println("real assimilation:", calculate_real_assimilation(model))
+    # Calculate Xall
+    Xall = model.Xmax_value - (calculate_real_assimilation(model) / model.KappaX) / model.Wv
     
-     if Xall < 0.0  
-         Xall = 0.0 
-     end
+    if Xall < 0.0  
+        Xall = 0.0 
+    end
     
     model.Xall = Xall
 
-    ## update response function f 
-
-    if ismissing(calculate_max_assimilation(model)) || calculate_max_assimilation(model) == 0.0 || isnan(calculate_max_assimilation(model))
+    # Update response function f
+    max_assimilation = calculate_max_assimilation(model)
+    
+    if ismissing(max_assimilation) || max_assimilation == 0.0 || isnan(max_assimilation)
         f = 0.0
     else
-        #rapporto tra quello disponibile e quello che si mangia su base di taglia e Tc!!
-    f = (model.Xmax_value * model.Wv * model.KappaX) / calculate_max_assimilation(model) #take into consideration the Nind of the superindividuals
+        # Ratio between available food and what is consumed based on size and Tc
+        f = (model.Xmax_value * model.Wv * model.KappaX) / max_assimilation
     end
 
-    ## Ensure that f is bounded between 0 and 1
-    model.f = max(0, min(f, 1.0)) # not 1 but 0.8
+    # Ensure that f is bounded between 0 and 1
+    model.f = max(0, min(f, 1.0))
 
     adults_juve = filter(a -> a.type == :adult || a.type == :juvenile, collect(values(allagents(model))))
 
-    # if there are no adults or juveniles, set f to 0.8.
-    # this prevent numerical instability when there are no agents in the model that feed exogenously
-    # infact, with just eggs, Lw and WW and Volume would go to zero and the population assimilation
-    # cannot be calculated with max and real assimilation functions.
-
+    # If there are no adults or juveniles, set f to 0.8.
+    # This prevents numerical instability when there are no agents in the model that feed exogenously.
     if isempty(adults_juve)
         model.f = 0.8 
+    end
+
     return
-
 end
-end
-
 
 function update_outputs!(model)
     agents = collect(values(allagents(model)))
     adults = filter(a -> a.type == :adult, agents)
-
-    # Check if there are any agents that match the criteria
-    #if !isempty(adults)
-    #    interquantiles_prop(model, :Ww, :QWw, :adult)
-    #end
-
-    adults_juv = filter(a -> (a.type == :adult || a.type == :juvenile), agents)
-
+    adults_juv = filter(a -> a.type == :adult || a.type == :juvenile, agents)
     if !isempty(adults_juv)
         # B plot: take into account Nind
         model.TotB = calculate_sum_prop(model, "Ww", Nind = true)
         model.JuvB = calculate_sum_prop(model, "Ww", type = :juvenile, Nind = true)
         model.AdB = calculate_sum_prop(model, "Ww", type = :adult, Nind = true)
 
-        # mean Ww plot
+
+        # Mean weight (Ww) plot
         model.meanAdWw = calculate_mean_prop(model, "Ww", type = :adult, age = 3.0)
         model.sdAdWw =  calculate_sd_prop(model, "Ww", type = :adult)
         model.meanJuvWw = calculate_mean_prop(model, "Ww", type = :juvenile)
         model.sdJuvWw = calculate_sd_prop(model, "Ww", type = :juvenile)
         
-        #mean Lw plot
+
+        # Mean length (Lw) plot
         model.meanAdL = calculate_mean_prop(model, "Lw", type = :adult)
         model.sdAdL = calculate_sd_prop(model, "Lw", type = :adult)
         model.meanJuvL = calculate_mean_prop(model, "Lw", type = :juvenile)
         model.sdJuvL = calculate_sd_prop(model, "Lw", type = :juvenile)
 
-        #mean tpuberty plot
+        # Mean time to puberty plot
         model.mean_tpuberty = calculate_mean_prop(model, "t_puberty", type = :adult)
         model.sd_tpuberty = calculate_sd_prop(model, "t_puberty", type = :adult)
-        #mean tpuberty plot
+
+        # Mean juvenile maturation energy plot
         model.mean_Hjuve = calculate_mean_prop(model, "H", type = :juvenile)
         model.sd_Hjuve = calculate_sd_prop(model, "H", type = :juvenile)
     end
+
     return
 end
-                         #############################
-                         ##### scheduler #############
-                         #############################
+
+#################
+#     Scheduler #
+#################
 
 mutable struct scheduler_Adults end
 
@@ -140,45 +130,45 @@ end
 sEA = scheduler_Adults()
 
 function complex_step!(model)
-    #parallel
+
+    # Parallel processing for Sardine agents
     Threads.@threads for sardine in collect(values(allagents(model)))
         parallel_sardine_step!(sardine, model)
     end 
 
+    # Remove all dead agents
     remove_all!(model, is_dead)
 
+    # Get IDs of adult agents
     sEA_ids = sEA(model)
     adult_ids = filter!(id -> hasid(model, id) && model[id].type == :adult, copy(sEA_ids))
 
+    # Handle spawning for adult agents
     for sardine in adult_ids
-        adultspawn!(model[sardine], model) # set if the sardine spawner or not, determinine the Nind to cluster in a new superindividual which is an egg
+        adultspawn!(model[sardine], model)  # Set if the sardine is a spawner or not, determine the Nind to cluster in a new superindividual (egg)
     end
 
+    # Filter spawners for creating new EggMass agents
     spawners = filter!(id -> hasid(model, id) && model[id].reproduction == :spawner, copy(sEA_ids))
 
     if !isempty(spawners)
-            #create new born daily superindividuals
-            prop_values = [getfield(model[agent], :superind_Neggs) for agent in spawners]
-            mean_Egg_energy = mean([getfield(model[agent], :maternal_EggEn) for agent in spawners])
-            max_generation = maximum([getfield(model[agent], :Generation) for agent in spawners]) + 1.0
-            tot_Neggs = sum(prop_values)
-            generate_EggMass(1, model, tot_Neggs,mean_Egg_energy, mean_Egg_energy, max_generation)
+        # Create new born daily superindividuals
+        prop_values = [getfield(model[agent], :superind_Neggs) for agent in spawners]
+        mean_Egg_energy = mean([getfield(model[agent], :maternal_EggEn) for agent in spawners])
+        max_generation = maximum([getfield(model[agent], :Generation) for agent in spawners]) + 1.0
+        tot_Neggs = sum(prop_values)
+        generate_EggMass(1, model, tot_Neggs, mean_Egg_energy, mean_Egg_energy, max_generation)
     end
 
-
+    # Update model outputs
     update_outputs!(model)
 
+    # Evolve the environment
     evolve_environment!(model)
 
-
-    #reset the reproduction variable
-    for id in spawners
-        agent = model[id]
-        agent.reproduction = :nonspawner
-    end
-    
+    # Optionally reset the reproduction variable
+    # for id in spawners
+    #     agent = model[id]
+    #     agent.reproduction = :nonspawner
+    # end
 end
-                                        
-                                        
-                                         
-                                        

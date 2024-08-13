@@ -81,13 +81,17 @@ num_runs = 1
 #initialize model: Na, Nj,Negg, Mf, Ww, day_of_the_year, Xmax, Kappa, Temp, M_egg, M0, M1, M2, M3, M4)
 # Initialize models
 
+
+#models = [
+#model_initialize_parallel(1000.0, 0.0, 0.0, Mf0_run, Mf1_run, Mf2_run, Mf3_run, Mf4_run, 1.7e14, 1.0, Xmax_run, 0.945, Temp_run, 0.9998,	1.08,	0.86,	0.69,	0.62,	0.48)
+#]
+
 models = [
-model_initialize_parallel(1000.0, 0.0, 0.0, Mf0_run, Mf1_run, Mf2_run, Mf3_run, Mf4_run, 1.7e14, 1.0, Xmax_run, 0.945, Temp_run, 0.9998,	1.08,	0.86,	0.69,	0.62,	0.48)
-#model_initialize_parallel(1000.0, 0.0, 0.0, Mf0_run, Mf1_run, Mf2_run, Mf3_run, Mf4_run, 1.7e14, 1.0, Xmax50percent, 0.945, Temp_run, 0.9998,	1.08,	0.86,	0.69,	0.62,	0.48)
+model_initialize_parallel(10.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.7e14, 1.0, 5.0, 0.945, 15.0, 0.9998,	1.08,	0.86,	0.69,	0.62,	0.48)
 ]
 
 # Initialize dataframes
-adata = [:type, :Nind, :t_puberty,:Age, :Lw, :Ww, :En, :R, :pA, :s_M_i, :superind_Neggs, :reproduction, :Dead]
+adata = [:type, :Nind, :t_puberty,:Age, :Lw, :Ww, :En, :R, :H, :CI, :GSI, :pA, :s_M_i, :superind_Neggs, :reproduction, :spawned, :Dead]
 mdata = [:day_of_the_year, :year, :TotB,:JuvB,:AdB, :f, :deadJ_nat, :deadJ_old, 
 :deadJ_starved, :deadA_nat, :deadA_old, :deadA_starved, :fished, :fishedW, :fished0, :fished1, :fished2, :fished3, :fished4more,
 :meanJuvL, :sdJuvL, :meanAdL, :sdAdL, :mean_tpuberty, :sd_tpuberty, :meanJuvWw, :sdJuvWw, :meanAdWw, :sdAdWw, :mean_Hjuve, :sd_Hjuve]
@@ -99,8 +103,9 @@ for (i, model) in enumerate(models)
     df_agent = init_agent_dataframe(model, adata)
     df_model = init_model_dataframe(model, mdata)
     #run!(model, 365*10; adata, mdata)
-    df_agent = run!(model, 30670; adata, mdata)
 
+    #df_agent = run!(model, 16070+365*30; adata, mdata)
+    df_agent = run!(model, 365*3; adata, mdata)
     push!(results, df_agent)
 
     end_time = Dates.now()
@@ -132,16 +137,18 @@ for (i, model) in enumerate(models)
     # mean biomass in medias sampling period (june september)
     summerbiom = plot_timeframe_param_timeseries(results[i][2], [:TotB, :AdB], 150.0, 180.0,true, :mean, "Mid - Year Biomass (tonnes)", 1975)
     
-    CSV.write("agent_$((i)).csv", results[i][1])
-    CSV.write("model_$((i)).csv", results[i][2])
+
+    CSV.write("update_smipA_agent_$((i)+1).csv", results[i][1])
+    CSV.write("update_smipA_model_$((i)+1).csv", results[i][2])
     #save plots
-    Plots.savefig(p1, "nowwquart_p1_$(Dates.format(today(), "yyyy-mm-dd"))_$((i)).png")
-    Plots.savefig(p2, "nowwquart_p2_$(Dates.format(today(), "yyyy-mm-dd"))_$((i)).png")
-    Plots.savefig(pop, "nowwquartpop_$(Dates.format(today(), "yyyy-mm-dd"))_$((i)).png")
-    Plots.savefig(deaths, "nowwquartdeaths_$(Dates.format(today(), "yyyy-mm-dd"))_$((i)).png")
-    Plots.savefig(biom, "nowwquartbiom_$(Dates.format(today(), "yyyy-mm-dd"))_$((i)).png")
-    Plots.savefig(fr, "nowwquartfr_$(Dates.format(today(), "yyyy-mm-dd"))_$((i)).png")
-    Plots.savefig(lengths, "nowwquartlengths_$(Dates.format(today(), "yyyy-mm-dd"))_$((i)).png")
-    Plots.savefig(fished, "nowwquartfished_$(Dates.format(today(), "yyyy-mm-dd"))_$((i)).png")
-    Plots.savefig(summerbiom, "nowwquartsummerbiom_$(Dates.format(today(), "yyyy-mm-dd"))_$((i)).png")
+    Plots.savefig(p1, "update_smipA__p1_$(Dates.format(today(), "yyyy-mm-dd"))_$((i)+1).png")
+    Plots.savefig(p2, "update_smipA__p2_$(Dates.format(today(), "yyyy-mm-dd"))_$((i)+1).png")
+    Plots.savefig(pop, "update_smipA_pop_$(Dates.format(today(), "yyyy-mm-dd"))_$((i)+1).png")
+    Plots.savefig(deaths, "update_smipA_deaths_$(Dates.format(today(), "yyyy-mm-dd"))_$((i)+1).png")
+    Plots.savefig(biom, "update_smipA_biom_$(Dates.format(today(), "yyyy-mm-dd"))_$((i)+1).png")
+    Plots.savefig(fr, "update_smipA_fr_$(Dates.format(today(), "yyyy-mm-dd"))_$((i)+1).png")
+    Plots.savefig(lengths, "update_smipA_lengths_$(Dates.format(today(), "yyyy-mm-dd"))_$((i)+1).png")
+    Plots.savefig(fished, "update_smipA_fished_$(Dates.format(today(), "yyyy-mm-dd"))_$((i)+1).png")
+    Plots.savefig(summerbiom, "update_smipA_summerbiom_$(Dates.format(today(), "yyyy-mm-dd"))_$((i)+1).png")
+
 end

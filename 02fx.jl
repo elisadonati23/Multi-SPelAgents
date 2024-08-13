@@ -557,7 +557,8 @@ function diagnostic_plots_pt2(out_model, model)
     Plots.default(legendfontsize = 4)  # Set the plot size
     
     #p5 = plot_means_with_std(out_model, [:meanAdL, :meanJuvL], [:sdAdL, :sdJuvL])
-    p5 = plot_param_timeseries(out_model, [:fishedW], missing, true)
+
+    p5 = plot_param_timeseries(out_model, [:fishedW],missing,  true)
     p6 = plot_means_with_std(out_model, [:mean_tpuberty], [:sd_tpuberty])
     p7 = plot_means_with_std(out_model, [:meanAdWw, :meanJuvWw], [:sdAdWw, :sdJuvWw])
     p8 = plot_means_with_std(out_model, [:mean_Hjuve], [:sd_Hjuve])
@@ -575,8 +576,9 @@ function diagnostic_plots_pt1(out_agent, out_model, model)
     # Plot the number of agents over time
     p1 = plot_population_timeseries(out_agent, missing, false)
     p2 = plot_param_timeseries(out_model,[:deadA_starved, :deadA_nat, :deadA_old,:deadJ_starved, :deadJ_nat, :deadJ_old, :fished])
-    p3 = plot_param_timeseries(out_model,[:TotB, :JuvB, :AdB],missing, true)
-    p4 = plot_param_timeseries(out_model, [:f],missing, false)
+    p3 = plot_param_timeseries(out_model,[:TotB, :JuvB, :AdB], missing, true)
+    p4 = plot_param_timeseries(out_model, [:f], missing, false)
+
 
 
     # Combine the plots in a 3x3 grid
