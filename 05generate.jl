@@ -10,7 +10,6 @@ function generate_EggMass(No_Egg, model, Nind = missing, maternal_EggEn = missin
     agent_L = model.L0
     agent_H = 0.00
     agent_spawned = 0.0
-    agent_QWw = "Q1"
     agent_Dead = false
     agent_reproduction = :nonspawner
     agent_CI = 0.0
@@ -45,7 +44,7 @@ function generate_EggMass(No_Egg, model, Nind = missing, maternal_EggEn = missin
         add_agent!(
             Sardine, model, agent_type, agent_reproduction, agent_Nind, agent_Age, agent_L, agent_H,
             agent_maternal_EggEn, agent_superind_Neggs, agent_En, agent_Generation, agent_Dead,
-            agent_f_i, agent_t_puberty, agent_Lw, agent_Ww, agent_QWw, agent_R, agent_Scaled_En,
+            agent_f_i, agent_t_puberty, agent_Lw, agent_Ww, agent_R, agent_Scaled_En,
             agent_s_M_i, agent_pA, agent_Lb_i, agent_Lj_i, agent_CI, agent_GSI, agent_spawned
         )
 
@@ -62,7 +61,6 @@ function generate_Juvenile(No_J, model, Nind = missing, Generation = 0.0, En = m
     agent_Lb_i = Lb_i
     agent_R = 0.0
     agent_spawned = 0.0
-    agent_QWw = "Q1"
     agent_Dead = false
     agent_reproduction = :nonspawner
     agent_Lj_i = 0.0
@@ -117,7 +115,7 @@ function generate_Juvenile(No_J, model, Nind = missing, Generation = 0.0, En = m
         add_agent!(
             Sardine, model, agent_type, agent_reproduction, agent_Nind, agent_Age, agent_L, agent_H,
             agent_maternal_EggEn, agent_superind_Neggs, agent_En, agent_Generation, agent_Dead,
-            agent_f_i, agent_t_puberty, agent_Lw, agent_Ww, agent_QWw, agent_R, agent_Scaled_En,
+            agent_f_i, agent_t_puberty, agent_Lw, agent_Ww, agent_R, agent_Scaled_En,
             agent_s_M_i, agent_pA, agent_Lb_i, agent_Lj_i, agent_CI, agent_GSI, agent_spawned
         )
 
@@ -135,7 +133,6 @@ function generate_Adult(No_A, model, Nind = missing, Age = missing, t_puberty = 
     agent_superind_Neggs = 0.0
     agent_Lb_i = model.Lb
     agent_spawned = 0.0
-    agent_QWw = "Q1"
     agent_Dead = false
 
     # Set maturation energy
@@ -206,7 +203,7 @@ function generate_Adult(No_A, model, Nind = missing, Age = missing, t_puberty = 
         add_agent!(
             Sardine, model, agent_type, agent_reproduction, agent_Nind, agent_Age, agent_L, agent_H,
             agent_maternal_EggEn, agent_superind_Neggs, agent_En, agent_Generation, agent_Dead,
-            agent_f_i, agent_t_puberty, agent_Lw, agent_Ww, agent_QWw, agent_R, agent_Scaled_En,
+            agent_f_i, agent_t_puberty, agent_Lw, agent_Ww, agent_R, agent_Scaled_En,
             agent_s_M_i, agent_pA, agent_Lb_i, agent_Lj_i, agent_CI, agent_GSI, agent_spawned
         )
     end

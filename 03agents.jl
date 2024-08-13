@@ -17,7 +17,6 @@
     t_puberty::Float64        # Time to puberty
     Lw::Float64               # Length-weight relationship
     Ww::Float64               # Weight
-    QWw::String               # Quantile weight category
     R::Float64                # Reproduction energy
     Scaled_En::Float64        # Scaled energy reserve
     s_M_i::Float64            # Shape parameter
