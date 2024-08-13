@@ -23,6 +23,7 @@
     pA::Float64               # Assimilation rate
     Lb_i::Float64             # Length at birth (individual)
     Lj_i::Float64             # Length at metamorphosys (individual)
+    metamorph::Bool           # Indicates if the sardine has metamorphosed -- In DEB meaning
 
     CI::Float64               # Condition Index
     GSI::Float64              # Gonadosomatic Index

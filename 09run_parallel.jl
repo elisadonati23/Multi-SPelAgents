@@ -9,7 +9,6 @@ include("07agent_step!.jl")
 include("08simulation_step.jl")
 
 
-
 # Read the CSV file
 # Name of the file in the current directory
 file_name = "all_timeseries_final_abm.csv"

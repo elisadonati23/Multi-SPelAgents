@@ -220,20 +220,19 @@ function juveDEB!(Sardine, model)
         Sardine.L = Sardine.Lw * model.del_M
         Sardine.pA = Sardine.f_i * model.p_Am * model.Tc_value * Sardine.s_M_i * ((Sardine.Lw * model.del_M)^2.0)
         
-        if 
-        end
-
         # adjust acceleration factor
         # before birth is 1
-        Sardine.s_M_i = if model.Hb >= Sardine.H
-            1.0
-            #during the transition phase is the length/ lb
-        elseif model.Hb <= Sardine.H <= model.Hj
-            (Sardine.Lw * model.del_M) / Sardine.Lb_i
-            #once metamorphosys occurred, it is fixed to Lj_i/Lb_i
-        elseif Sardine.H >= model.Hj
-            Sardine.Lj_i = Sardine.Lw * model.del_M
-            Sardine.s_M_i = Sardine.Lj_i / Sardine.Lb_i_i
+        if !Sardine.metamorph
+           if model.Hb >= Sardine.H
+                Sardine.s_M_i = 1.0
+            elseif model.Hb < Sardine.H < model.Hj
+                Sardine.s_M_i = (Sardine.Lw * model.del_M) / Sardine.Lb_i
+            elseif Sardine.H >= model.Hj
+                Sardine.Lj_i = Sardine.Lw * model.del_M
+                Sardine.s_M_i = model.Lj / model.Lb
+                Sardine.metamorph = true
+                println("s_M_i: ", Sardine.s_M_i, " Lj_i: ", Sardine.Lj_i, " Lb_i: ", Sardine.Lb_i)
+            end
         end
 
         Sardine.pA = Sardine.f_i * model.p_Am * model.Tc_value * Sardine.s_M_i * ((Sardine.Lw * model.del_M)^2.0)
@@ -249,7 +248,6 @@ function juvemature!(Sardine, model)
          Sardine.R = 0.0
          Sardine.pA = Sardine.f_i * model.p_Am * model.Tc_value * Sardine.s_M_i * ((Sardine.Lw * model.del_M)^2.0) #perchè non alla 2/3?
          Sardine.Generation += 1.0
-         Sardine.s_M_i = Sardine.Lj_i / Sardine.Lb_i
     end
     return
 end
