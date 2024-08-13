@@ -163,7 +163,6 @@ function juveDEB!(Sardine, model)
         Sardine.f_i = model.f #if no one is eating (=model initilized with eggs), it is set to 0.8)
 
         # juvenile store energy into maturation state variable and eventually they mature
-        #println("for agent $(Sardine.id) Lw is ", Sardine.Lw, "and del_M_i is ", model.del_M)
 
         #initialize the state variables before the fluxes
         Vdyn = (Sardine.Lw * model.del_M) ^ 3.0
