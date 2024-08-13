@@ -166,9 +166,4 @@ function complex_step!(model)
     # Evolve the environment
     evolve_environment!(model)
 
-    # Optionally reset the reproduction variable
-    # for id in spawners
-    #     agent = model[id]
-    #     agent.reproduction = :nonspawner
-    # end
 end
