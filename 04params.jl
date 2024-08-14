@@ -74,7 +74,7 @@ function create_params(
     # Growth, puberty, and reproduction parameters
 
     Hb = 0.0112
-    Hj = 30.0 #0.3478
+    Hj = 0.3478 #0.3478
     Hp = 3013.0
     Lb = 0.0321
     Lj = 0.0993
@@ -84,9 +84,9 @@ function create_params(
     Am = 2920.0
     E0 = 0.966581
     ep_min = 0.25
-    E0_min = 0.389
+    E0_min = 0.389 # when you have a juvenile with the minimum enough energy to produce eggs in the reserve: it reflects the energy of the mother
     E0_max = 0.967
-    W0 = 0.00021
+    W0 = 0.00021 # Addmypet
     L0 = 0.001  # Initial length in cm
     Ta = 8000.0  # Arrhenius temperature
     Tr = 293.0   # Reference temperature

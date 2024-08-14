@@ -87,7 +87,7 @@ results = []
 num_runs = 1
 
 models = [
-model_initialize_parallel(0.0, 100.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.7e14, 1.0, 5.0, 0.945, 15.0, 0.9998,	1.08,	0.86,	0.69,	0.62,	0.48)
+model_initialize_parallel(100.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.7e14, 1.0, 5.0, 0.945, 15.0, 0.9998,	1.08,	0.86,	0.69,	0.62,	0.48)
 ]
 
 # Initialize dataframes
@@ -105,7 +105,7 @@ for (i, model) in enumerate(models)
     #run!(model, 365*20; adata, mdata)
 
     #df_agent = run!(model, 16070+365*30; adata, mdata)
-    df_agent = run!(model, 365*20; adata, mdata)
+    df_agent = run!(model, 365*5; adata, mdata)
     push!(results, df_agent)
 
     end_time = Dates.now()

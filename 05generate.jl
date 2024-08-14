@@ -8,7 +8,7 @@ function generate_EggMass(No_Egg, model, Nind = missing, maternal_EggEn = missin
     agent_type = :eggmass
     agent_Age = 0.0
     agent_L = model.L0
-    agent_H = 0.00
+    agent_H = 0.0
     agent_spawned = 0.0
     agent_Dead = false
     agent_reproduction = :nonspawner

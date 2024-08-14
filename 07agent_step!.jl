@@ -75,7 +75,7 @@ function egghatch!(Sardine, model)
         Sardine.Lw = (Sardine.L / model.del_M)
         Sardine.Lb_i = Sardine.L
         Sardine.Age = model.Ap * (Sardine.Lw * model.del_M) / model.Lp
-        Sardine.H = model.Hp * (Sardine.Lw * model.del_M) / model.Lp
+        #Sardine.H = model.Hp * (Sardine.Lw * model.del_M) / model.Lp
         Sardine.Nind = Float64(ceil((1 - model.M_egg) * Float64((Sardine.Nind))))
         
         Sardine.s_M_i = if model.Hb >= Sardine.H
@@ -433,7 +433,7 @@ if (!Sardine.Dead && Sardine.Nind >= 100000.0)  &&
     #2nd condition: being in the repro period
     ((model.repro_start <= model.day_of_the_year <= 365.0) || (1.0 <= model.day_of_the_year <= model.repro_end)) &&
           
-            # 4th condition: random number between 0 and 1 is smaller than the probability of spawning, then reproduction occurs
+            # 3th condition: random number between 0 and 1 is smaller than the probability of spawning, then reproduction occurs
             (rand() <= model.prob_dict[model.day_of_the_year])
 
             #eggs from all females

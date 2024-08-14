@@ -159,6 +159,7 @@ function complex_step!(model)
         mean_Egg_energy = mean([getfield(model[agent], :maternal_EggEn) for agent in spawners])
         max_generation = maximum([getfield(model[agent], :Generation) for agent in spawners]) + 1.0
         tot_Neggs = sum(prop_values)
+        #function generate_EggMass(No_Egg, model, Nind = missing, maternal_EggEn = missing, En = missing, Generation = missing)
         generate_EggMass(1, model, tot_Neggs, mean_Egg_energy, mean_Egg_energy, max_generation)
     end
 
