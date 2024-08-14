@@ -72,8 +72,8 @@ function create_params(
     p_M = 54.67 
     Eg = 5077.00  
 
-    # GROWTH PUBERTY REPRODUCTION - #tutte negli agents
-    Hb = 0.0001223 #  Hb = 0.000122
+    # GROWTH PUBERTY REPRODUCTION
+    Hb = 0.0001223 
     Hj = 0.6741
     Hp = 244.0
     Lb = 0.0133472
@@ -86,9 +86,8 @@ function create_params(
     ep_min = 0.30 
     E0_min =  0.004
     E0_max =  0.0137527 
-    #W0 = 0.0000006
     L0 = 0.001
-    W0 = 2.98e-6,
+    W0 = 2.98e-6
     Ta = 9800.0  # Arrhenius temperature
     Tr = 293.0   # Reference temperature
 

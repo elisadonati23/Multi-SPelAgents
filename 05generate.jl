@@ -75,7 +75,7 @@ function generate_Juvenile(No_J, model, Nind = missing, Generation = 0.0, En = m
         agent_Nind = ismissing(Nind) ? 1e7 : Float64(floor(Nind))
 
         # Set length-weight relationship
-        agent_Lw = ismissing(Lw) ? clamp(round(randn() * 0.5 + 5.0, digits=2), 4.45, 5.5) : Lw
+        agent_Lw = ismissing(Lw) ? clamp(round(randn() * 0.5 + 3.5, digits=2), 3.0, 4.0) : Lw
 
         # Calculate age and time to puberty based on length
         agent_Age = model.Ap * (agent_Lw * model.del_M) / model.Lp
@@ -155,7 +155,7 @@ function generate_Adult(No_A, model, Nind = missing, Age = missing, t_puberty = 
         agent_Nind = ismissing(Nind) ? 1e7 : Float64(floor(Nind))
 
         # Set length-weight relationship
-        agent_Lw = ismissing(Lw) ? clamp(round(randn() * 5.0 + 20.0, digits=2), 15.0, 25.0) : agent_Lw
+        agent_Lw = ismissing(Lw) ? clamp(round(randn() * 5.0 + 13.0, digits=2), 8.0, 18.0) : agent_Lw
 
         # Calculate age based on length
         agent_Age = if ismissing(Age)
