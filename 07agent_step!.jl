@@ -213,9 +213,10 @@ function juveDEB!(Sardine, model)
         Sardine.Scaled_En = Sardine.En / (model.Em * (( Sardine.Lw * model.del_M)^3.0))
 
         #check whether Lm is a vector or a float
+
         Sardine.L = Sardine.Lw * model.del_M
         Sardine.pA = Sardine.f_i * model.p_Am * model.Tc_value * Sardine.s_M_i * ((Sardine.Lw * model.del_M)^2.0)
-        
+  
         # adjust acceleration factor
         # before birth is 1
         if !Sardine.metamorph
