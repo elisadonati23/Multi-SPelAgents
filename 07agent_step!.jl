@@ -431,7 +431,7 @@ function adultspawn!(Sardine, model)
 if (!Sardine.Dead && Sardine.Nind >= 100000.0)  &&
 
     #2nd condition: being in the repro period
-    ( model.repro_start <= model.day_of_the_year <= model.day_of_the_year) &&
+    ( model.repro_start <= model.day_of_the_year <= model.repro_end) &&
           
             # 3th condition: random number between 0 and 1 is smaller than the probability of spawning, then reproduction occurs
             (rand() <= model.prob_dict[model.day_of_the_year])
