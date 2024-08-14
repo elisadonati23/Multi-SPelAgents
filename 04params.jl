@@ -43,27 +43,7 @@ function create_params(
     DEB_timing = 1.0
     sim_timing = 1
 
-    repro_start = 270.0  # Sardines reproduction starts in October
-    repro_end = 90.0     # Sardines reproduction ends in April
-    peak1_sardine = 1
-    peak2_sardine = missing
-    total_repro_sardine = 10
-    std_dev = 60
-
-    repro_period = vcat(270.0:365.0, 1.0:90.0)  # Reproduction period covering the year-end
-
     # DEB model parameters
-    Sex_ratio = 0.5
-    p_Am = 396.002  # Maximum assimilation power
-    v_rate = 0.0172  # Energy conductance
-    KappaX = 0.8  # Digestion efficiency
-    KappaR = 0.95  # Repro efficiency
-    Fm = 6.5  # Maximum specific searching rate
-    del_M = 0.1152  # Shape coefficient (isomorph)
-    k_J = 0.002  # Maturity maintenance rate coefficient
-    s_M = 3.093  # Stress coefficient
-    p_M = 396.195  # Volume-specific somatic maintenance
-    Eg = 5197.37  # Cost per unit of structure
     d_V = 0.2  # Volume-specific density of structure
     mu_V = 500000.0  # Chemical potential of structure
     mu_E = 550000.0  # Chemical potential of reserve
@@ -73,23 +53,65 @@ function create_params(
 
     # Growth, puberty, and reproduction parameters
 
-    Hb = 0.0112
-    Hj = 0.3478 #0.3478
-    Hp = 3013.0
-    Lb = 0.0321
-    Lj = 0.0993
-    Lp = 1.3832
-    Ab = 8.0
-    Ap = 234.0
-    Am = 2920.0
-    E0 = 0.966581
-    ep_min = 0.25
-    E0_min = 0.389 # when you have a juvenile with the minimum enough energy to produce eggs in the reserve: it reflects the energy of the mother
-    E0_max = 0.967
-    W0 = 0.00021 # Addmypet
-    L0 = 0.001  # Initial length in cm
-    Ta = 8000.0  # Arrhenius temperature
+    repro_start = 90.0 
+    repro_end = 270.
+    peak1_sardine = 180
+    peak2_sardine = missing
+    total_repro_sardine = 5
+    std_dev = 60
+    repro_period = vcat(90.0:270.0)
+    Sex_ratio = 0.5
+    p_Am = 11.1372
+    v_rate = 0.01944
+    Kappa = 0.9901
+    KappaX = 0.8
+    KappaR = 0.95
+    Fm = 6.5 
+    del_M = 0.1656
+    k_J = 0.002 
+    s_M = 17.3829 
+    p_M = 54.67 
+    Eg = 5077.00  
+
+    # GROWTH PUBERTY REPRODUCTION - #tutte negli agents
+    Hb = 0.0001223 #  Hb = 0.000122
+    Hj = 0.6741
+    Hp = 244.0
+    #Lb = 0.3,
+    #Lj = 3.75,
+    #Lp = 9.0,
+    Lb = 0.0706
+    Lj = 0.08
+    Lp = 0.48
+    Ab = 6.0
+    Ap = 292.0
+    Am = 1825.0
+    E0 = 0.0137527
+    ep_min = 0.30 
+    E0_min =  0.004
+    E0_max =  0.0137527 
+    #W0 = 0.0000006
+    L0 = 0.00001
+    W0 = 0.00021
+    Ta = 9800.0  # Arrhenius temperature
     Tr = 293.0   # Reference temperature
+
+    #Hb = 0.000122,
+    #Hj = 0.6741,
+    #Hp = 244.0,
+    #Lb = 0.0133472,
+    #Lj = 0.232013,
+    #Lp = 1.50,
+    #Ab = 6.0,
+    #Ap = 292.0,
+    #Am = 1825.0,
+    #E0 = 0.013653,
+    #ep_min = 0.25,
+    #E0_min = 0.004,
+    #E0_max = 0.013753,
+    #W0 = 2.98e-6,
+    #L0 = 0.00001, 
+
 
     # Derived parameters based on DEB theory
     Em = p_Am / v_rate  # Maximum reserve density
@@ -115,7 +137,7 @@ function create_params(
     prob_dict = Dict(zip(repro_period, daily_repro_probabilities))
 
     # Initialize output variables
-    Nsuperind = No_A + No_J + No_Egg
+
     year = 1.0
     dead_eggmass = 0
     deadJ_nat = 0
@@ -281,8 +303,7 @@ function create_params(
         :fished1 => fished1,
         :fished2 => fished2,
         :fished3 => fished3,
-        :fished4more => fished4more,
-        :Nsuperind => Nsuperind
+        :fished4more => fished4more
     )
                            
     return model_parameters            
