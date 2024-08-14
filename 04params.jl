@@ -63,7 +63,6 @@ function create_params(
     Sex_ratio = 0.5
     p_Am = 11.1372
     v_rate = 0.01944
-    Kappa = 0.9901
     KappaX = 0.8
     KappaR = 0.95
     Fm = 6.5 
@@ -77,12 +76,9 @@ function create_params(
     Hb = 0.0001223 #  Hb = 0.000122
     Hj = 0.6741
     Hp = 244.0
-    #Lb = 0.3,
-    #Lj = 3.75,
-    #Lp = 9.0,
-    Lb = 0.0706
-    Lj = 0.08
-    Lp = 0.48
+    Lb = 0.0133472
+    Lj = 0.232013
+    Lp = 1.50
     Ab = 6.0
     Ap = 292.0
     Am = 1825.0
@@ -91,17 +87,15 @@ function create_params(
     E0_min =  0.004
     E0_max =  0.0137527 
     #W0 = 0.0000006
-    L0 = 0.00001
-    W0 = 0.00021
+    L0 = 0.001
+    W0 = 2.98e-6,
     Ta = 9800.0  # Arrhenius temperature
     Tr = 293.0   # Reference temperature
 
     #Hb = 0.000122,
     #Hj = 0.6741,
     #Hp = 244.0,
-    #Lb = 0.0133472,
-    #Lj = 0.232013,
-    #Lp = 1.50,
+
     #Ab = 6.0,
     #Ap = 292.0,
     #Am = 1825.0,
@@ -109,7 +103,7 @@ function create_params(
     #ep_min = 0.25,
     #E0_min = 0.004,
     #E0_max = 0.013753,
-    #W0 = 2.98e-6,
+    #
     #L0 = 0.00001, 
 
 

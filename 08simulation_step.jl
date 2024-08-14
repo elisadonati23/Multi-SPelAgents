@@ -81,7 +81,7 @@ end
 
 function update_outputs!(model)
     agents = collect(values(allagents(model)))
-    model.Nsuperind = length(agents)
+    #model.Nsuperind = length(agents)
     
     adults = filter(a -> a.type == :adult, agents)
     adults_juv = filter(a -> a.type == :adult || a.type == :juvenile, agents)
