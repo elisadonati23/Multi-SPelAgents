@@ -74,7 +74,7 @@ function create_params(
     # Growth, puberty, and reproduction parameters
 
     Hb = 0.0112
-    Hj = 0.3478
+    Hj = 30.0 #0.3478
     Hp = 3013.0
     Lb = 0.0321
     Lj = 0.0993
@@ -87,7 +87,6 @@ function create_params(
     E0_min = 0.389
     E0_max = 0.967
     W0 = 0.00021
-
     L0 = 0.001  # Initial length in cm
     Ta = 8000.0  # Arrhenius temperature
     Tr = 293.0   # Reference temperature

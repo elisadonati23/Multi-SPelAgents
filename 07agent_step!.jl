@@ -77,15 +77,14 @@ function egghatch!(Sardine, model)
         Sardine.Age = model.Ap * (Sardine.Lw * model.del_M) / model.Lp
         Sardine.H = model.Hp * (Sardine.Lw * model.del_M) / model.Lp
         Sardine.Nind = Float64(ceil((1 - model.M_egg) * Float64((Sardine.Nind))))
-        Sardine.s_M_i = 1.0
         
-        #Sardine.s_M_i = if model.Hb >= Sardine.H
-        #    1.0
-        #elseif Sardine.H > model.Hb && model.Hj > Sardine.H
-        #    Sardine.Lw * model.del_M / Sardine.Lb_i
-        #else
-        #    Sardine.Lj_i/ Sardine.Lb_i
-        #end
+        Sardine.s_M_i = if model.Hb >= Sardine.H
+            1.0
+        elseif model.Hb < Sardine.H < model.Hj
+            Sardine.Lw * model.del_M / Sardine.Lb_i
+        else
+            model.s_M
+        end
 
         # 0.8 is f = functional response: I start juvenile starts exogenous feeding with not limiting capacity;
         # this allow to calculate first pA and then update real and maximum assimilation in the evolve_environment function
@@ -154,9 +153,6 @@ function juvedie!(Sardine, model)
 return
 end
 
-
-
-
 function juveDEB!(Sardine, model)
 
     if !Sardine.Dead
@@ -223,13 +219,13 @@ function juveDEB!(Sardine, model)
         # adjust acceleration factor
         # before birth is 1
         if !Sardine.metamorph
-           if model.Hb >= Sardine.H
+           if Sardine.H <= model.Hb
                 Sardine.s_M_i = 1.0
             elseif model.Hb < Sardine.H < model.Hj
                 Sardine.s_M_i = (Sardine.Lw * model.del_M) / Sardine.Lb_i
             elseif Sardine.H >= model.Hj
                 Sardine.Lj_i = Sardine.Lw * model.del_M
-                Sardine.s_M_i = model.Lj / model.Lb
+                Sardine.s_M_i = Sardine.Lj_i / Sardine.Lb_i
                 Sardine.metamorph = true
                 println("s_M_i: ", Sardine.s_M_i, " Lj_i: ", Sardine.Lj_i, " Lb_i: ", Sardine.Lb_i)
             end
@@ -408,7 +404,7 @@ if !Sardine.Dead
     Sardine.H = Hdyn + deltaH
     Sardine.R = Rdyn + deltaR
     Sardine.Ww = (model.w *(model.d_V * V + model.w_E/ model.mu_E * (Sardine.En + Sardine.R)))
-
+    Sardine.L = Sardine.Lw * model.del_M
     Sardine.Scaled_En= Sardine.En / (model.Em * (( Sardine.Lw * model.del_M)^3.0))
     Sardine.pA = Sardine.f_i * model.p_Am * model.Tc_value * Sardine.s_M_i * ((Sardine.Lw * model.del_M)^2.0)
     Sardine.CI = 100 * Sardine.Ww / (Sardine.Lw^3)

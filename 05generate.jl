@@ -28,7 +28,7 @@ function generate_EggMass(No_Egg, model, Nind = missing, maternal_EggEn = missin
     agent_Ww = 0.0
     agent_R = 0.0
     agent_Scaled_En = 0.0
-    agent_s_M_i = 1.0
+    agent_s_M_i = 0.0
     agent_pA = 0.0
     agent_Lb_i = 0.0
     agent_superind_Neggs = 0.0
@@ -99,10 +99,11 @@ function generate_Juvenile(No_J, model, Nind = missing, Generation = 0.0, En = m
             agent_s_M_i = 1.0
             agent_metamorph = false
         elseif model.Hb < agent_H < model.Hj
-            agent_Lw * model.del_M / agent_Lb_i
+            agent_s_M_i = agent_Lw * model.del_M / agent_Lb_i
             agent_metamorph = false
         else
-            model.Lj / agent_Lb_i
+            agent_Lj_i = model.Lj
+            agent_s_M_i = model.Lj / agent_Lb_i
             agent_metamorph = true
         end
         
@@ -119,7 +120,7 @@ function generate_Juvenile(No_J, model, Nind = missing, Generation = 0.0, En = m
             Sardine, model, agent_type, agent_reproduction, agent_Nind, agent_Age, agent_L, agent_H,
             agent_maternal_EggEn, agent_superind_Neggs, agent_En, agent_Generation, agent_Dead,
             agent_f_i, agent_t_puberty, agent_Lw, agent_Ww, agent_R, agent_Scaled_En,
-            agent_s_M_i, agent_pA, agent_Lb_i, agent_Lj_i,agent_metamorph, agent_CI, agent_GSI, agent_spawned
+            agent_s_M_i, agent_pA, agent_Lb_i, agent_Lj_i, agent_metamorph, agent_CI, agent_GSI, agent_spawned
         )
 
     end
