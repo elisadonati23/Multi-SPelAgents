@@ -74,7 +74,7 @@ function create_params(
     # Growth, puberty, and reproduction parameters
 
     Hb = 0.0112
-    Hj = 0.3478
+    Hj = 0.3478 #0.3478
     Hp = 3013.0
     Lb = 0.0321
     Lj = 0.0993
@@ -84,10 +84,9 @@ function create_params(
     Am = 2920.0
     E0 = 0.966581
     ep_min = 0.25
-    E0_min = 0.389
+    E0_min = 0.389 # when you have a juvenile with the minimum enough energy to produce eggs in the reserve: it reflects the energy of the mother
     E0_max = 0.967
-    W0 = 0.00021
-
+    W0 = 0.00021 # Addmypet
     L0 = 0.001  # Initial length in cm
     Ta = 8000.0  # Arrhenius temperature
     Tr = 293.0   # Reference temperature
@@ -116,7 +115,7 @@ function create_params(
     prob_dict = Dict(zip(repro_period, daily_repro_probabilities))
 
     # Initialize output variables
-
+    Nsuperind = No_A + No_J + No_Egg
     year = 1.0
     dead_eggmass = 0
     deadJ_nat = 0
@@ -282,7 +281,8 @@ function create_params(
         :fished1 => fished1,
         :fished2 => fished2,
         :fished3 => fished3,
-        :fished4more => fished4more
+        :fished4more => fished4more,
+        :Nsuperind => Nsuperind
     )
                            
     return model_parameters            

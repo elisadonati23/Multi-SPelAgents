@@ -62,7 +62,7 @@ function eggDEB!(Sardine, model)
         Sardine.En = Sardine.En + deltaEggEn
         Sardine.maternal_EggEn = Sardine.maternal_EggEn + deltaEggEn
         Sardine.H = Sardine.H + deltaH 
-        Sardine.L = (V + deltaV)^(1/3)
+        Sardine.L = (V + deltaV)^(1/3) # structural
     end
     return
 end
@@ -75,12 +75,12 @@ function egghatch!(Sardine, model)
         Sardine.Lw = (Sardine.L / model.del_M)
         Sardine.Lb_i = Sardine.L
         Sardine.Age = model.Ap * (Sardine.Lw * model.del_M) / model.Lp
-        Sardine.H = model.Hp * (Sardine.Lw * model.del_M) / model.Lp
+        #Sardine.H = model.Hp * (Sardine.Lw * model.del_M) / model.Lp
         Sardine.Nind = Float64(ceil((1 - model.M_egg) * Float64((Sardine.Nind))))
-
+        
         Sardine.s_M_i = if model.Hb >= Sardine.H
             1.0
-        elseif Sardine.H > model.Hb && model.Hj > Sardine.H
+        elseif model.Hb < Sardine.H < model.Hj
             Sardine.Lw * model.del_M / Sardine.Lb_i
         else
             model.s_M
@@ -153,9 +153,6 @@ function juvedie!(Sardine, model)
 return
 end
 
-
-
-
 function juveDEB!(Sardine, model)
 
     if !Sardine.Dead
@@ -163,7 +160,6 @@ function juveDEB!(Sardine, model)
         Sardine.f_i = model.f #if no one is eating (=model initilized with eggs), it is set to 0.8)
 
         # juvenile store energy into maturation state variable and eventually they mature
-        #println("for agent $(Sardine.id) Lw is ", Sardine.Lw, "and del_M_i is ", model.del_M)
 
         #initialize the state variables before the fluxes
         Vdyn = (Sardine.Lw * model.del_M) ^ 3.0
@@ -217,17 +213,23 @@ function juveDEB!(Sardine, model)
         Sardine.Scaled_En = Sardine.En / (model.Em * (( Sardine.Lw * model.del_M)^3.0))
 
         #check whether Lm is a vector or a float
-        Lm_value = isa(model.Lm, Vector{Float64}) ? model.Lm[model.sim_timing] : model.Lm
+
         Sardine.L = Sardine.Lw * model.del_M
-
-
+        Sardine.pA = Sardine.f_i * model.p_Am * model.Tc_value * Sardine.s_M_i * ((Sardine.Lw * model.del_M)^2.0)
+  
         # adjust acceleration factor
-        Sardine.s_M_i = if model.Hb >= Sardine.H
-            1.0
-        elseif Sardine.H > model.Hb && model.Hj > Sardine.H
-            Sardine.Lw * model.del_M / Sardine.Lb_i
-        else
-            model.s_M
+        # before birth is 1
+        if !Sardine.metamorph
+           if Sardine.H <= model.Hb
+                Sardine.s_M_i = 1.0
+            elseif model.Hb < Sardine.H < model.Hj
+                Sardine.s_M_i = (Sardine.Lw * model.del_M) / Sardine.Lb_i
+            elseif Sardine.H >= model.Hj
+                Sardine.Lj_i = Sardine.Lw * model.del_M
+                Sardine.s_M_i = Sardine.Lj_i / Sardine.Lb_i
+                Sardine.metamorph = true
+                println("s_M_i: ", Sardine.s_M_i, " Lj_i: ", Sardine.Lj_i, " Lb_i: ", Sardine.Lb_i)
+            end
         end
 
         Sardine.pA = Sardine.f_i * model.p_Am * model.Tc_value * Sardine.s_M_i * ((Sardine.Lw * model.del_M)^2.0)
@@ -238,14 +240,11 @@ end
 
 function juvemature!(Sardine, model)
     if !Sardine.Dead && (Sardine.H >= model.Hp)
-         #put adult features
          #Keep the same number of individuals which survived up to now in juvenile superind
          Sardine.type = :adult
          Sardine.R = 0.0
          Sardine.pA = Sardine.f_i * model.p_Am * model.Tc_value * Sardine.s_M_i * ((Sardine.Lw * model.del_M)^2.0) #perchè non alla 2/3?
          Sardine.Generation += 1.0
-
-         Sardine.s_M_i = model.s_M
     end
     return
 end
@@ -406,7 +405,7 @@ if !Sardine.Dead
     Sardine.H = Hdyn + deltaH
     Sardine.R = Rdyn + deltaR
     Sardine.Ww = (model.w *(model.d_V * V + model.w_E/ model.mu_E * (Sardine.En + Sardine.R)))
-
+    Sardine.L = Sardine.Lw * model.del_M
     Sardine.Scaled_En= Sardine.En / (model.Em * (( Sardine.Lw * model.del_M)^3.0))
     Sardine.pA = Sardine.f_i * model.p_Am * model.Tc_value * Sardine.s_M_i * ((Sardine.Lw * model.del_M)^2.0)
     Sardine.CI = 100 * Sardine.Ww / (Sardine.Lw^3)
@@ -435,7 +434,7 @@ if (!Sardine.Dead && Sardine.Nind >= 100000.0)  &&
     #2nd condition: being in the repro period
     ((model.repro_start <= model.day_of_the_year <= 365.0) || (1.0 <= model.day_of_the_year <= model.repro_end)) &&
           
-            # 4th condition: random number between 0 and 1 is smaller than the probability of spawning, then reproduction occurs
+            # 3th condition: random number between 0 and 1 is smaller than the probability of spawning, then reproduction occurs
             (rand() <= model.prob_dict[model.day_of_the_year])
 
             #eggs from all females

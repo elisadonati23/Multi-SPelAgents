@@ -8,13 +8,14 @@ function generate_EggMass(No_Egg, model, Nind = missing, maternal_EggEn = missin
     agent_type = :eggmass
     agent_Age = 0.0
     agent_L = model.L0
-    agent_H = 0.00
+    agent_H = 0.0
     agent_spawned = 0.0
-    agent_QWw = "Q1"
     agent_Dead = false
     agent_reproduction = :nonspawner
     agent_CI = 0.0
     agent_GSI = 0.0
+    agent_Lj_i = 0.0
+    agent_metamorph = false
 
     # Set maternal egg energy
     agent_maternal_EggEn = ismissing(maternal_EggEn) ? Float64(model.E0) : Float64(maternal_EggEn)
@@ -44,8 +45,8 @@ function generate_EggMass(No_Egg, model, Nind = missing, maternal_EggEn = missin
         add_agent!(
             Sardine, model, agent_type, agent_reproduction, agent_Nind, agent_Age, agent_L, agent_H,
             agent_maternal_EggEn, agent_superind_Neggs, agent_En, agent_Generation, agent_Dead,
-            agent_f_i, agent_t_puberty, agent_Lw, agent_Ww, agent_QWw, agent_R, agent_Scaled_En,
-            agent_s_M_i, agent_pA, agent_Lb_i, agent_CI, agent_GSI, agent_spawned
+            agent_f_i, agent_t_puberty, agent_Lw, agent_Ww, agent_R, agent_Scaled_En,
+            agent_s_M_i, agent_pA, agent_Lb_i, agent_Lj_i, agent_metamorph, agent_CI, agent_GSI, agent_spawned
         )
 
     end
@@ -61,11 +62,9 @@ function generate_Juvenile(No_J, model, Nind = missing, Generation = 0.0, En = m
     agent_Lb_i = Lb_i
     agent_R = 0.0
     agent_spawned = 0.0
-    agent_QWw = "Q1"
     agent_Dead = false
     agent_reproduction = :nonspawner
-
-
+    
     # Silenced features
     agent_maternal_EggEn = model.E0
     agent_superind_Neggs = 0.0  # EggMass
@@ -96,13 +95,18 @@ function generate_Juvenile(No_J, model, Nind = missing, Generation = 0.0, En = m
 
         # Determine shape parameter
 
-        agent_s_M_i = if model.Hb >= agent_H
-            1.0
-        elseif agent_H > model.Hb && model.Hj > agent_H
-            agent_Lw * model.del_M / agent_Lb_i
+        if model.Hb >= agent_H
+            agent_s_M_i = 1.0
+            agent_metamorph = false
+        elseif model.Hb < agent_H < model.Hj
+            agent_s_M_i = agent_Lw * model.del_M / agent_Lb_i
+            agent_metamorph = false
         else
-            model.s_M
+            agent_Lj_i = model.Lj
+            agent_s_M_i = model.Lj / agent_Lb_i
+            agent_metamorph = true
         end
+        
         # Calculate assimilation rate
         Tc_value = isa(model.Tc, Vector{Float64}) ? model.Tc[model.sim_timing] : model.Tc
         agent_pA = agent_f_i * model.p_Am * Tc_value * agent_s_M_i * ((agent_Lw * model.del_M)^2.0)
@@ -115,14 +119,14 @@ function generate_Juvenile(No_J, model, Nind = missing, Generation = 0.0, En = m
         add_agent!(
             Sardine, model, agent_type, agent_reproduction, agent_Nind, agent_Age, agent_L, agent_H,
             agent_maternal_EggEn, agent_superind_Neggs, agent_En, agent_Generation, agent_Dead,
-            agent_f_i, agent_t_puberty, agent_Lw, agent_Ww, agent_QWw, agent_R, agent_Scaled_En,
-            agent_s_M_i, agent_pA, agent_Lb_i, agent_CI, agent_GSI, agent_spawned
+            agent_f_i, agent_t_puberty, agent_Lw, agent_Ww, agent_R, agent_Scaled_En,
+            agent_s_M_i, agent_pA, agent_Lb_i, agent_Lj_i, agent_metamorph, agent_CI, agent_GSI, agent_spawned
         )
 
     end
 end
 
-function generate_Adult(No_A, model, Nind = missing, Age = missing, t_puberty = missing, Lw = missing, Ww = missing, H = missing, R = missing, En = missing, Scaled_En = missing, Generation = missing, pA = missing)
+function generate_Adult(No_A, model, Nind = missing, Age = missing, t_puberty = missing, Lw = missing, Ww = missing, H = missing, R = missing, En = missing, Scaled_En = missing, Generation = missing, pA = missing, Lj = missing)
 
     # Initialize default agent properties for Adult
     agent_type = :adult
@@ -133,21 +137,14 @@ function generate_Adult(No_A, model, Nind = missing, Age = missing, t_puberty = 
     agent_superind_Neggs = 0.0
     agent_Lb_i = model.Lb
     agent_spawned = 0.0
-    agent_QWw = "Q1"
     agent_Dead = false
+    agent_metamorph = true
 
     # Set maturation energy
     agent_H = ismissing(H) ? model.Hp : H
 
     # Determine shape parameter
-    agent_s_M_i = if model.Hb >= agent_H
-        1.0
-    elseif agent_H > model.Hb && model.Hj > agent_H
-        agent_Lw * model.del_M / model.Lb
-    else
-
-        model.s_M
-    end
+    agent_s_M_i = model.Lj / model.Lb
 
     # Set generation
     agent_Generation = ismissing(Generation) ? 0.0 : Generation
@@ -169,6 +166,12 @@ function generate_Adult(No_A, model, Nind = missing, Age = missing, t_puberty = 
             end
         else
             Age
+        end
+
+        agent_Lj_i = if ismissing(Lj)
+            model.Lj
+        else
+            Lj
         end
 
         # Set time to puberty
@@ -198,8 +201,8 @@ function generate_Adult(No_A, model, Nind = missing, Age = missing, t_puberty = 
         add_agent!(
             Sardine, model, agent_type, agent_reproduction, agent_Nind, agent_Age, agent_L, agent_H,
             agent_maternal_EggEn, agent_superind_Neggs, agent_En, agent_Generation, agent_Dead,
-            agent_f_i, agent_t_puberty, agent_Lw, agent_Ww, agent_QWw, agent_R, agent_Scaled_En,
-            agent_s_M_i, agent_pA, agent_Lb_i, agent_CI, agent_GSI, agent_spawned
+            agent_f_i, agent_t_puberty, agent_Lw, agent_Ww, agent_R, agent_Scaled_En,
+            agent_s_M_i, agent_pA, agent_Lb_i, agent_Lj_i, agent_metamorph, agent_CI, agent_GSI, agent_spawned
         )
     end
 
