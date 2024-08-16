@@ -47,24 +47,25 @@ function evolve_environment!(model)
     
 
     # Calculate Xall
-    Xall = model.Xmax_value - (calculate_real_assimilation(model) / model.KappaX) / model.Wv
+    #Xall = model.Xmax_value - (calculate_real_assimilation(model) / model.KappaX) / model.Wv
+    #
+    #if Xall < 0.0  
+    #    Xall = 0.0 
+    #end
     
-    if Xall < 0.0  
-        Xall = 0.0 
-    end
-    
-    model.Xall = Xall
+    #model.Xall = Xall
 
     # Update response function f
-    max_assimilation = calculate_max_assimilation(model)
+    #max_assimilation = calculate_max_assimilation(model)
     
-    if ismissing(max_assimilation) || max_assimilation == 0.0 || isnan(max_assimilation)
-        f = 0.0
-    else
-        # Ratio between available food and what is consumed based on size and Tc
-        f = (model.Xmax_value * model.Wv * model.KappaX) / max_assimilation
-    end
-
+    #if ismissing(max_assimilation) || max_assimilation == 0.0 || isnan(max_assimilation)
+    #    f = 0.0
+    #else
+    #    # Ratio between available food and what is consumed based on size and Tc
+    #    f = (model.Xmax_value * model.Wv * model.KappaX) / max_assimilation
+    #end
+    model.f = model.Xmax_value / (model.Xmax_value * model.Ksat) # where Ksat is molX/Lw
+    
     # Ensure that f is bounded between 0 and 1
     model.f = max(0, min(f, 1.0))
 
