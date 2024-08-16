@@ -452,7 +452,6 @@ if  ((model.repro_start <= model.day_of_the_year <= 365.0) || (1.0 <= model.day_
                 Sardine.reproduction = :spawner
                 Sardine.R = Float64(Sardine.R - spawned_en) #(Sardine.R / spawn_period)) 
                 Sardine.spawned += 1.0 #number of times the fish has spawned
-                Sardine.R = Sardine.R - spawned_en
             else
                 Sardine.superind_Neggs = 0.0
                 Sardine.reproduction = :nonspawner
