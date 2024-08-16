@@ -247,7 +247,7 @@ function calculate_max_assimilation(model)
         Nind_values = [getfield(agent, Symbol("Nind")) for agent in filtered_agents]
         #the total max assimilation of the Superindividuals
         # Perform element-wise operations and calculate the sum
-        denom = sum(Nind_values .* (p_Am_values .* Tc_value .* s_M_i_values .* (Lw_values .* model.del_M .^ 2)))
+        denom = sum(Nind_values .* (p_Am_values .* Tc_value .* s_M_i_values .* ((Lw_values .* model.del_M) .^ 2)))
     end
     return denom
 end
