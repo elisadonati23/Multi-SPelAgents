@@ -428,18 +428,18 @@ function adultspawn!(Sardine, model)
     Sardine.superind_Neggs = 0.0
 
 #1st condition to reproduce not being dead
-if (!Sardine.Dead && Sardine.Nind >= 100000.0)  &&
+#if (!Sardine.Dead && Sardine.Nind >= 100000.0)  &&
 
     #2nd condition: being in the repro period
-    ( model.repro_start <= model.day_of_the_year <= model.repro_end) &&
+    if (model.repro_start <= model.day_of_the_year <= model.repro_end)
           
             # 3th condition: random number between 0 and 1 is smaller than the probability of spawning, then reproduction occurs
-            (rand() <= model.prob_dict[model.day_of_the_year])
+            #(rand() <= model.prob_dict[model.day_of_the_year])
 
             #eggs from all females
-            superind_Neggs_value = Float64(420.0 * Sardine.Ww) * ceil((Sardine.Nind/2.0)) 
+            superind_Neggs_value = Float64(460.0 * Sardine.Ww) * ceil((Sardine.Nind/2.0)) 
             #eggs from one female
-            Neggs_value_single = Float64(420.0 * Sardine.Ww) #420 standard number of eggs per weight of female
+            Neggs_value_single = Float64(460.0 * Sardine.Ww) #420 standard number of eggs per weight of female
 
 
             # Then determine the energy content of the eggs from maternal effects
@@ -448,12 +448,13 @@ if (!Sardine.Dead && Sardine.Nind >= 100000.0)  &&
             spawned_en = Neggs_value_single *  Sardine.maternal_EggEn #Sardine.R * Kappa_valueR / spawn_period 
 
             # and if the energy to be spawned is lower than the energy available, spawn!
-            if (spawned_en < Sardine.R * model.KappaR) #* Kappa_valueR)
+            if (spawned_en <= Sardine.R * model.KappaR) #* Kappa_valueR)
                 #Nind males and females lose the same amount of spawned energy
                 Sardine.superind_Neggs = superind_Neggs_value
                 Sardine.reproduction = :spawner
                 Sardine.R = Float64(Sardine.R - spawned_en) #(Sardine.R / spawn_period)) 
                 Sardine.spawned += 1.0 #number of times the fish has spawned
+                SArdine.R = Sardine.R - spawned_en
             else
                 Sardine.superind_Neggs = 0.0
                 Sardine.reproduction = :nonspawner
