@@ -454,7 +454,6 @@ function adultspawn!(Sardine, model)
                 Sardine.reproduction = :spawner
                 Sardine.R = Float64(Sardine.R - spawned_en) #(Sardine.R / spawn_period)) 
                 Sardine.spawned += 1.0 #number of times the fish has spawned
-                SArdine.R = Sardine.R - spawned_en
             else
                 Sardine.superind_Neggs = 0.0
                 Sardine.reproduction = :nonspawner
