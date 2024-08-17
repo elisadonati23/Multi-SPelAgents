@@ -434,11 +434,12 @@ if  ((model.repro_start <= model.day_of_the_year <= 365.0) || (1.0 <= model.day_
             # 3th condition: random number between 0 and 1 is smaller than the probability of spawning, then reproduction occurs
             #(rand() <= model.prob_dict[model.day_of_the_year])
 
+            Wg = (model.w * (model.w_E / model.mu_E) * Sardine.R)
+            free_weight = Sardine.Ww - Wg
             #eggs from all females
-            superind_Neggs_value = Float64(400.0 * Sardine.Ww) * ceil((Sardine.Nind/2.0)) 
+            superind_Neggs_value = Float64(400.0 * free_weight) * ceil((Sardine.Nind/2.0)) 
             #eggs from one female
-            Neggs_value_single = Float64(400.0 * Sardine.Ww) #420 standard number of eggs per weight of female
-
+            Neggs_value_single = Float64(400.0 * free_weight) #420 standard number of eggs per weight of female
 
             # Then determine the energy content of the eggs from maternal effects
             Sardine.maternal_EggEn = Float64(((model.E0_max - model.E0_min) / (1.0- model.ep_min)) * (Sardine.Scaled_En - model.ep_min)) + model.E0_min
