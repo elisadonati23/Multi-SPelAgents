@@ -86,9 +86,9 @@ zeros_long = vcat(repeat([0.0], 365*40+1+16071))
 results = []
 num_runs = 1
 
-models = [
-model_initialize_parallel(100.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.7e14, 1.0, 5.0, 0.945, 15.0, 0.9998,	1.08,	0.86,	0.69,	0.62,	0.48)
-]
+#models = [
+#model_initialize_parallel(10.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.7e14, 1.0, 5.0, 0.945, 15.0, 0.9998,	1.08,	0.86,	0.69,	0.62,	0.48)
+#]
 
 # Initialize dataframes
 adata = [:type, :Nind, :t_puberty,:Age, :Lw, :Ww, :En, :R, :H, :CI, :GSI, :pA, :s_M_i, :superind_Neggs, :reproduction, :spawned, :Dead]
