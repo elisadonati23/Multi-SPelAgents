@@ -57,7 +57,6 @@ function generate_Juvenile(No_J, model, Nind = missing, Generation = 0.0, En = m
     # Initialize default agent properties for Juvenile
     agent_type = :juvenile
     agent_f_i = 0.8
-    agent_L = model.L0
     agent_Generation = Generation
     agent_Lb_i = Lb_i
     agent_R = 0.0
@@ -76,6 +75,7 @@ function generate_Juvenile(No_J, model, Nind = missing, Generation = 0.0, En = m
 
         # Set length-weight relationship
         agent_Lw = ismissing(Lw) ? clamp(round(randn() * 0.5 + 5.0, digits=2), 4.45, 5.5) : Lw
+        agent_L = agent_Lw * model.del_M
 
         # Calculate age and time to puberty based on length
         agent_Age = model.Ap * (agent_Lw * model.del_M) / model.Lp
@@ -132,7 +132,6 @@ function generate_Adult(No_A, model, Nind = missing, Age = missing, t_puberty = 
     agent_type = :adult
     agent_f_i = model.f
     agent_reproduction = :nonspawner
-    agent_L = 0.0
     agent_maternal_EggEn = model.E0
     agent_superind_Neggs = 0.0
     agent_Lb_i = model.Lb
@@ -156,6 +155,7 @@ function generate_Adult(No_A, model, Nind = missing, Age = missing, t_puberty = 
 
         # Set length-weight relationship
         agent_Lw = ismissing(Lw) ? clamp(round(randn() * 5.0 + 20.0, digits=2), 15.0, 25.0) : agent_Lw
+        agent_L = agent_Lw * model.del_M
 
         # Calculate age based on length
         agent_Age = if ismissing(Age)
