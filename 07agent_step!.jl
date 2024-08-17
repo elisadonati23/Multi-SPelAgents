@@ -436,10 +436,12 @@ function adultspawn!(Sardine, model)
             # 3th condition: random number between 0 and 1 is smaller than the probability of spawning, then reproduction occurs
             #(rand() <= model.prob_dict[model.day_of_the_year])
 
+            Wg = (model.w * (model.w_E / model.mu_E) * Sardine.R)
+            free_weight = Sardine.Ww - Wg
             #eggs from all females
-            superind_Neggs_value = Float64(460.0 * Sardine.Ww) * ceil((Sardine.Nind/2.0)) 
+            superind_Neggs_value = Float64(460.0 * free_weight) * ceil((Sardine.Nind/2.0)) 
             #eggs from one female
-            Neggs_value_single = Float64(460.0 * Sardine.Ww) #420 standard number of eggs per weight of female
+            Neggs_value_single = Float64(460.0 * free_weight) #420 standard number of eggs per weight of female
 
 
             # Then determine the energy content of the eggs from maternal effects
