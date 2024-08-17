@@ -28,7 +28,7 @@ function generate_EggMass(No_Egg, model, Nind = missing, maternal_EggEn = missin
     agent_Ww = 0.0
     agent_R = 0.0
     agent_Scaled_En = 0.0
-    agent_s_M_i = 0.0
+    agent_s_M_i = 1.0
     agent_pA = 0.0
     agent_Lb_i = 0.0
     agent_superind_Neggs = 0.0
