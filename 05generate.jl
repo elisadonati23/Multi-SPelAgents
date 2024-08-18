@@ -22,7 +22,7 @@ function generate_EggMass(No_Egg, model, Nind = missing, maternal_EggEn = missin
 
     # Set generation
     agent_Generation = ismissing(Generation) ? 0.0 : Generation
-    agent_f_i = 0.8
+    agent_f_i = model.f
     agent_t_puberty = 0.0
     agent_Lw = 0.0
     agent_Ww = 0.0
@@ -56,7 +56,7 @@ function generate_Juvenile(No_J, model, Nind = missing, Generation = 0.0, En = m
 
     # Initialize default agent properties for Juvenile
     agent_type = :juvenile
-    agent_f_i = 0.8
+    agent_f_i = model.f
     agent_Generation = Generation
     agent_Lb_i = Lb_i
     agent_R = 0.0

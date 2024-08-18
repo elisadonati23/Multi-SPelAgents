@@ -79,5 +79,12 @@ function model_initialize_parallel(
         # Ensure f is within the range [0, 1]
         model.f = max(0, min(f, 1.0))
     end
+
+        # Assign the calculated f to all agents in the model
+        for agent in agents
+            agent.f = model.f
+        end
+
+        
     return model
 end
