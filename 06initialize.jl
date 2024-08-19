@@ -74,7 +74,7 @@ function model_initialize_parallel(
     else
         # sim_timing = 1 at initialization, so directly index Xmax and Tc
         f = (model.Xmax[model.sim_timing] * model.Wv * model.KappaX) / 
-            (model.p_Am * model.Tc[model.sim_timing] * model.s_M * (mean_Lw ^ 2))
+            (model.p_Am * model.Tc[model.sim_timing] * model.s_M * ((mean_Lw * model.del_M) ^ 2))
 
         # Ensure f is within the range [0, 1]
         model.f = max(0, min(f, 1.0))
@@ -84,7 +84,5 @@ function model_initialize_parallel(
         for agent in agents
             agent.f = model.f
         end
-
-        
     return model
 end
