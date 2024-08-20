@@ -72,11 +72,11 @@ function model_initialize_parallel(
     if isempty(adults) && isempty(juveniles)    
         model.f = 0.8
     else
-        # sim_timing = 1 at initialization, so directly index Xmax and Tc
-        f = (model.Xmax[model.sim_timing] * model.Wv * model.KappaX) / 
-            (model.p_Am * model.Tc[model.sim_timing] * model.s_M * ((mean_Lw * model.del_M) ^ 2))
-
-        # Ensure f is within the range [0, 1]
+        model.f = model.Xmax_value / (model.Xmax_value + model.Kx_AmP) # where Ksat is molX/Lw
+        # Ensure that f is bounded between 0 and 1
+        if model.f < 0.0 || model.f > 1.0
+            println("f is out of bounds: ", model.f)
+        end
         model.f = max(0, min(f, 1.0))
     end
 

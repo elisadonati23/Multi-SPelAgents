@@ -95,6 +95,7 @@ function create_params(
     Em = p_Am / v_rate  # Maximum reserve density
     Lm = Kappa .* p_Am .* s_M ./ p_M  # Maximum length (can be a vector if Kappa is a vector)
     Kx = p_Am * s_M / (KappaX * Fm)  # Half-saturation coefficient
+    Kx_AmP = 0.000145056 # Half-saturation coefficient for Add My pet
     g = Eg ./ (Kappa .* Em)  # Energy investment ratio
     k_M = p_M / Eg  # Somatic maintenance rate coefficient
     spawn_period = days_between_dates(repro_start, repro_end)  # Duration of the spawning period
@@ -282,7 +283,8 @@ function create_params(
         :fished2 => fished2,
         :fished3 => fished3,
         :fished4more => fished4more,
-        :Nsuperind => Nsuperind
+        :Nsuperind => Nsuperind,
+        :Kx_AmP => Kx_AmP
     )
                            
     return model_parameters            

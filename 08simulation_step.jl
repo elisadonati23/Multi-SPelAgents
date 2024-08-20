@@ -64,9 +64,13 @@ function evolve_environment!(model)
     #    # Ratio between available food and what is consumed based on size and Tc
     #    f = (model.Xmax_value * model.Wv * model.KappaX) / max_assimilation
     #end
-    model.f = model.Xmax_value / (model.Xmax_value * model.Ksat) # where Ksat is molX/Lw
+    #model.f = model.Xmax_value / (model.Xmax_value * model.Ksat) # where Ksat is molX/Lw
     
+    model.f = model.Xmax_value / (model.Xmax_value + model.Kx_AmP) # where Ksat is molX/Lw
     # Ensure that f is bounded between 0 and 1
+    if model.f < 0.0 || model.f > 1.0
+        println("f is out of bounds: ", model.f)
+    end
     model.f = max(0, min(f, 1.0))
 
     adults_juve = filter(a -> a.type == :adult || a.type == :juvenile, collect(values(allagents(model))))
