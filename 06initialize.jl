@@ -72,6 +72,7 @@ function model_initialize_parallel(
     if isempty(adults) && isempty(juveniles)    
         model.f = 0.8
     else
+        
         model.f = model.Xmax_value / (model.Xmax_value + model.Kx_AmP) # where Ksat is molX/Lw
         # Ensure that f is bounded between 0 and 1
         if model.f < 0.0 || model.f > 1.0

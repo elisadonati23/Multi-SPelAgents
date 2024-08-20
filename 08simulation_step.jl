@@ -71,7 +71,7 @@ function evolve_environment!(model)
     if model.f < 0.0 || model.f > 1.0
         println("f is out of bounds: ", model.f)
     end
-    model.f = max(0, min(model.f, 1.0))
+    model.f = max(0, min(model. f, 1.0))
 
     adults_juve = filter(a -> a.type == :adult || a.type == :juvenile, collect(values(allagents(model))))
 
