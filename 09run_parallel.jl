@@ -21,24 +21,25 @@ df = CSV.read(file_path, DataFrame; delim=';', decimal=',')
 dropmissing!(df)
 length(df.date)
 
-Xmax = Vector(df[!, :zoo]) #16071 elements from 1.1.1975 to 31.12.2018
-
+#Xmax = Vector(df[!, :zoo])
+  #16071 elements from 1.1.1975 to 31.12.2018
+Xmax = Vector(df[!, :mol_L])
 
 temp = Vector(df[!, :thetao])
 
-Mf0 = Vector(df[!, :mf0])
-Mf1 = Vector(df[!, :mf1])
-Mf2 = Vector(df[!, :mf2])
-Mf3 = Vector(df[!, :mf3])
-Mf4 = Vector(df[!, :mf4])
+Mf0_pil = Vector(df[!, :mf0_pil])
+Mf1_pil = Vector(df[!, :mf1_pil])
+Mf2_pil = Vector(df[!, :mf2_pil])
+Mf3_pil = Vector(df[!, :mf3_pil])
+Mf4_pil = Vector(df[!, :mf4_pil])
 
 
 meanXmax = mean(Xmax) #mean for spin up
-minMf0 = minimum(Mf0) #mean for spin up
-minMf1 = minimum(Mf1) #mean for spin up
-minMf2 = minimum(Mf2) #mean for spin up
-minMf3 = minimum(Mf3) #mean for spin up
-minMf4 = minimum(Mf4) #mean for spin up
+minMf0_pil = minimum(Mf0_pil) #mean for spin up
+minMf1_pil = minimum(Mf1_pil) #mean for spin up
+minMf2_pil = minimum(Mf2_pil) #mean for spin up
+minMf3_pil = minimum(Mf3_pil) #mean for spin up
+minMf4_pil = minimum(Mf4_pil) #mean for spin up
 meanTemp = 15.0 #mean for spin up
 
 
@@ -63,11 +64,11 @@ Xmax05percent = Xmax_run .* 0.005
 #spin up + timeseries from 1975 to 2018
 Temp_run = vcat(repTemp, temp)
 Temp_run = Float64.(Temp_run) #spin up + timeseries from 1975 to 2018
-Mf0_run = vcat(zeros, Mf0) #spin up + timeseries from 1975 to 2018
-Mf1_run = vcat(zeros, Mf1) #spin up + timeseries from 1975 to 2018
-Mf2_run = vcat(zeros, Mf2) #spin up + timeseries from 1975 to 2018
-Mf3_run = vcat(zeros, Mf3) #spin up + timeseries from 1975 to 2018
-Mf4_run = vcat(zeros, Mf4) #spin up + timeseries from 1975 to 2018
+Mf0_pil_run = vcat(zeros, Mf0_pil) #spin up + timeseries from 1975 to 2018
+Mf1_pil_run = vcat(zeros, Mf1_pil) #spin up + timeseries from 1975 to 2018
+Mf2_pil_run = vcat(zeros, Mf2_pil) #spin up + timeseries from 1975 to 2018
+Mf3_pil_run = vcat(zeros, Mf3_pil) #spin up + timeseries from 1975 to 2018
+Mf4_pil_run = vcat(zeros, Mf4_pil) #spin up + timeseries from 1975 to 2018
 
 zeros_long = vcat(repeat([0.0], 365*40+1+16071))
 
@@ -80,14 +81,14 @@ zeros_long = vcat(repeat([0.0], 365*40+1+16071))
 # Initialize models
 
 
-#models = [
-#model_initialize_parallel(1000.0, 0.0, 0.0, Mf0_run, Mf1_run, Mf2_run, Mf3_run, Mf4_run, 1.7e14, 1.0, Xmax_run, 0.945, Temp_run, 0.9998,	1.08,	0.86,	0.69,	0.62,	0.48)
-#]
+models = [
+model_initialize_parallel(1000.0, 0.0, 0.0, Mf0_pil_run, Mf1_pil_run, Mf2_pil_run, Mf3_pil_run, Mf4_pil_run, 1.7e14, 1.0, Xmax_run, 0.945, Temp_run, 0.9998,	1.08,	0.86,	0.69,	0.62,	0.48)
+]
 results = []
 num_runs = 1
 
 models = [
-model_initialize_parallel(100.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.7e14, 1.0, 5.0, 0.945, 15.0, 0.9998,	1.08,	0.86,	0.69,	0.62,	0.48)
+model_initialize_parallel(1000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.7e14, 1.0, 5.0, 0.945, 15.0, 0.9998,	1.08,	0.86,	0.69,	0.62,	0.48)
 ]
 
 # Initialize dataframes

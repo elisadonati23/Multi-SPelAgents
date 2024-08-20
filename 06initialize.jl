@@ -77,12 +77,12 @@ function model_initialize_parallel(
         if model.f < 0.0 || model.f > 1.0
             println("f is out of bounds: ", model.f)
         end
-        model.f = max(0, min(f, 1.0))
+        model.f = max(0, min(model.f, 1.0))
     end
 
         # Assign the calculated f to all agents in the model
         for agent in agents
-            agent.f = model.f
+            agent.f_i = model.f
         end
 
         
