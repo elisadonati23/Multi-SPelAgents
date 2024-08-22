@@ -94,8 +94,9 @@ function create_params(
     # Derived parameters based on DEB theory
     Em = p_Am / v_rate  # Maximum reserve density
     Lm = Kappa .* p_Am .* s_M ./ p_M  # Maximum length (can be a vector if Kappa is a vector)
-    Kx = p_Am * s_M / (KappaX * Fm)  # Half-saturation coefficient
-    Kx_AmP = 0.000145056 # Half-saturation coefficient for Add My pet
+    Kx = p_Am * s_M / (KappaX * Fm) # Half-saturation coefficient
+    J_X_Am = 0.000942863  # max surface-spec feeding flux
+    Kx_AmP = 0.000145056 # Half-saturation coefficient for Add My pet #mol/L = J_X_Am/Fm
     g = Eg ./ (Kappa .* Em)  # Energy investment ratio
     k_M = p_M / Eg  # Somatic maintenance rate coefficient
     spawn_period = days_between_dates(repro_start, repro_end)  # Duration of the spawning period
