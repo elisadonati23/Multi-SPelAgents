@@ -151,10 +151,9 @@ function generate_Adult(No_A, model, Nind = missing, Age = missing, t_puberty = 
     # Generate Adult agents
     for _ in 1:No_A
         # Set number of individuals in the superindividual
-        agent_Nind = ismissing(Nind) ? 1e7 : Float64(floor(Nind))
-
+        
         # Set length-weight relationship
-        agent_Lw = ismissing(Lw) ? clamp(round(randn() * 5.0 + 20.0, digits=2), 15.0, 25.0) : agent_Lw
+        agent_Lw = ismissing(Lw) ? clamp(round(randn() * 3.0 + 14.0, digits=2), 10.0, 20.0) : agent_Lw
         agent_L = agent_Lw * model.del_M
 
         # Calculate age based on length
@@ -168,6 +167,24 @@ function generate_Adult(No_A, model, Nind = missing, Age = missing, t_puberty = 
             Age
         end
 
+        if ismissing(Nind)
+            if Age <= 1
+                agent_Nind = 1e7
+            elseif  1 < Age < 2
+                agent_Nind = 4.23e6
+            elseif 2 <= Age < 3
+                agent_Nind = 2.12248e6
+            elseif 3 <= Age < 4
+                agent_Nind = 1.141776e6
+            elseif 4 <= Age < 5
+                agent_Nind = 706512.0
+            else
+                agent_Nind = 500000  # Default value if age is 5 or more
+            end
+        else
+            agent_Nind = Nind
+        end
+        
         agent_Lj_i = if ismissing(Lj)
             model.Lj
         else
@@ -208,3 +225,5 @@ function generate_Adult(No_A, model, Nind = missing, Age = missing, t_puberty = 
 
     return
 end
+
+
