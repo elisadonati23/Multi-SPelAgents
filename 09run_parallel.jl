@@ -66,13 +66,13 @@ zeros_long = vcat(repeat([0.0], 365*40+1+16071))
 #initialize model: Na, Nj,Negg, Mf, Ww, day_of_the_year, Xmax, Kappa, Temp, M_egg, M0, M1, M2, M3, M4)
 
 models = [
-model_initialize_parallel(1000.0, 0.0, 0.0, Mf0_run, Mf1_run, Mf2_run, Mf3_run, Mf4_run, 1.7e14, 1.0, Xmax_run, 0.945, Temp_run, 0.9998,	1.08,	0.86,	0.69,	0.62,	0.48)
+model_initialize_parallel(1000.0, 0.0, 0.0, Mf0_run, Mf1_run, Mf2_run, Mf3_run, Mf4_run, 1.7e14, 1.0, Xmax_run, 0.9901, Temp_run, 0.9998,	2.08,	1.46,	0.90,	0.72,	0.68)
 ]
 results = []
 num_runs = 1
 
 #models = [
-#model_initialize_parallel(100.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.7e14, 1.0, 5.0, 0.9901, 15.0, 0.9998,	1.08,	0.86,	0.69,	0.62,	0.48)
+#model_initialize_parallel(100.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.7e14, 1.0, 5.0, 0.9901, 15.0, 0.9998,	2.08,	1.46,	0.90,	0.72,	0.68)
 #]
 
 # Initialize dataframes
@@ -87,10 +87,10 @@ for (i, model) in enumerate(models)
 
     df_agent = init_agent_dataframe(model, adata)
     df_model = init_model_dataframe(model, mdata)
-    #run!(model, 365*20; adata, mdata)
+    run!(model, 365*40; adata, mdata)
 
-    #df_agent = run!(model, 16070+365*30; adata, mdata)
-    df_agent = run!(model, 365*5; adata, mdata)
+    #df_agent = run!(model, 365*40; adata, mdata)
+    df_agent = run!(model, 16070; adata, mdata)
     push!(results, df_agent)
 
     end_time = Dates.now()
@@ -123,17 +123,17 @@ for (i, model) in enumerate(models)
     summerbiom = plot_timeframe_param_timeseries(results[i][2], [:TotB, :AdB], 150.0, 180.0,true, :mean, "Mid - Year Biomass (tonnes)", 1975)
     
 
-    CSV.write("update_smipA_agent_$((i)+1).csv", results[i][1])
-    CSV.write("update_smipA_model_$((i)+1).csv", results[i][2])
+    CSV.write("forcings_standardf_anchovy_agent_$((i)+1).csv", results[i][1])
+    CSV.write("forcings_standardf_anchovy_model_$((i)+1).csv", results[i][2])
     #save plots
-    Plots.savefig(p1, "update_smipA__p1_$(Dates.format(today(), "yyyy-mm-dd"))_$((i)+1).png")
-    Plots.savefig(p2, "update_smipA__p2_$(Dates.format(today(), "yyyy-mm-dd"))_$((i)+1).png")
-    Plots.savefig(pop, "update_smipA_pop_$(Dates.format(today(), "yyyy-mm-dd"))_$((i)+1).png")
-    Plots.savefig(deaths, "update_smipA_deaths_$(Dates.format(today(), "yyyy-mm-dd"))_$((i)+1).png")
-    Plots.savefig(biom, "update_smipA_biom_$(Dates.format(today(), "yyyy-mm-dd"))_$((i)+1).png")
-    Plots.savefig(fr, "update_smipA_fr_$(Dates.format(today(), "yyyy-mm-dd"))_$((i)+1).png")
-    Plots.savefig(lengths, "update_smipA_lengths_$(Dates.format(today(), "yyyy-mm-dd"))_$((i)+1).png")
-    Plots.savefig(fished, "update_smipA_fished_$(Dates.format(today(), "yyyy-mm-dd"))_$((i)+1).png")
-    Plots.savefig(summerbiom, "update_smipA_summerbiom_$(Dates.format(today(), "yyyy-mm-dd"))_$((i)+1).png")
+    Plots.savefig(p1, "forcings_standardf_anchovy__p1_$(Dates.format(today(), "yyyy-mm-dd"))_$((i)+1).png")
+    Plots.savefig(p2, "forcings_standardf_anchovy__p2_$(Dates.format(today(), "yyyy-mm-dd"))_$((i)+1).png")
+    Plots.savefig(pop, "forcings_standardf_anchovy_pop_$(Dates.format(today(), "yyyy-mm-dd"))_$((i)+1).png")
+    Plots.savefig(deaths, "forcings_standardf_anchovy_deaths_$(Dates.format(today(), "yyyy-mm-dd"))_$((i)+1).png")
+    Plots.savefig(biom, "forcings_standardf_anchovy_biom_$(Dates.format(today(), "yyyy-mm-dd"))_$((i)+1).png")
+    Plots.savefig(fr, "forcings_standardf_anchovy_fr_$(Dates.format(today(), "yyyy-mm-dd"))_$((i)+1).png")
+    Plots.savefig(lengths, "forcings_standardf_anchovy_lengths_$(Dates.format(today(), "yyyy-mm-dd"))_$((i)+1).png")
+    Plots.savefig(fished, "forcings_standardf_anchovy_fished_$(Dates.format(today(), "yyyy-mm-dd"))_$((i)+1).png")
+    Plots.savefig(summerbiom, "forcings_standardf_anchovy_summerbiom_$(Dates.format(today(), "yyyy-mm-dd"))_$((i)+1).png")
 
 end
