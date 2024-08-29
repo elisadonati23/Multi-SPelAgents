@@ -46,27 +46,12 @@ function evolve_environment!(model)
     update_MF4!(model, model.M_f4)
     
 
-    # Calculate Xall
-    Xall = model.Xmax_value - (calculate_real_assimilation(model) / model.KappaX) / model.Wv
-    
-    if Xall < 0.0  
-        Xall = 0.0 
-    end
-    
-    model.Xall = Xall
-
-    # Update response function f
-    max_assimilation = calculate_max_assimilation(model)
-    
-    if ismissing(max_assimilation) || max_assimilation == 0.0 || isnan(max_assimilation)
-        f = 0.0
-    else
-        # Ratio between available food and what is consumed based on size and Tc
-        f = (model.Xmax_value * model.Wv * model.KappaX) / max_assimilation
-    end
-
+    model.f = model.Xmax_value / (model.Xmax_value + model.Kx_AmP) # where Ksat is molX/Lw
     # Ensure that f is bounded between 0 and 1
-    model.f = max(0, min(f, 1.0))
+    if model.f < 0.0 || model.f > 1.0
+        println("f is out of bounds: ", model.f)
+    end
+    model.f = max(0, min(model.f, 1.0))
 
     adults_juve = filter(a -> a.type == :adult || a.type == :juvenile, collect(values(allagents(model))))
 

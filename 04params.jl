@@ -109,7 +109,8 @@ function create_params(
     # Derived parameters based on DEB theory
     Em = p_Am / v_rate  # Maximum reserve density
     Lm = Kappa .* p_Am .* s_M ./ p_M  # Maximum length (can be a vector if Kappa is a vector)
-    Kx = p_Am * s_M / (KappaX * Fm)  # Half-saturation coefficient
+    Kx = p_Am * s_M / (KappaX * Fm) # Half-saturation coefficient
+    Kx_AmP = 4.07956e-06 # Half-saturation coefficient add my pet value
     g = Eg ./ (Kappa .* Em)  # Energy investment ratio
     k_M = p_M / Eg  # Somatic maintenance rate coefficient
     spawn_period = days_between_dates(repro_start, repro_end)  # Duration of the spawning period
@@ -296,7 +297,8 @@ function create_params(
         :fished1 => fished1,
         :fished2 => fished2,
         :fished3 => fished3,
-        :fished4more => fished4more
+        :fished4more => fished4more,
+        :Kx_AmP => Kx_AmP
     )
                            
     return model_parameters            
