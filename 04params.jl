@@ -28,6 +28,8 @@ function create_params(
     M3 = M3 / 365.0
     M4 = M4 / 365.0
 
+    death_threshold = 0.01
+
     # Variable parameters
     Kappa_value = Kappa[1] #KAppa rule value
   
@@ -187,6 +189,7 @@ function create_params(
         :M2 => M2,
         :M3 => M3,
         :M4 => M4,
+        :death_threshold => death_threshold,
         :r_food => r_food,
         :DEB_timing => DEB_timing,
         :day_of_the_year => day_of_the_year,

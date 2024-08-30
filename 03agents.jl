@@ -2,7 +2,8 @@
     # Basic characteristics
     type::Symbol              # :eggmass, :juvenile, :adult
     reproduction::Symbol      # :spawner, :nonspawner
-    Nind::Float64             # Number of individuals in the superindividual
+    Nind::Float64             # Number of individuals in the superindividual - current
+    Nind0::Float64            # Number of individuals in the superindividual - initial
     Age::Float64              # Age in days
     L::Float64                # Structural length (assumed to be close to 0 for eggs from DEB Theory)
     H::Float64                # Maturation energy

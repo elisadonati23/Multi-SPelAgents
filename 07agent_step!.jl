@@ -77,6 +77,7 @@ function egghatch!(Sardine, model)
         Sardine.Age = model.Ap * (Sardine.Lw * model.del_M) / model.Lp
         #Sardine.H = model.Hp * (Sardine.Lw * model.del_M) / model.Lp
         Sardine.Nind = Float64(ceil((1 - model.M_egg) * Float64((Sardine.Nind))))
+        Sardine.Nind0 = Sardine.Nind
         
         Sardine.s_M_i = if model.Hb >= Sardine.H
             1.0
@@ -146,7 +147,7 @@ function juvedie!(Sardine, model)
 
     end
 #if less than 1 ind, superindividual dies
-    if  Sardine.Nind < 100000.0 && !Sardine.Dead
+    if  Sardine.Nind <= Sardine.Nind0 * model.death_threshold && !Sardine.Dead
             Sardine.Dead = true
             model.deadJ_nat += Sardine.Nind
     end
@@ -343,7 +344,7 @@ function adultdie!(Sardine, model)
             end
      end
 
-    if Sardine.Nind < 100000.0
+    if Sardine.Nind <= Sardine.Nind0 * model.death_threshold && !Sardine.Dead
         Sardine.Dead = true
         model.deadA_nat += Sardine.Nind
     end
