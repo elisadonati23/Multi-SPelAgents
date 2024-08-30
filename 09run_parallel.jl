@@ -83,6 +83,14 @@ zeros_long = vcat(repeat([0.0], 365*40+1+16071))
 #models = [
 #model_initialize_parallel(1000.0, 0.0, 0.0, Mf0_run, Mf1_run, Mf2_run, Mf3_run, Mf4_run, 1.7e14, 1.0, Xmax_run, 0.945, Temp_run, 0.9998,	1.08,	0.86,	0.69,	0.62,	0.48)
 #]
+
+#mortalities from stock assessment
+#2.36
+#1.10
+#0.81
+#0.69
+#0.625
+
 results = []
 num_runs = 1
 
