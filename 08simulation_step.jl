@@ -133,6 +133,8 @@ sEA = scheduler_Adults()
 
 function complex_step!(model)
 
+    remove_all!(model, is_dead)
+
     # Parallel processing for Sardine agents
     Threads.@threads for sardine in collect(values(allagents(model)))
         parallel_sardine_step!(sardine, model)
@@ -153,6 +155,8 @@ function complex_step!(model)
     # Filter spawners for creating new EggMass agents
     spawners = filter!(id -> hasid(model, id) && model[id].reproduction == :spawner, copy(sEA_ids))
 
+    remove_all!(model, is_dead)
+
     if !isempty(spawners)
         # Create new born daily superindividuals
         prop_values = [getfield(model[agent], :superind_Neggs) for agent in spawners]
@@ -162,6 +166,8 @@ function complex_step!(model)
         #function generate_EggMass(No_Egg, model, Nind = missing, maternal_EggEn = missing, En = missing, Generation = missing)
         generate_EggMass(1, model, tot_Neggs, mean_Egg_energy, mean_Egg_energy, max_generation)
     end
+
+    remove_all!(model, is_dead)
 
     # Update model outputs
     update_outputs!(model)
