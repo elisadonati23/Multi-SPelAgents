@@ -90,12 +90,6 @@ models = [
 model_initialize_parallel(0.0, 100.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.7e14, 1.0, 5.0, 0.615, 15.0, 0.9998,	1.08,	0.86,	0.69,	0.62,	0.48)
 ]
 
-# Extract the ages of the agents
-ages = [agent.Age for agent in collect(allagents(models[1]))]
-
-# Calculate the mean age of the agents
-mean_age = mean(ages)
-
 # Initialize dataframes
 adata = [:type, :Nind, :t_puberty,:Age, :Lw, :Ww, :En, :R, :H, :CI, :GSI, :pA, :s_M_i, :superind_Neggs, :reproduction, :spawned, :Dead]
 mdata = [:day_of_the_year, :year, :TotB,:JuvB,:AdB, :f, :deadJ_nat, :deadJ_old, 
@@ -111,7 +105,7 @@ for (i, model) in enumerate(models)
     #run!(model, 365*20; adata, mdata)
 
     #df_agent = run!(model, 16070+365*30; adata, mdata)
-    df_agent = run!(model, 365*12; adata, mdata)
+    df_agent = run!(model, 365*3; adata, mdata)
     push!(results, df_agent)
 
     end_time = Dates.now()
@@ -158,11 +152,5 @@ for (i, model) in enumerate(models)
     Plots.savefig(summerbiom, "update_smipA_summerbiom_$(Dates.format(today(), "yyyy-mm-dd"))_$((i)+1).png")
 
 end
-
-results[1][1]
-filtered_agents = filter(agent -> agent.id == 80 , results[1][1])
-
-
-using Random
 
 
