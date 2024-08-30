@@ -50,6 +50,8 @@ function create_params(
     total_repro_sardine = 10
     std_dev = 60
 
+    death_threshold = 0.01
+
     repro_period = vcat(270.0:365.0, 1.0:90.0)  # Reproduction period covering the year-end
 
     # DEB model parameters
@@ -187,6 +189,7 @@ function create_params(
         :M2 => M2,
         :M3 => M3,
         :M4 => M4,
+        :death_threshold => death_threshold,
         :r_food => r_food,
         :DEB_timing => DEB_timing,
         :day_of_the_year => day_of_the_year,
