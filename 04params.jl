@@ -56,16 +56,16 @@ function create_params(
 
     # DEB model parameters
     Sex_ratio = 0.5
-    p_Am = 499.582	  # Maximum assimilation power
-    v_rate = 0.026184  # Energy conductance
+    p_Am = 554.351	  # Maximum assimilation power
+    v_rate = 0.0216466  # Energy conductance
     KappaX = 0.8  # Digestion efficiency
     KappaR = 0.95  # Repro efficiency
     Fm = 6.5  # Maximum specific searching rate
     del_M = 0.1152  # Shape coefficient (isomorph)
     k_J = 0.002  # Maturity maintenance rate coefficient
-    s_M = 1.91955  # Acceleration factor
-    p_M = 257.014  # Volume-specific somatic maintenance
-    Eg = 5224.72  # Cost per unit of structure
+    s_M = 2.25531  # Acceleration factor
+    p_M = 438.602  # Volume-specific somatic maintenance
+    Eg = 5017.55  # Cost per unit of structure
     d_V = 0.2  # Volume-specific density of structure
     mu_V = 500000.0  # Chemical potential of structure
     mu_E = 550000.0  # Chemical potential of reserve
@@ -75,20 +75,20 @@ function create_params(
 
     # Growth, puberty, and reproduction parameters
 
-    Hb = 0.182662
-    Hj = 1.33118 #0.3478
-    Hp = 24920
-    Lb = 0.0374713	
-    Lj = 0.071928
-    Lp = 1.31449
-    Ab = 7.5845	
-    Ap = 275.59
-    Am = 2924.0
+    Hb = 0.0157489
+    Hj = 	0.187349 #0.3478
+    Hp = 4553.63
+    Lb = 0.0279366
+    Lj = 0.0630058
+    Lp = 1.19937
+    Ab = 6.56247	
+    Ap = 202.166
+    Am = 3461.0
     E0 = 1.47992
-    ep_min = 0.25
-    E0_min = 0.589 # when you have a juvenile with the minimum enough energy to produce eggs in the reserve: it reflects the energy of the mother
-    E0_max = 1.47992
-    W0 = 0.000321546 # Addmypet
+    ep_min = 0.218697
+    E0_min = 0.3 # when you have a juvenile with the minimum enough energy to produce eggs in the reserve: it reflects the energy of the mother
+    E0_max = 0.694024
+    W0 = 0.000150792 # Addmypet
     L0 = 0.001  # Initial length in cm
     Ta = 8000.0  # Arrhenius temperature
     Tr = 293.0   # Reference temperature
