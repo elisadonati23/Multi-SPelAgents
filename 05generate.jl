@@ -37,13 +37,14 @@ function generate_EggMass(No_Egg, model, Nind = missing, maternal_EggEn = missin
     for _ in 1:No_Egg
         # Set number of individuals in the superindividual
         agent_Nind = ismissing(Nind) ? (1e7 / 2) * (40 * 400) : Float64(floor(Nind))
+        agent_Nind0 = agent_Nind
 
         # Set reserve energy
         agent_En = ismissing(En) ? model.E0 : Float64(En)
 
         # Add agent to the model
         add_agent!(
-            Sardine, model, agent_type, agent_reproduction, agent_Nind, agent_Age, agent_L, agent_H,
+            Sardine, model, agent_type, agent_reproduction, agent_Nind,agent_Nind0, agent_Age, agent_L, agent_H,
             agent_maternal_EggEn, agent_superind_Neggs, agent_En, agent_Generation, agent_Dead,
             agent_f_i, agent_t_puberty, agent_Lw, agent_Ww, agent_R, agent_Scaled_En,
             agent_s_M_i, agent_pA, agent_Lb_i, agent_Lj_i, agent_metamorph, agent_CI, agent_GSI, agent_spawned
@@ -72,6 +73,7 @@ function generate_Juvenile(No_J, model, Nind = missing, Generation = 0.0, En = m
     for _ in 1:No_J
         # Set number of individuals in the superindividual
         agent_Nind = ismissing(Nind) ? 1e7 : Float64(floor(Nind))
+        agent_Nind0 = agent_Nind
 
         # Set length-weight relationship
         agent_Lw = ismissing(Lw) ? clamp(round(randn() * 0.5 + 5.0, digits=2), 4.45, 5.5) : Lw
@@ -117,7 +119,7 @@ function generate_Juvenile(No_J, model, Nind = missing, Generation = 0.0, En = m
 
         # Add agent to the model
         add_agent!(
-            Sardine, model, agent_type, agent_reproduction, agent_Nind, agent_Age, agent_L, agent_H,
+            Sardine, model, agent_type, agent_reproduction, agent_Nind, agent_Nind0, agent_Age, agent_L, agent_H,
             agent_maternal_EggEn, agent_superind_Neggs, agent_En, agent_Generation, agent_Dead,
             agent_f_i, agent_t_puberty, agent_Lw, agent_Ww, agent_R, agent_Scaled_En,
             agent_s_M_i, agent_pA, agent_Lb_i, agent_Lj_i, agent_metamorph, agent_CI, agent_GSI, agent_spawned
@@ -151,10 +153,9 @@ function generate_Adult(No_A, model, Nind = missing, Age = missing, t_puberty = 
     # Generate Adult agents
     for _ in 1:No_A
         # Set number of individuals in the superindividual
-        agent_Nind = ismissing(Nind) ? 1e7 : Float64(floor(Nind))
-
+        
         # Set length-weight relationship
-        agent_Lw = ismissing(Lw) ? clamp(round(randn() * 5.0 + 20.0, digits=2), 15.0, 25.0) : agent_Lw
+        agent_Lw = ismissing(Lw) ? clamp(round(randn() * 2.0 + 13.0, digits=2), 10.0, 20.0) : agent_Lw
         agent_L = agent_Lw * model.del_M
 
         # Calculate age based on length
@@ -168,6 +169,26 @@ function generate_Adult(No_A, model, Nind = missing, Age = missing, t_puberty = 
             Age
         end
 
+        if ismissing(Nind)
+            if agent_Age <= 1.0*365.0
+                agent_Nind = 1e7
+            elseif  1.0*365.0 < agent_Age < 2.0*365.0
+                agent_Nind = 4.23e6
+            elseif 2.0*365.0 <= agent_Age < 3.0*365.0
+                agent_Nind = 2.12248e6
+            elseif 3.0*365.0 <= agent_Age < 4*365.0
+                agent_Nind = 1.141776e6
+            elseif 4.0*365 <= agent_Age < 5.0*365.0
+                agent_Nind = 706512.0
+            else
+                agent_Nind = 500000  # Default value if age is 5 or more
+            end
+        else
+            agent_Nind = Nind
+        end
+
+        agent_Nind0 = 1e7 # depending on age, above, i put the Nind to ensure correct lifespan but I assume that they were 1e7 at age 0+
+        
         agent_Lj_i = if ismissing(Lj)
             model.Lj
         else
@@ -199,7 +220,7 @@ function generate_Adult(No_A, model, Nind = missing, Age = missing, t_puberty = 
 
         # Add agent to the model
         add_agent!(
-            Sardine, model, agent_type, agent_reproduction, agent_Nind, agent_Age, agent_L, agent_H,
+            Sardine, model, agent_type, agent_reproduction, agent_Nind,agent_Nind0, agent_Age, agent_L, agent_H,
             agent_maternal_EggEn, agent_superind_Neggs, agent_En, agent_Generation, agent_Dead,
             agent_f_i, agent_t_puberty, agent_Lw, agent_Ww, agent_R, agent_Scaled_En,
             agent_s_M_i, agent_pA, agent_Lb_i, agent_Lj_i, agent_metamorph, agent_CI, agent_GSI, agent_spawned
@@ -208,3 +229,5 @@ function generate_Adult(No_A, model, Nind = missing, Age = missing, t_puberty = 
 
     return
 end
+
+
