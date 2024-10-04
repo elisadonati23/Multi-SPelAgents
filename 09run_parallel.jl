@@ -49,7 +49,7 @@ zeros = repeat([0.0], 40*365+1)#spinup
 
 Xmax_run = vcat(repXmax, Xmax) #100%
 Xmax1percent = Xmax_run .* 0.01
-
+Plots.plot(Xmax_run, label="Xmax")
 #spin up + timeseries from 1975 to 2018
 Temp_run = vcat(repTemp, temp)
 Temp_run = Float64.(Temp_run) #spin up + timeseries from 1975 to 2018
@@ -60,13 +60,13 @@ Mf3_run = vcat(zeros, Mf3) #spin up + timeseries from 1975 to 2018
 Mf4_run = vcat(zeros, Mf4) #spin up + timeseries from 1975 to 2018
 
 zeros_long = vcat(repeat([0.0], 365*40+1+16071))
-
+Xmaxplus10 = Xmax_run .*10
 # running -----------------
 
 #initialize model: Na, Nj,Negg, Mf, Ww, day_of_the_year, Xmax, Kappa, Temp, M_egg, M0, M1, M2, M3, M4)
 
 models = [
-model_initialize_parallel(1000.0, 0.0, 0.0, Mf0_run, Mf1_run, Mf2_run, Mf3_run, Mf4_run, 1.7e14, 1.0, Xmax_run, 0.9901, Temp_run, 0.9998,	2.08,	1.46,	0.90,	0.72,	0.68)
+model_initialize_parallel(100.0, 0.0, 0.0, Mf0_run, Mf1_run, Mf2_run, Mf3_run, Mf4_run, 1.7e14, 1.0, Xmaxplus10, 0.9901, Temp_run, 0.9998,	2.08,	1.46,	0.90,	0.72,	0.68)
 ]
 results = []
 num_runs = 1
@@ -87,10 +87,10 @@ for (i, model) in enumerate(models)
 
     df_agent = init_agent_dataframe(model, adata)
     df_model = init_model_dataframe(model, mdata)
-    run!(model, 365*40; adata, mdata)
+    #run!(model, 365*40; adata, mdata)
 
     #df_agent = run!(model, 365*40; adata, mdata)
-    df_agent = run!(model, 16070; adata, mdata)
+    df_agent = run!(model, 365*5; adata, mdata)
     push!(results, df_agent)
 
     end_time = Dates.now()
