@@ -47,16 +47,9 @@ zeros = repeat([0.0], 40*365+1)#spinup
 
 
 Xmax_run = vcat(repXmax, Xmax) #100%
-Xmax1percent = Xmax_run .* 0.01
+
 Xmax10percent = Xmax_run .* 0.1
-Xmax20percent = Xmax_run .* 0.2
-Xmax30percent = Xmax_run .* 0.3
-Xmax40percent = Xmax_run .* 0.4
-Xmax50percent = Xmax_run .* 0.5
-Xmax60percent = Xmax_run .* 0.6
-Xmax70percent = Xmax_run .* 0.7
-Xmax80percent = Xmax_run .* 0.8
-Xmax90percent = Xmax_run .* 0.9
+Xmaxplus10 = Xmax_run .*10
 
 #spin up + timeseries from 1975 to 2018
 Temp_run = vcat(repTemp, temp)
@@ -69,33 +62,21 @@ Mf4_pil_run = vcat(zeros, Mf4_pil) #spin up + timeseries from 1975 to 2018
 
 zeros_long = vcat(repeat([0.0], 365*40+1+16071))
 
-# Define the scaling function
-function scale_value(input_value; input_min=minimum(Xmax_run), input_max=maximum(Xmax_run), output_min=0.2, output_max=0.99)
-  # Apply the linear transformation formula
-  output_min + (input_value - input_min) / (input_max - input_min) * (output_max - output_min)
-end
-
-# Assuming Xmax10percent is a vector of Float64
-fscaled = scale_value.(Xmax_run; input_min=5.7e-7, input_max=0.0006, output_min=0.0, output_max=1.0)
-
-Plots.plot(fscaled, label="Xmax scaled", title="Xmax scaled", xlabel="Days", ylabel="Xmax scaled")
-
-Plots.plot(Xmax_run, label="Xmax", title="Xmax", xlabel="Days", ylabel="Xmax")
 # running -----------------
 
 #initialize model: Na, Nj,Negg, Mf, Ww, day_of_the_year, Xmax, Kappa, Temp, M_egg, M0, M1, M2, M3, M4)
 # Initialize models
 
 
-#models = [
-#model_initialize_parallel(500.0, 0.0, 0.0, Mf0_pil_run, Mf1_pil_run, Mf2_pil_run, Mf3_pil_run, Mf4_pil_run, 1.7e14, 1.0, Xmax_run, 0.945, Temp_run, 0.9998,	1.08,	0.86,	0.69,	0.62,	0.48)
-#]
+models = [
+model_initialize_parallel(10.0, 0.0, 0.0, Mf0_pil_run, Mf1_pil_run, Mf2_pil_run, Mf3_pil_run, Mf4_pil_run, 1.7e14, 1.0, Xmaxplus10, 0.945, Temp_run, 0.9998,	1.08,	0.86,	0.69,	0.62,	0.48)
+]
 results = []
 num_runs = 1
 
-models = [
-model_initialize_parallel(1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.7e14, 1.0, 4.46e-6, 0.945, 15.0, 0.9998,	1.08,	0.86,	0.69,	0.62,	0.48)
-]
+#models = [
+#model_initialize_parallel(1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.7e14, 1.0, 4.46e-6, 0.945, 15.0, 0.9998,	1.08,	0.86,	0.69,	0.62,	0.48)
+#]
 
 # Initialize dataframes
 adata = [:type, :Nind, :t_puberty,:Age, :Lw, :Ww, :En, :R, :H, :CI, :GSI, :pA, :s_M_i, :superind_Neggs, :reproduction, :spawned, :Dead]
