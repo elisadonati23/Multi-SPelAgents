@@ -1,3 +1,7 @@
+function functional_response(x; L = 1.0, x0 = 0.00005, k = 50000)
+    L / (1 + exp(-k * (x - x0)))
+end
+
 function update_Kappa!(model, Kappa::Float64)
     model.Kappa_value = Kappa
 end

@@ -24,7 +24,6 @@ length(df.date)
 #Xmax = Vector(df[!, :zoo])
   #16071 elements from 1.1.1975 to 31.12.2018
 Xmax = Vector(df[!, :mol_L])
-
 temp = Vector(df[!, :thetao])
 
 Mf0_pil = Vector(df[!, :mf0_pil])
@@ -32,7 +31,6 @@ Mf1_pil = Vector(df[!, :mf1_pil])
 Mf2_pil = Vector(df[!, :mf2_pil])
 Mf3_pil = Vector(df[!, :mf3_pil])
 Mf4_pil = Vector(df[!, :mf4_pil])
-
 
 meanXmax = mean(Xmax) #mean for spin up
 minMf0_pil = minimum(Mf0_pil) #mean for spin up
@@ -60,7 +58,6 @@ Xmax70percent = Xmax_run .* 0.7
 Xmax80percent = Xmax_run .* 0.8
 Xmax90percent = Xmax_run .* 0.9
 
-Xmax05percent = Xmax_run .* 0.005
 #spin up + timeseries from 1975 to 2018
 Temp_run = vcat(repTemp, temp)
 Temp_run = Float64.(Temp_run) #spin up + timeseries from 1975 to 2018
@@ -72,11 +69,20 @@ Mf4_pil_run = vcat(zeros, Mf4_pil) #spin up + timeseries from 1975 to 2018
 
 zeros_long = vcat(repeat([0.0], 365*40+1+16071))
 
+# Define the scaling function
+function scale_value(input_value; input_min=minimum(Xmax_run), input_max=maximum(Xmax_run), output_min=0.2, output_max=0.99)
+  # Apply the linear transformation formula
+  output_min + (input_value - input_min) / (input_max - input_min) * (output_max - output_min)
+end
+
+# Assuming Xmax10percent is a vector of Float64
+fscaled = scale_value.(Xmax_run; input_min=5.7e-7, input_max=0.0006, output_min=0.0, output_max=1.0)
+
+Plots.plot(fscaled, label="Xmax scaled", title="Xmax scaled", xlabel="Days", ylabel="Xmax scaled")
+
+Plots.plot(Xmax_run, label="Xmax", title="Xmax", xlabel="Days", ylabel="Xmax")
 # running -----------------
 
-
-
-Xmax_run
 #initialize model: Na, Nj,Negg, Mf, Ww, day_of_the_year, Xmax, Kappa, Temp, M_egg, M0, M1, M2, M3, M4)
 # Initialize models
 
