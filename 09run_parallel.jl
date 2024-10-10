@@ -40,7 +40,6 @@ minMf3_pil = minimum(Mf3_pil) #mean for spin up
 minMf4_pil = minimum(Mf4_pil) #mean for spin up
 meanTemp = 15.0 #mean for spin up
 
-
 repXmax = repeat([meanXmax], 40*365+1) #spinup
 repTemp = repeat([meanTemp], 40*365+1) #spinup
 zeros = repeat([0.0], 40*365+1)#spinup
@@ -50,6 +49,19 @@ Xmax_run = vcat(repXmax, Xmax) #100%
 
 Xmax10percent = Xmax_run .* 0.1
 Xmaxplus10 = Xmax_run .*10
+
+function functional_response(x; L = 1.0, x0 = 0.00002, k = 50000)
+  L ./ (1 .+ exp.(-k .* (x .- x0)))
+end
+
+x_values = range(0, stop=0.00021, length=100000)
+
+# Compute the corresponding y values
+y_values = functional_response.(x_values)
+
+# Plot the curve
+Plots.plot(x_values, y_values, xlabel="x", ylabel="functional_response(x)", title="Functional Response Curve", legend=false)
+
 
 #spin up + timeseries from 1975 to 2018
 Temp_run = vcat(repTemp, temp)
