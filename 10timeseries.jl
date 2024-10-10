@@ -75,3 +75,36 @@ zeros_long = vcat(repeat([0.0], 365*40+1+16071))
 #Plots.plot!(x, Mf2, label="Mf2", color=:green)
 #Plots.plot!(x, Mf3, label="Mf3", color=:orange)
 #Plots.plot!(x, Mf4, label="Mf4", color=:purple)
+
+
+using CSV
+using DataFrames
+using Dates
+using Statistics
+
+# Read the CSV file
+# Name of the file in the current directory
+file_name = "all_timeseries_final_abm.csv"
+
+# Construct the file path
+file_path = joinpath(pwd(), file_name)
+
+# Read the CSV file
+df = CSV.read(file_path, DataFrame; delim=';', decimal=',')
+dropmissing!(df)
+length(df.date)
+
+
+# Parse the date column to extract day and month
+df.date = Date.(df.date, "dd/mm/yyyy")
+df.day_month = Dates.format.(df.date, "dd/mm")
+
+
+# Specify the columns for which to calculate the daily annual average
+columns_to_average = [:thetao, :zoo, :mf0, :mf1, :mf2, :mf3, :mf4]
+
+# Group by day and month and calculate the mean of the specified columns
+climatologies = combine(groupby(df, :day_month), columns_to_average .=> mean)
+
+# Display the climatologies dataset
+println(climatologies)
