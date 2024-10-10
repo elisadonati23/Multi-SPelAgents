@@ -126,6 +126,12 @@ function create_params(
     deadA_starved = 0
     deadA_old = 0
     deadJ_old = 0
+    starvedA_biom = 0
+    starvedJ_biom = 0
+    natA_biom = 0
+    natJ_biom = 0
+    oldA_biom = 0
+    oldJ_biom = 0
     mean_batch_eggs = 0.0
     mean_spawning_events = 0.0
     fished = 0
@@ -157,6 +163,11 @@ function create_params(
     fished2 = 0.0
     fished3 = 0.0
     fished4more = 0.0
+    fished0_biom = 0.0
+    fished1_biom = 0.0
+    fished2_biom = 0.0
+    fished3_biom = 0.0
+    fished4more_biom = 0.0
 
     # Store all parameters in a dictionary for easy access in the model
     model_parameters = Dict(
@@ -285,7 +296,18 @@ function create_params(
         :fished2 => fished2,
         :fished3 => fished3,
         :fished4more => fished4more,
-        :Nsuperind => Nsuperind
+        :Nsuperind => Nsuperind,
+        :starvedA_biom => starvedA_biom,
+        :starvedJ_biom => starvedJ_biom,
+        :natA_biom => natA_biom,
+        :natJ_biom => natJ_biom,
+        :oldA_biom => oldA_biom,
+        :oldJ_biom => oldJ_biom,
+        :fished0_biom => fished0_biom,
+        :fished1_biom => fished1_biom,
+        :fished2_biom => fished2_biom,
+        :fished3_biom => fished3_biom,
+        :fished4more_biom => fished4more_biom
     )
                            
     return model_parameters            

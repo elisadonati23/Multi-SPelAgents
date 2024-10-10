@@ -21,6 +21,8 @@ df = CSV.read(file_path, DataFrame; delim=';', decimal=',')
 dropmissing!(df)
 length(df.date)
 
+
+
 #extract forcings
 Xmax = Vector(df[!, :zoo]) #16071 elements from 1.1.1975 to 31.12.2018
 
