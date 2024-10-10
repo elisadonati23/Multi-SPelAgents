@@ -60,3 +60,18 @@ Mf3_run = vcat(zeros, Mf3) #spin up + timeseries from 1975 to 2018
 Mf4_run = vcat(zeros, Mf4) #spin up + timeseries from 1975 to 2018
 
 zeros_long = vcat(repeat([0.0], 365*40+1+16071))
+
+# plotting forcings_newentr_lowerf__p1_
+#x = 1:length(Xmax90percent)
+#Plots.plot(x, Xmax90percent, label="Xmax90percent", color=:blue)
+#
+#
+#x = 1:length(Temp_run)
+#Plots.plot(x, Temp_run, label="Temp_run", color=:blue)
+#
+#x = 1:length(Mf0)
+#Plots.plot(x, Mf0, label="Mf0", color=:blue)
+#Plots.plot!(x, Mf1, label="Mf1", color=:red)
+#Plots.plot!(x, Mf2, label="Mf2", color=:green)
+#Plots.plot!(x, Mf3, label="Mf3", color=:orange)
+#Plots.plot!(x, Mf4, label="Mf4", color=:purple)

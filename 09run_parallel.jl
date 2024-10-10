@@ -10,20 +10,6 @@ include("08simulation_step.jl")
 include("10timeseries.jl")
 
 
-# plotting forcings_newentr_lowerf__p1_
-#x = 1:length(Xmax90percent)
-#Plots.plot(x, Xmax90percent, label="Xmax90percent", color=:blue)
-#
-#
-#x = 1:length(Temp_run)
-#Plots.plot(x, Temp_run, label="Temp_run", color=:blue)
-#
-#x = 1:length(Mf0)
-#Plots.plot(x, Mf0, label="Mf0", color=:blue)
-#Plots.plot!(x, Mf1, label="Mf1", color=:red)
-#Plots.plot!(x, Mf2, label="Mf2", color=:green)
-#Plots.plot!(x, Mf3, label="Mf3", color=:orange)
-#Plots.plot!(x, Mf4, label="Mf4", color=:purple)
 
 # running -----------------
 
@@ -35,14 +21,14 @@ include("10timeseries.jl")
 results = []
 num_runs = 1
 
-#models = [
-#model_initialize_parallel(10.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.7e14, 1.0, 5.0, 0.945, 15.0, 0.9998,	1.08,	0.86,	0.69,	0.62,	0.48)
-#]
+models = [
+model_initialize_parallel(10.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.7e14, 1.0, 5.0, 0.945, 15.0, 0.9998,	1.08,	0.86,	0.69,	0.62,	0.48)
+]
 
 # Initialize dataframes
 adata = [:type, :Nind, :t_puberty,:Age, :Lw, :Ww, :En, :R, :H, :CI, :GSI, :pA, :s_M_i, :superind_Neggs, :reproduction, :spawned, :Dead]
-mdata = [:day_of_the_year, :year, :TotB,:JuvB,:AdB, :f, :deadJ_nat, :deadJ_old, 
-:deadJ_starved, :deadA_nat, :deadA_old, :deadA_starved, :fished, :fishedW, :fished0, :fished1, :fished2, :fished3, :fished4more,
+mdata = [:day_of_the_year, :year, :TotB,:JuvB,:AdB, :f, :deadJ_nat, 
+:deadJ_starved, :deadA_nat, :deadA_starved, :fished, :fishedW, :fished0, :fished1, :fished2, :fished3, :fished4more,
 :meanJuvL, :sdJuvL, :meanAdL, :sdAdL, :mean_tpuberty, :sd_tpuberty, :meanJuvWw, :sdJuvWw, :meanAdWw, :sdAdWw, :mean_Hjuve, :sd_Hjuve]
 
 # Run the model for each model in the list
@@ -54,7 +40,7 @@ for (i, model) in enumerate(models)
     #run!(model, 365*20; adata, mdata)
 
     #df_agent = run!(model, 16070+365*30; adata, mdata)
-    df_agent = run!(model, 365*5; adata, mdata)
+    df_agent = run!(model, 365*2; adata, mdata)
     push!(results, df_agent)
 
     end_time = Dates.now()
@@ -69,7 +55,7 @@ for (i, model) in enumerate(models)
     pop = plot_population_timeseries(results[i][1], missing, true)
     
     #type of deaths
-    deaths = plot_param_timeseries(results[i][2],[:deadA_starved, :deadA_nat, :deadA_old,:deadJ_starved, :deadJ_nat, :deadJ_old, :fished])
+    deaths = plot_param_timeseries(results[i][2],[:deadA_starved, :deadA_nat,:deadJ_starved, :deadJ_nat, :fished])
     
     #annual mean biomass in tonnes
     biom = plot_annual_param_timeseries(results[i][2],[:TotB, :AdB], true, :mean, "Anual mean tonnes of biomass", 1975)

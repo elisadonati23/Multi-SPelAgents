@@ -148,6 +148,7 @@ function create_params(
     # natural mortality
         #adults
     deadA_nat = 0
+    deadA_nat0 = 0
     deadA_nat1 = 0
     deadA_nat2 = 0
     deadA_nat3 = 0
@@ -352,7 +353,7 @@ function create_params(
         :fished1_biom => fished1_biom,
         :fished2_biom => fished2_biom,
         :fished3_biom => fished3_biom,
-        :fished4more_biom => fished4more_biom
+        :fished4more_biom => fished4more_biom,
 
 
         :dead_eggmass => dead_eggmass,
@@ -366,6 +367,7 @@ function create_params(
         :natJ_biom1 => natJ_biom1,
 
         :deadA_nat => deadA_nat,
+        :deadA_nat0 => deadA_nat0,
         :deadA_nat1 => deadA_nat1,
         :deadA_nat2 => deadA_nat2,
         :deadA_nat3 => deadA_nat3,
