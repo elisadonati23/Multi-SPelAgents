@@ -101,10 +101,110 @@ df.day_month = Dates.format.(df.date, "dd/mm")
 
 
 # Specify the columns for which to calculate the daily annual average
-columns_to_average = [:thetao, :zoo, :mf0, :mf1, :mf2, :mf3, :mf4]
+columns_to_average = [:mmolm3,:molL,:JL,:thetao,:zoo1,:mf0_pil,:mf1_pil,:mf2_pil,:mf3_pil,:mf4_pil,:mf0_ane,:mf1_ane,:mf2_ane,:mf3_ane,:mf4_ane]
 
 # Group by day and month and calculate the mean of the specified columns
 climatologies = combine(groupby(df, :day_month), columns_to_average .=> mean)
 
-# Display the climatologies dataset
-println(climatologies)
+# Write the climatologies DataFrame to a CSV file with ; separator and , as decimal
+output_file_path = "climatologies.csv"
+CSV.write(output_file_path, climatologies, delim=';', decimal=',')
+
+
+
+include("01dependencies.jl")
+include("03agents.jl")
+include("04params.jl")
+include("02fx.jl")
+include("05generate.jl")
+include("06initialize.jl")
+include("07agent_step!.jl")
+include("08simulation_step.jl")
+
+
+# Read the CSV file
+# Name of the file in the current directory
+file_name = "all_timeseries_final_abm.csv"
+
+# Construct the file path
+file_path = joinpath(pwd(), file_name)
+
+# Read the CSV file
+df = CSV.read(file_path, DataFrame; delim=';', decimal=',')
+dropmissing!(df)
+length(df.date)
+
+Xmax = Vector(df[!, :JL]) #16071 elements from 1.1.1975 to 31.12.2018
+temp = Vector(df[!, :thetao])
+Mf0 = Vector(df[!, :mf0_pil])
+Mf1 = Vector(df[!, :mf1_pil])
+Mf2 = Vector(df[!, :mf2_pil])
+Mf3 = Vector(df[!, :mf3_pil])
+Mf4 = Vector(df[!, :mf4_pil])
+
+meanXmax = mean(Xmax) #mean for spin up
+meanTemp = 15.0 #mean for spin up
+
+
+repXmax = repeat([meanXmax], 40*365+1) #spinup
+repTemp = repeat([meanTemp], 40*365+1) #spinup
+zeros = repeat([0.0], 40*365+1)#spinup
+
+
+Xmax_run = vcat(repXmax, Xmax) #100%
+Xmax10percent = Xmax_run .* 0.1
+
+#spin up + timeseries from 1975 to 2018
+Temp_run = vcat(repTemp, temp)
+Temp_run = Float64.(Temp_run) #spin up + timeseries from 1975 to 2018
+Mf0_run = vcat(zeros, Mf0) #spin up + timeseries from 1975 to 2018
+Mf1_run = vcat(zeros, Mf1) #spin up + timeseries from 1975 to 2018
+Mf2_run = vcat(zeros, Mf2) #spin up + timeseries from 1975 to 2018
+Mf3_run = vcat(zeros, Mf3) #spin up + timeseries from 1975 to 2018
+Mf4_run = vcat(zeros, Mf4) #spin up + timeseries from 1975 to 2018
+
+zeros_long = vcat(repeat([0.0], 365*40+1+16071))
+
+#climatologies
+# Read the CSV file
+# Name of the file in the current directory
+file_name = "climatologies.csv"
+
+# Construct the file path
+file_path = joinpath(pwd(), file_name)
+
+# Read the CSV file
+clima_df = CSV.read(file_path, DataFrame; delim=';', decimal=',')
+dropmissing!(clima_df)
+
+# Remove the 366th row
+clima_df = clima_df[1:365, :]
+
+# Repeat the DataFrame 50 times
+repeated_df = vcat([clima_df for _ in 1:50]...)
+
+clima_Xmax = Vector(repeated_df[!, :JL_mean]) #16071 elements from 1.1.1975 to 31.12.2018
+clima_temp = Vector(repeated_df[!, :thetao_mean])
+clima_Mf0 = Vector(repeated_df[!, :mf0_mean])
+clima_Mf1 = Vector(repeated_df[!, :mf1_mean])
+clima_Mf2 = Vector(repeated_df[!, :mf2_mean])
+clima_Mf3 = Vector(repeated_df[!, :mf3_mean])
+clima_Mf4 = Vector(repeated_df[!, :mf4_mean])
+
+mean_clima_Xmax = mean(clima_Xmax)
+rep_mean_clima_Xmax= repeat([mean_clima_Xmax], 40*365+1) #spinup
+rep_clima_Temp = repeat([meanTemp], 40*365+1) #spinup
+zeros = repeat([0.0], 40*365+1)#spinup
+
+#spin up + timeseries from 1975 to 2018
+clima_Xmax_run = vcat(rep_mean_clima_Xmax, clima_Xmax) #100%
+clima_Xmax10percent = clima_Xmax_run .* 0.1
+clima_Temp_run = vcat(rep_clima_Temp, clima_temp)
+clima_Temp_run = Float64.(clima_Temp_run) #spin up + timeseries from 1975 to 2018
+clima_Mf0_run = vcat(zeros, clima_Mf0) #spin up + timeseries from 1975 to 2018
+clima_Mf1_run = vcat(zeros, clima_Mf1) #spin up + timeseries from 1975 to 2018
+clima_Mf2_run = vcat(zeros, clima_Mf2) #spin up + timeseries from 1975 to 2018
+clima_Mf3_run = vcat(zeros, clima_Mf3) #spin up + timeseries from 1975 to 2018
+clima_Mf4_run = vcat(zeros, clima_Mf4) #spin up + timeseries from 1975 to 2018
+
+
