@@ -56,15 +56,15 @@ function create_params(
 
     # DEB model parameters
     Sex_ratio = 0.5
-    p_Am = 396.002  # Maximum assimilation power
+    p_Am = 396.002  # surface-area Maximum assimilation {pAm}
     v_rate = 0.0172  # Energy conductance
     KappaX = 0.8  # Digestion efficiency
     KappaR = 0.95  # Repro efficiency
     Fm = 6.5  # Maximum specific searching rate
     del_M = 0.1152  # Shape coefficient (isomorph)
     k_J = 0.002  # Maturity maintenance rate coefficient
-    s_M = 3.093  # Stress coefficient
-    p_M = 396.195  # Volume-specific somatic maintenance
+    s_M = 3.093  # acceleration coefficient
+    p_M = 396.195  # Volume-specific somatic maintenance [pM]
     Eg = 5197.37  # Cost per unit of structure
     d_V = 0.2  # Volume-specific density of structure
     mu_V = 500000.0  # Chemical potential of structure
