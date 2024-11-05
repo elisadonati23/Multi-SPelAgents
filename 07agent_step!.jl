@@ -29,7 +29,7 @@ function eggDEB!(Sardine, model)
         
         ## Energy fluxes
                 #Somatic maintenance
-        pS = (model.p_M * model.Tc_value) * V  #p_M_T*V
+        pS = (Sardine.pM_i * model.Tc_value) * V  #p_M_T*V
         # Mobilized energy
         pC = ((Sardine.maternal_EggEn / V) * (model.Eg * (model.v_rate * model.Tc_value) * (V ^ (2/3)) + pS)/(model.Kappa_value * (Sardine.maternal_EggEn / V) + model.Eg))
 
@@ -198,7 +198,7 @@ function juveDEB!(Sardine, model)
         Hdyn = Sardine.H
         Rdyn = Sardine.R
 
-        p_M_T = model.p_M * model.Tc_value 
+        p_M_T = Sardine.pM_i * model.Tc_value 
 
         #initialize the variation in the state variables
         deltaV = 0.0
@@ -281,7 +281,7 @@ return
 end
 
 function juvemature!(Sardine, model)
-    if !Sardine.Dead && (Sardine.H >= model.Hp)
+    if !Sardine.Dead && (Sardine.H >= Sardine.Hp_i)
          #Keep the same number of individuals which survived up to now in juvenile superind
          Sardine.type = :adult
          Sardine.R = 0.0
@@ -416,10 +416,10 @@ if !Sardine.Dead
     Sardine.f_i = model.f
     Vdyn = (Sardine.Lw * model.del_M) ^ 3.0
     Endyn = Sardine.En
-    Hdyn = model.Hp
+    Hdyn = Sardine.Hp_i
     Rdyn = Sardine.R
 
-    p_M_T = model.p_M * model.Tc_value # this should be in the update environment module
+    p_M_T = Sardine.pM_i * model.Tc_value # this should be in the update environment module
     
     deltaV = 0.0
     deltaEn  = 0.0
