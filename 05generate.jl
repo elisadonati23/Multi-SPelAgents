@@ -18,7 +18,7 @@ function generate_EggMass(No_Egg, model, Nind = missing, maternal_EggEn = missin
     agent_metamorph = false
     agent_Wg = 0.0
     agent_Hp_i = model.Hp + (randn() * 0.01 * model.Hp)
-    agent_pM_i = model.p_M * (randn() * 0.01 * model.p_M)
+    agent_pM_i = model.p_M + (randn() * 0.01 * model.p_M)
 
     # Set maternal egg energy
     agent_maternal_EggEn = ismissing(maternal_EggEn) ? Float64(model.E0) : Float64(maternal_EggEn)
@@ -69,7 +69,7 @@ function generate_Juvenile(No_J, model, Nind = missing, Generation = 0.0, En = m
     agent_reproduction = :nonspawner
     agent_Wg = 0.0
     agent_Hp_i = model.Hp + (randn() * 0.01 * model.Hp)
-    agent_pM_i = model.p_M * (randn() * 0.01 * model.p_M)
+    agent_pM_i = model.p_M + (randn() * 0.01 * model.p_M)
     
     # Silenced features
     agent_maternal_EggEn = model.E0
@@ -93,7 +93,7 @@ function generate_Juvenile(No_J, model, Nind = missing, Generation = 0.0, En = m
         agent_Ww = ismissing(Ww) ? (model.w * (model.d_V * ((agent_Lw * model.del_M) ^ 3.0))) : Ww
 
         # Calculate maturation energy
-        agent_H = agent_Hp_i * (agent_Lw * model.del_M) / model.Lp
+        agent_H = model.Hp * (agent_Lw * model.del_M) / model.Lp
 
         # Set reserve energy
         agent_En = ismissing(En) ? agent_f_i * model.Em * ((agent_Lw * model.del_M)^3.0) : En
@@ -148,10 +148,10 @@ function generate_Adult(No_A, model, Nind = missing, Age = missing, t_puberty = 
     agent_metamorph = true
     agent_Wg = 0.0
     agent_Hp_i = model.Hp
-    agent_pM_i = model.p_M * (randn() * 0.01 * model.p_M)
+    agent_pM_i = model.p_M + (randn() * 0.01 * model.p_M)
 
     # Set maturation energy
-    agent_H = ismissing(H) ? agent_Hp_i : H
+    agent_H = ismissing(H) ? model.Hp : H
 
     # Determine shape parameter
     agent_s_M_i = model.Lj / model.Lb
@@ -379,7 +379,7 @@ function generate_juvenile_pop(model, Lwclass = missing, Lw_biom = missing)
         # Calculate scaled energy reserve
         agent_Scaled_En = agent_En / (model.Em * ((agent_Lw * model.del_M)^3.0))
         agent_Ww = (model.w * (model.d_V * ((agent_Lw * model.del_M) ^ 3.0) + model.w_E / model.mu_E * (agent_En + agent_R))) 
-        agent_H = agent_Hp_i * (agent_Lw * model.del_M) / model.Lp
+        agent_H = model.Hp * (agent_Lw * model.del_M) / model.Lp
 
         if model.Hb >= agent_H
             agent_s_M_i = 1.0
