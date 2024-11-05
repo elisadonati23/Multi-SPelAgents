@@ -132,7 +132,7 @@ function generate_Adult(No_A, model, Nind = missing, Age = missing, t_puberty = 
 
     # Initialize default agent properties for Adult
     agent_type = :adult
-    agent_f_i = model.f
+    agent_f_i = model.f 
     agent_reproduction = :nonspawner
     agent_maternal_EggEn = model.E0
     agent_superind_Neggs = 0.0
@@ -231,3 +231,173 @@ function generate_Adult(No_A, model, Nind = missing, Age = missing, t_puberty = 
 end
 
 
+function generate_adult_pop(model, Lwclass = missing, Lw_biom = missing)
+    # to be used with medias info on length class and biomass
+    #USE ONLY TO Initialize MODEL FROM MEDIAS DATA
+
+        # Initialize default agent properties for Adult - true for everyone
+        agent_type = :adult
+        agent_f_i = model.f
+        agent_reproduction = :nonspawner
+        agent_maternal_EggEn = model.E0
+        agent_superind_Neggs = 0.0
+        agent_Lb_i = model.Lb
+        agent_spawned = 0.0
+        agent_Dead = false
+        agent_metamorph = true
+        agent_H = model.Hp
+        agent_s_M_i = model.Lj / model.Lb
+        agent_Generation = 0.0
+
+    #Lw class - biom relationship - based on MEDIAS
+    agent_R =  0.0
+    # Set reserve energy
+    agent_En_class = agent_f_i * model.Em * ((Lwclass * model.del_M)^3.0)
+    agent_Ww_class = (model.w * (model.d_V * ((Lwclass * model.del_M) ^ 3.0) + model.w_E / model.mu_E * (agent_En_class + agent_R))) 
+
+    Nind = Lw_biom/agent_Ww_class
+
+    # Define No_A based on Nind if Nind is greater than 1e7
+    if Nind > 1e7
+        No_A = ceil(Int, Nind / 1e7)
+        agent_Nind = ceil(Int, Nind / No_A)
+        agent_Nind0 = agent_Nind
+    else
+        No_A = 1
+        agent_Nind = Nind
+        agent_Nind0 = Nind # Adjust the divisor as needed to define the number of superindividuals
+    end
+
+    # Generate Adult agents
+    for _ in 1:No_A
+        # Set number of individuals in the superindividual
+        agent_Lw = clamp(round(randn() * 0.5 + Lwclass, digits=2), Lwclass - 0.5, Lwclass+0.5)
+        agent_L = agent_Lw * model.del_M
+        # Set reproduction energy
+        agent_En = agent_f_i * model.Em * ((agent_Lw * model.del_M)^3.0)
+
+        agent_Ww = (model.w * (model.d_V * ((agent_Lw * model.del_M) ^ 3.0) + model.w_E / model.mu_E * (agent_En + agent_R))) 
+
+        # Calculate age based on length
+        agent_Age = 
+            if model.Lm isa Float64
+            model.Am * agent_Lw * model.del_M / model.Lm
+            else
+            model.Am * agent_Lw * model.del_M / model.Lm[model.sim_timing]
+            end
+
+
+        
+        # Calculate scaled energy reserve
+        agent_Scaled_En = agent_En / (model.Em * ((agent_Lw * model.del_M)^3.0))
+
+         # depending on age, above, i put the Nind to ensure correct lifespan but I assume that they were 1e7 at age 0+
+        
+        agent_Lj_i = 
+            model.Lj
+
+
+        # Set time to puberty
+        agent_t_puberty = model.Ap * (agent_Lw * model.del_M) / model.Lp
+        
+        # Calculate assimilation rate
+        Tc_value = isa(model.Tc, Vector{Float64}) ? model.Tc[model.sim_timing] : model.Tc
+        agent_pA = agent_f_i * model.p_Am * Tc_value * agent_s_M_i * ((agent_Lw * model.del_M)^2.0)
+
+        # Calculate condition index and gonadosomatic index
+        agent_CI = 100 * agent_Ww / (agent_Lw^3)
+        agent_GSI = (model.w * (model.w_E / model.mu_E) * agent_R) / agent_Ww * 100  # Weight of the gonads as a percentage of total weight
+
+        # Add agent to the model
+        add_agent!(
+            Sardine, model, agent_type, agent_reproduction, agent_Nind, agent_Nind0, agent_Age, agent_L, agent_H,
+            agent_maternal_EggEn, agent_superind_Neggs, agent_En, agent_Generation, agent_Dead,
+            agent_f_i, agent_t_puberty, agent_Lw, agent_Ww, agent_R, agent_Scaled_En,
+            agent_s_M_i, agent_pA, agent_Lb_i, agent_Lj_i, agent_metamorph, agent_CI, agent_GSI, agent_spawned
+        )
+    end
+    return
+end
+
+
+function generate_juvenile_pop(model, Lwclass = missing, Lw_biom = missing)
+    # to be used with medias info on length class and biomass
+    #USE ONLY TO Initialize MODEL FROM MEDIAS DATA
+    if Lwclass >= 10.0
+        println("ATTENTION: Lwclass is equal to the fishery recruitment size")
+    end
+        # Initialize default agent properties for Adult - true for everyone
+        agent_type = :juvenile
+        agent_f_i = model.f
+        agent_reproduction = :nonspawner
+        agent_maternal_EggEn = model.E0
+        agent_superind_Neggs = 0.0
+        agent_Lb_i = model.Lb
+        agent_spawned = 0.0
+        agent_Dead = false
+        agent_Generation = 0.0
+
+    #Lw class - biom relationship - based on MEDIAS
+    agent_R =  0.0
+    # Set reserve energy
+    agent_En_class = agent_f_i * model.Em * ((Lwclass * model.del_M)^3.0)
+    agent_Ww_class = (model.w * (model.d_V * ((Lwclass * model.del_M) ^ 3.0) + model.w_E / model.mu_E * (agent_En_class + agent_R))) 
+    Nind = Lw_biom/agent_Ww_class
+
+    # Define No_A based on Nind if Nind is greater than 1e7
+    if Nind > 1e7
+        No_J = ceil(Int, Nind / 1e7)
+        agent_Nind = ceil(Int, Nind / No_A)
+        agent_Nind0 = agent_Nind
+    else
+        No_J = 1
+        agent_Nind = Nind
+        agent_Nind0 = Nind # Adjust the divisor as needed to define the number of superindividuals
+    end
+
+    # Generate Adult agents
+    for _ in 1:No_J
+        # Set number of individuals in the superindividual
+        agent_Lw = clamp(round(randn() * 0.5 + Lwclass, digits=2), Lwclass - 0.5, Lwclass+0.5)
+        agent_L = agent_Lw * model.del_M
+        # Set reproduction energy
+        agent_En = agent_f_i * model.Em * ((agent_Lw * model.del_M)^3.0)
+        # Calculate scaled energy reserve
+        agent_Scaled_En = agent_En / (model.Em * ((agent_Lw * model.del_M)^3.0))
+        agent_Ww = (model.w * (model.d_V * ((agent_Lw * model.del_M) ^ 3.0) + model.w_E / model.mu_E * (agent_En + agent_R))) 
+        agent_H = model.Hp * (agent_Lw * model.del_M) / model.Lp
+
+        if model.Hb >= agent_H
+            agent_s_M_i = 1.0
+            agent_metamorph = false
+        elseif model.Hb < agent_H < model.Hj
+            agent_s_M_i = agent_Lw * model.del_M / agent_Lb_i
+            agent_metamorph = false
+        else
+            agent_Lj_i = model.Lj
+            agent_s_M_i = model.Lj / agent_Lb_i
+            agent_metamorph = true
+        end
+
+        # Calculate age based on length
+        agent_Age = model.Ap * (agent_Lw * model.del_M) / model.Lp
+        agent_t_puberty = model.Ap * (agent_Lw * model.del_M) / model.Lp
+        
+        # Calculate assimilation rate
+        Tc_value = isa(model.Tc, Vector{Float64}) ? model.Tc[model.sim_timing] : model.Tc
+        agent_pA = agent_f_i * model.p_Am * Tc_value * agent_s_M_i * ((agent_Lw * model.del_M)^2.0)
+
+        # Calculate condition index and gonadosomatic index
+        agent_CI = 100 * agent_Ww / (agent_Lw^3)
+        agent_GSI = (model.w * (model.w_E / model.mu_E) * agent_R) / agent_Ww * 100  # Weight of the gonads as a percentage of total weight
+
+        # Add agent to the model
+        add_agent!(
+            Sardine, model, agent_type, agent_reproduction, agent_Nind, agent_Nind0, agent_Age, agent_L, agent_H,
+            agent_maternal_EggEn, agent_superind_Neggs, agent_En, agent_Generation, agent_Dead,
+            agent_f_i, agent_t_puberty, agent_Lw, agent_Ww, agent_R, agent_Scaled_En,
+            agent_s_M_i, agent_pA, agent_Lb_i, agent_Lj_i, agent_metamorph, agent_CI, agent_GSI, agent_spawned
+        )
+    end
+    return
+end

@@ -22,8 +22,14 @@ results = []
 num_runs = 1
 
 models = [
-model_initialize_parallel(10.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.7e14, 1.0, 5.0, 0.945, 15.0, 0.9998,	1.08,	0.86,	0.69,	0.62,	0.48)
+model_initialize_parallel(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.7e14, 1.0, 5.0, 0.945, 15.0, 0.9998,	1.08,	0.86,	0.69,	0.62,	0.48)
 ]
+
+
+generate_adult_pop(models[1], 12.5, 6e8)
+generate_juvenile_pop(models[1], 10.5, 10000)
+
+allagents(models[1])
 
 # Initialize dataframes
 adata = [:type, :Nind, :t_puberty,:Age, :Lw, :Ww, :En, :R, :H, :CI, :GSI, :pA, :s_M_i, :superind_Neggs, :reproduction, :spawned, :Dead]
