@@ -1,6 +1,6 @@
 # This file is machine-generated - editing it directly is not advised
 
-julia_version = "1.10.2"
+julia_version = "1.10.4"
 manifest_format = "2.0"
 project_hash = "6561c5d6e8df07974980b383fbd2352759c8e206"
 
@@ -308,7 +308,7 @@ weakdeps = ["Dates", "LinearAlgebra"]
 [[deps.CompilerSupportLibraries_jll]]
 deps = ["Artifacts", "Libdl"]
 uuid = "e66e0078-7015-5450-92f7-15fbd957f2ae"
-version = "1.1.0+0"
+version = "1.1.1+0"
 
 [[deps.ConcurrentUtilities]]
 deps = ["Serialization", "Sockets"]
@@ -840,7 +840,6 @@ deps = ["DataStructures", "Distributions", "Random", "ResumableFunctions", "Stat
 git-tree-sha1 = "77b746b1a0e4a4441072d665c1368704f3b22d85"
 uuid = "ef79a3d2-ae9f-5cd2-ab61-e13847810a6e"
 version = "0.2.11"
-
 
 [[deps.JLD2]]
 deps = ["FileIO", "MacroTools", "Mmap", "OrderedCollections", "Pkg", "PrecompileTools", "Reexport", "Requires", "TranscodingStreams", "UUIDs", "Unicode"]
@@ -1857,7 +1856,6 @@ deps = ["MacroTools", "PrecompileTools"]
 git-tree-sha1 = "73dbf987e33aeae99a488348780693b758367dd6"
 uuid = "8e1ec7a9-0e02-4297-b0fe-6433085c89f2"
 version = "0.5.6"
-
 
 [[deps.Suppressor]]
 deps = ["Logging"]
