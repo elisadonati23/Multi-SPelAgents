@@ -147,52 +147,52 @@ function create_params(
 
     # natural mortality
         #adults
-    deadA_nat = 0
-    deadA_nat0 = 0
-    deadA_nat1 = 0
-    deadA_nat2 = 0
-    deadA_nat3 = 0
-    deadA_nat4more = 0
-    natA_biom = 0
-    natA_biom0 = 0
-    natA_biom1 = 0
-    natA_biom2 = 0
-    natA_biom3 = 0
-    natA_biom4more = 0
+    deadA_nat = 0.0
+    deadA_nat0 = 0.0
+    deadA_nat1 = 0.0
+    deadA_nat2 = 0.0
+    deadA_nat3 = 0.0
+    deadA_nat4more = 0.0
+    natA_biom = 0.0
+    natA_biom0 = 0.0
+    natA_biom1 = 0.0
+    natA_biom2 = 0.0
+    natA_biom3 = 0.0
+    natA_biom4more = 0.0
 
         #juvenile
-    deadJ_nat = 0
-    deadJ_nat0 = 0
-    deadJ_nat1 = 0
-    natJ_biom = 0
-    natJ_biom0 = 0
-    natJ_biom1 = 0
+    deadJ_nat = 0.0
+    deadJ_nat0 = 0.0
+    deadJ_nat1 = 0.0
+    natJ_biom = 0.0
+    natJ_biom0 = 0.0
+    natJ_biom1 = 0.0
 
     # starving mortality
         # adult
-    deadA_starved = 0
-    deadA_starved0 = 0
-    deadA_starved1 = 0
-    deadA_starved2 = 0
-    deadA_starved3 = 0
-    deadA_starved4more = 0
-    starvedA_biom = 0
-    starvedA_biom0 = 0
-    starvedA_biom1 = 0
-    starvedA_biom2 = 0
-    starvedA_biom3 = 0
-    starvedA_biom4more = 0
+    deadA_starved = 0.0
+    deadA_starved0 = 0.0
+    deadA_starved1 = 0.0
+    deadA_starved2 = 0.0
+    deadA_starved3 = 0.0
+    deadA_starved4more = 0.0
+    starvedA_biom = 0.0
+    starvedA_biom0 = 0.0
+    starvedA_biom1 = 0.0
+    starvedA_biom2 = 0.0
+    starvedA_biom3 = 0.0
+    starvedA_biom4more = 0.0
         # juvenile
-    starvedJ_biom = 0
-    starvedJ_biom0 = 0
-    starvedJ_biom1 = 0
-    deadJ_starved = 0
-    deadJ_starved0 = 0
-    deadJ_starved1 = 0
+    starvedJ_biom = 0.0
+    starvedJ_biom0 = 0.0
+    starvedJ_biom1 = 0.0
+    deadJ_starved = 0.0
+    deadJ_starved0 = 0.0
+    deadJ_starved1 = 0.0
 
 
     # fishing mortality
-    fished = 0
+    fished = 0.0
     fishedW = 0.0
     fished0 = 0.0
     fished1 = 0.0
@@ -344,6 +344,8 @@ function create_params(
         :starvedA_biom4more => starvedA_biom4more,
 
         #fishing mortality
+        :fished => fished,
+        :fishedW => fishedW,
         :fished0 => fished0,
         :fished1 => fished1,
         :fished2 => fished2,

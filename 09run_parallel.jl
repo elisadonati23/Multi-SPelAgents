@@ -25,18 +25,15 @@ models = [
 model_initialize_parallel(3.0, 3.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.7e14, 1.0, 5.0, 0.945, 15.0, 0.9998,	1.08,	0.86,	0.69,	0.62,	0.48)
 ]
 
-
-generate_adult_pop(models[1], 12.5, 6e8)
-generate_juvenile_pop(models[1], 10.5, 10000)
-
 allagents(models[1])
 
 # Initialize dataframes
 adata = [:type, :Nind, :t_puberty,:Age, :Lw, :Ww, :En, :R, :H, :CI, :GSI, :pA, :s_M_i, :superind_Neggs, :reproduction, :spawned, :Dead]
-mdata = [:day_of_the_year, :year, :TotB,:JuvB,:AdB, :f, :deadJ_nat, 
+mdata = [:day_of_the_year, :year, :TotB,:JuvB,:AdB, :f, :deadJ_nat, :starvedJ_biom,:starvedA_biom,:natJ_biom, :natA_biom,
 :deadJ_starved, :deadA_nat, :deadA_starved, :fished, :fishedW, :fished0, :fished1, :fished2, :fished3, :fished4more,
 :meanJuvL, :sdJuvL, :meanAdL, :sdAdL, :mean_tpuberty, :sd_tpuberty, :meanJuvWw, :sdJuvWw, :meanAdWw, :sdAdWw, :mean_Hjuve, :sd_Hjuve]
 
+#:starvedJ_biom,  , :natA_biom,
 # Run the model for each model in the list
 for (i, model) in enumerate(models)
     start_time = Dates.now()

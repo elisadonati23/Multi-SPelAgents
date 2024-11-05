@@ -130,6 +130,7 @@ function juvedie!(Sardine, model)
             natural_deaths = Float64(rand(Binomial(Int64(Sardine.Nind), 1-exp(-(model.M_j)))))
             Sardine.Nind -= natural_deaths
             model.deadJ_nat += natural_deaths
+            model.natJ_biom += natural_deaths * Sardine.Ww
 
             #keep track of the age
             if floor(Sardine.Age / 365.0 ) == 0.0
