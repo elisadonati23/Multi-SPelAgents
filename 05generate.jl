@@ -154,7 +154,7 @@ function generate_Adult(No_A, model, Nind = missing, Age = missing, t_puberty = 
         agent_Nind = ismissing(Nind) ? 1e7 : Float64(floor(Nind))
 
         # Set length-weight relationship
-        agent_Lw = ismissing(Lw) ? clamp(round(randn() * 5.0 + 20.0, digits=2), 15.0, 25.0) : agent_Lw
+        agent_Lw = ismissing(Lw) ? clamp(round(randn() * 2.0 + 15.0, digits=2), 10.0, 20.0) : agent_Lw
         agent_L = agent_Lw * model.del_M
 
         # Calculate age based on length
