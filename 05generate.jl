@@ -224,7 +224,7 @@ function generate_Adult(No_A, model, Nind = missing, Age = missing, t_puberty = 
 
         # Add agent to the model
         add_agent!(
-            Sardine, model, agent_type, agent_reproduction, agent_Nind, agent_Age, agent_L, agent_H,
+            Sardine, model, agent_type, agent_reproduction, agent_Nind, agent_Nind0, agent_Age, agent_L, agent_H,
             agent_maternal_EggEn, agent_superind_Neggs, agent_En, agent_Generation, agent_Dead,
             agent_f_i, agent_t_puberty, agent_Lw, agent_Ww, agent_R, agent_Scaled_En,
             agent_s_M_i, agent_pA, agent_Lb_i, agent_Lj_i, agent_metamorph, agent_CI, agent_GSI, agent_spawned

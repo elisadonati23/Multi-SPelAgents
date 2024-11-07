@@ -22,7 +22,7 @@ results = []
 num_runs = 1
 
 models = [
-model_initialize_parallel(100.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.7e14, 1.0, 5.0, 0.9901, 15.0, 0.9998,	1.08,	0.86,	0.69,	0.62,	0.48)
+model_initialize_parallel(5.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.7e14, 1.0, 5.0, 0.9901, 15.0, 0.9998,	1.08,	0.86,	0.69,	0.62,	0.48)
 ]
 generate_adult_pop(models[1],10.5, 8338621693)
 generate_adult_pop(models[1],11.5, 17782674446)
