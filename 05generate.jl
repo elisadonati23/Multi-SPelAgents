@@ -155,7 +155,22 @@ function generate_Adult(No_A, model, Nind = missing, Age = missing, t_puberty = 
         # Set number of individuals in the superindividual
         #agent_Nind = ismissing(Nind) ? 1e7 : Float64(floor(Nind))
         #agent_Nind0 = agent_Nind
+        # Calculate age based on length
 
+        # Set length-weight relationship
+        agent_Lw = ismissing(Lw) ? clamp(round(randn() * 5.0 + 13.0, digits=2), 8.0, 18.0) : agent_Lw
+        agent_L = agent_Lw * model.del_M
+
+                
+        agent_Age = if ismissing(Age)
+            if model.Lm isa Float64
+                model.Am * agent_Lw * model.del_M / model.Lm
+            else
+                model.Am * agent_Lw * model.del_M / model.Lm[model.sim_timing]
+            end
+        else
+            Age
+        end
         # not sure needed with anchovies because the lifespan was correct.
         # in case remove
         if ismissing(Nind)
@@ -177,21 +192,6 @@ function generate_Adult(No_A, model, Nind = missing, Age = missing, t_puberty = 
         end
 
         agent_Nind0 = 1e7
-
-        # Set length-weight relationship
-        agent_Lw = ismissing(Lw) ? clamp(round(randn() * 5.0 + 13.0, digits=2), 8.0, 18.0) : agent_Lw
-        agent_L = agent_Lw * model.del_M
-
-        # Calculate age based on length
-        agent_Age = if ismissing(Age)
-            if model.Lm isa Float64
-                model.Am * agent_Lw * model.del_M / model.Lm
-            else
-                model.Am * agent_Lw * model.del_M / model.Lm[model.sim_timing]
-            end
-        else
-            Age
-        end
 
         agent_Lj_i = if ismissing(Lj)
             model.Lj
