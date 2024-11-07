@@ -164,7 +164,7 @@ function generate_Adult(No_A, model, Nind = missing, Age = missing, t_puberty = 
         # Set number of individuals in the superindividual
         
         # Set length-weight relationship
-        agent_Lw = ismissing(Lw) ? clamp(round(randn() * 2.0 + 13.0, digits=2), 10.0, 20.0) : agent_Lw
+        agent_Lw = ismissing(Lw) ? clamp(round(randn() * 2.0 + 15.0, digits=2), 10.0, 20.0) : agent_Lw
         agent_L = agent_Lw * model.del_M
 
         # Calculate age based on length
