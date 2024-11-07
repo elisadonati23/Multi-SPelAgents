@@ -122,6 +122,53 @@ function update_outputs!(model)
     return
 end
 
+function reset_variables(model)
+    # natural mortality
+    #adults
+    model.deadA_nat = 0.0
+    model.deadA_nat1 = 0.0
+    model.deadA_nat2 = 0.0
+    model.deadA_nat3 = 0.0
+    model.deadA_nat4more = 0.0
+    model.natA_biom = 0.0
+    model.natA_biom0 = 0.0
+    model.natA_biom1 = 0.0
+    model.natA_biom2 = 0.0
+    model.natA_biom3 = 0.0
+    model.natA_biom4more = 0.0
+
+        #juvenile
+    model.deadJ_nat = 0.0
+    model.deadJ_nat0 = 0.0
+    model.deadJ_nat1 = 0.0
+    model.natJ_biom = 0.0
+    model.natJ_biom0 = 0.0
+    model.natJ_biom1 = 0.0
+
+    # starving mortality
+        # adult
+    model.deadA_starved = 0.0
+    model.deadA_starved0 = 0.0
+    model.deadA_starved1 = 0.0
+    model.deadA_starved2 = 0.0
+    model.deadA_starved3 = 0.0
+    model.deadA_starved4more = 0.0
+    model.starvedA_biom = 0.0
+    model.starvedA_biom0 = 0.0
+    model.starvedA_biom1 = 0.0
+    model.starvedA_biom2 = 0.0
+    model.starvedA_biom3 = 0.0
+    model.starvedA_biom4more = 0.0
+        # juvenile
+    model.starvedJ_biom = 0.0
+    model.starvedJ_biom0 = 0.0
+    model.starvedJ_biom1 = 0.0
+    model.deadJ_starved = 0.0
+    model.deadJ_starved0 = 0.0
+    model.deadJ_starved1 = 0.0
+return
+end
+
 #################
 #     Scheduler #
 #################
@@ -129,49 +176,57 @@ end
 mutable struct scheduler_Adults end
 
 function (sEA::scheduler_Adults)(model::ABM)
-    ids = [agent.id for agent in values(allagents(model))] 
-    ids = filter!(id -> hasid(model, id) && (model[id].type == :adult), ids)
-    return ids
+ids = [agent.id for agent in values(allagents(model))] 
+ids = filter!(id -> hasid(model, id) && (model[id].type == :adult), ids)
+return ids
 end
 
 sEA = scheduler_Adults()
 
 function complex_step!(model)
 
-    # Parallel processing for Sardine agents
-    Threads.@threads for sardine in collect(values(allagents(model)))
-        parallel_sardine_step!(sardine, model)
-    end 
+reset_variables(model)
 
-    # Remove all dead agents
-    remove_all!(model, is_dead)
+remove_all!(model, is_dead)
 
-    # Get IDs of adult agents
-    sEA_ids = sEA(model)
-    adult_ids = filter!(id -> hasid(model, id) && model[id].type == :adult, copy(sEA_ids))
+# Parallel processing for Sardine agents
+Threads.@threads for sardine in collect(values(allagents(model)))
+    parallel_sardine_step!(sardine, model)
+end 
 
-    # Handle spawning for adult agents
-    for sardine in adult_ids
-        adultspawn!(model[sardine], model)  # Set if the sardine is a spawner or not, determine the Nind to cluster in a new superindividual (egg)
-    end
+# Remove all dead agents
+remove_all!(model, is_dead)
 
-    # Filter spawners for creating new EggMass agents
-    spawners = filter!(id -> hasid(model, id) && model[id].reproduction == :spawner, copy(sEA_ids))
+# Get IDs of adult agents
+sEA_ids = sEA(model)
+adult_ids = filter!(id -> hasid(model, id) && model[id].type == :adult, copy(sEA_ids))
 
-    if !isempty(spawners)
-        # Create new born daily superindividuals
-        prop_values = [getfield(model[agent], :superind_Neggs) for agent in spawners]
-        mean_Egg_energy = mean([getfield(model[agent], :maternal_EggEn) for agent in spawners])
-        max_generation = maximum([getfield(model[agent], :Generation) for agent in spawners]) + 1.0
-        tot_Neggs = sum(prop_values)
-        #function generate_EggMass(No_Egg, model, Nind = missing, maternal_EggEn = missing, En = missing, Generation = missing)
-        generate_EggMass(1, model, tot_Neggs, mean_Egg_energy, mean_Egg_energy, max_generation)
-    end
+# Handle spawning for adult agents
+for sardine in adult_ids
+    adultspawn!(model[sardine], model)  # Set if the sardine is a spawner or not, determine the Nind to cluster in a new superindividual (egg)
+end
 
-    # Update model outputs
-    update_outputs!(model)
+# Filter spawners for creating new EggMass agents
+spawners = filter!(id -> hasid(model, id) && model[id].reproduction == :spawner, copy(sEA_ids))
 
-    # Evolve the environment
-    evolve_environment!(model)
+remove_all!(model, is_dead)
+
+if !isempty(spawners)
+    # Create new born daily superindividuals
+    prop_values = [getfield(model[agent], :superind_Neggs) for agent in spawners]
+    mean_Egg_energy = mean([getfield(model[agent], :maternal_EggEn) for agent in spawners])
+    max_generation = maximum([getfield(model[agent], :Generation) for agent in spawners]) + 1.0
+    tot_Neggs = sum(prop_values)
+    #function generate_EggMass(No_Egg, model, Nind = missing, maternal_EggEn = missing, En = missing, Generation = missing)
+    generate_EggMass(1, model, tot_Neggs, mean_Egg_energy, mean_Egg_energy, max_generation)
+end
+
+remove_all!(model, is_dead)
+
+# Update model outputs
+update_outputs!(model)
+
+# Evolve the environment
+evolve_environment!(model)
 
 end
