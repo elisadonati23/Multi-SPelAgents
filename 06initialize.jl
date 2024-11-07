@@ -82,7 +82,7 @@ function model_initialize_parallel(
 
         # Assign the calculated f to all agents in the model
         for agent in agents
-            agent.f = model.f
+            agent.f_i = model.f
         end
     return model
 end
