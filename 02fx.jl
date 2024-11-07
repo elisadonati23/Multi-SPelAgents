@@ -562,7 +562,7 @@ function diagnostic_plots_pt2(out_model, model)
     #p5 = plot_param_timeseries(out_model, [:fishedW], missing,  true)
     p6 = plot_means_with_std(out_model, [:mean_tpuberty], [:sd_tpuberty])
     p7 = plot_means_with_std(out_model, [:meanAdWw, :meanJuvWw], [:sdAdWw, :sdJuvWw])
-    p8 = plot_param_timeseries(out_model, [:TotB, :starvedJ_biom, :starvedA_biom, :natA_biom, :natJ_biom, :fished_W])
+    p8 = plot_param_timeseries(out_model, [:TotB, :starvedJ_biom, :starvedA_biom, :natA_biom, :natJ_biom, :fishedW])
 
 
     # Combine the plots in a 3x3 grid
