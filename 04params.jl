@@ -130,20 +130,14 @@ function create_params(
     # Store daily reproduction probabilities in a dictionary for easy access
     prob_dict = Dict(zip(repro_period, daily_repro_probabilities))
 
+    
     # Initialize output variables
-
+    Nsuperind = No_A + No_J + No_Egg
     year = 1.0
     dead_eggmass = 0
-    deadJ_nat = 0
-    deadA_nat = 0
-    deadJ_starved = 0
-    deadA_starved = 0
-    deadA_old = 0
-    deadJ_old = 0
     mean_batch_eggs = 0.0
     mean_spawning_events = 0.0
-    fished = 0
-    fishedW = 0.0
+
     TotB = 0.0
     JuvB = 0.0
     AdB = 0.0
@@ -166,11 +160,65 @@ function create_params(
     mean_Hjuve = 0.0
     sd_Hjuve = 0.0
 
+    # natural mortality
+        #adults
+    deadA_nat = 0.0
+    deadA_nat0 = 0.0
+    deadA_nat1 = 0.0
+    deadA_nat2 = 0.0
+    deadA_nat3 = 0.0
+    deadA_nat4more = 0.0
+    natA_biom = 0.0
+    natA_biom0 = 0.0
+    natA_biom1 = 0.0
+    natA_biom2 = 0.0
+    natA_biom3 = 0.0
+    natA_biom4more = 0.0
+
+        #juvenile
+    deadJ_nat = 0.0
+    deadJ_nat0 = 0.0
+    deadJ_nat1 = 0.0
+    natJ_biom = 0.0
+    natJ_biom0 = 0.0
+    natJ_biom1 = 0.0
+
+    # starving mortality
+        # adult
+    deadA_starved = 0.0
+    deadA_starved0 = 0.0
+    deadA_starved1 = 0.0
+    deadA_starved2 = 0.0
+    deadA_starved3 = 0.0
+    deadA_starved4more = 0.0
+    starvedA_biom = 0.0
+    starvedA_biom0 = 0.0
+    starvedA_biom1 = 0.0
+    starvedA_biom2 = 0.0
+    starvedA_biom3 = 0.0
+    starvedA_biom4more = 0.0
+        # juvenile
+    starvedJ_biom = 0.0
+    starvedJ_biom0 = 0.0
+    starvedJ_biom1 = 0.0
+    deadJ_starved = 0.0
+    deadJ_starved0 = 0.0
+    deadJ_starved1 = 0.0
+
+
+    # fishing mortality
+    fished = 0.0
+    fishedW = 0.0
     fished0 = 0.0
     fished1 = 0.0
     fished2 = 0.0
     fished3 = 0.0
     fished4more = 0.0
+    fished0_biom = 0.0
+    fished1_biom = 0.0
+    fished2_biom = 0.0
+    fished3_biom = 0.0
+    fished4more_biom = 0.0
 
     # Store all parameters in a dictionary for easy access in the model
     model_parameters = Dict(
@@ -203,17 +251,11 @@ function create_params(
         :M2 => M2,
         :M3 => M3,
         :M4 => M4,
+        :death_threshold => death_threshold,
         :r_food => r_food,
         :DEB_timing => DEB_timing,
         :day_of_the_year => day_of_the_year,
         :sim_timing => sim_timing,
-        :dead_eggmass => dead_eggmass,
-        :deadJ_nat => deadJ_nat,
-        :deadA_nat => deadA_nat,
-        :deadJ_starved => deadJ_starved,
-        :deadA_starved => deadA_starved,
-        :deadA_old => deadA_old,
-        :deadJ_old => deadJ_old,
         :mean_batch_eggs => mean_batch_eggs,
         :mean_spawning_events => mean_spawning_events,
         :fished => fished,
@@ -293,12 +335,67 @@ function create_params(
         :sd_Ww_puberty => sd_Ww_puberty,
         :mean_Hjuve => mean_Hjuve,
         :sd_Hjuve => sd_Hjuve,
+
+        :Nsuperind => Nsuperind,
+
+        # starving mortality
+        :deadJ_starved => deadJ_starved,
+        :deadJ_starved0 => deadJ_starved0,
+        :deadJ_starved1 => deadJ_starved1,
+        :starvedJ_biom => starvedJ_biom,
+        :starvedJ_biom0 => starvedJ_biom0,
+        :starvedJ_biom1 => starvedJ_biom1,
+        :deadA_starved => deadA_starved,
+        :deadA_starved0 => deadA_starved0,
+        :deadA_starved1 => deadA_starved1,
+        :deadA_starved2 => deadA_starved2,
+        :deadA_starved3 => deadA_starved3,
+        :deadA_starved4more => deadA_starved4more,
+        :starvedA_biom => starvedA_biom,
+        :starvedA_biom0 => starvedA_biom0,
+        :starvedA_biom1 => starvedA_biom1,
+        :starvedA_biom2 => starvedA_biom2,
+        :starvedA_biom3 => starvedA_biom3,
+        :starvedA_biom4more => starvedA_biom4more,
+
+        #fishing mortality
+        :fished => fished,
+        :fishedW => fishedW,
         :fished0 => fished0,
         :fished1 => fished1,
         :fished2 => fished2,
         :fished3 => fished3,
         :fished4more => fished4more,
-        :Kx_AmP => Kx_AmP
+        :fished0_biom => fished0_biom,
+        :fished1_biom => fished1_biom,
+        :fished2_biom => fished2_biom,
+        :fished3_biom => fished3_biom,
+        :fished4more_biom => fished4more_biom,
+
+
+        :dead_eggmass => dead_eggmass,
+
+        #natural mortality
+        :deadJ_nat => deadJ_nat,
+        :deadJ_nat0 => deadJ_nat0,
+        :deadJ_nat1 => deadJ_nat1,
+        :natJ_biom => natJ_biom,
+        :natJ_biom0 => natJ_biom0,
+        :natJ_biom1 => natJ_biom1,
+
+        :deadA_nat => deadA_nat,
+        :deadA_nat0 => deadA_nat0,
+        :deadA_nat1 => deadA_nat1,
+        :deadA_nat2 => deadA_nat2,
+        :deadA_nat3 => deadA_nat3,
+        :deadA_nat4more => deadA_nat4more,
+        :natA_biom => natA_biom,
+        :natA_biom0 => natA_biom0,
+        :natA_biom1 => natA_biom1,
+        :natA_biom2 => natA_biom2,
+        :natA_biom3 => natA_biom3,
+        :natA_biom4more => natA_biom4more,
+        
     )
                            
     return model_parameters            
