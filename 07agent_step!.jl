@@ -76,6 +76,7 @@ function egghatch!(Sardine, model)
         Sardine.Lb_i = Sardine.L
         Sardine.Age = model.Ap * (Sardine.Lw * model.del_M) / model.Lp
         Sardine.Nind = Float64(ceil((1 - model.M_egg) * Float64((Sardine.Nind))))
+        Sardine.Nind0 = Sardine.Nind
         
         Sardine.s_M_i = if model.Hb >= Sardine.H
             1.0
@@ -122,30 +123,61 @@ function juvedie!(Sardine, model)
     
     if !Sardine.Dead && Sardine.Nind >= 100000.0
 
+        # 1st case: sardine too small to be fished
         if Sardine.Lw < 10.0 || model.MF0_value == 0.0
+            # only natural mortality
             natural_deaths = Float64(rand(Binomial(Int64(Sardine.Nind), 1-exp(-(model.M_j)))))
             Sardine.Nind -= natural_deaths
             model.deadJ_nat += natural_deaths
+            model.natJ_biom += natural_deaths * Sardine.Ww
+
+            #keep track of the age
+            if floor(Sardine.Age / 365.0 ) == 0.0
+                model.deadJ_nat0 += natural_deaths
+                model.natJ_biom0 += natural_deaths * Sardine.Ww
+            elseif floor(Sardine.Age / 365.0 ) == 1.0
+                model.deadJ_nat1 += natural_deaths
+                model.natJ_biom1 += natural_deaths * Sardine.Ww
+            end
         end
 
+        #juveniles that are big enough to be fished
         if Sardine.Lw > 10.0 && !(model.MF0_value == 0.0)
             M = model.M_j + ((model.MF0_value)/365.0)
+
             total_deaths = Float64(rand(Binomial(Int64(Sardine.Nind), 1-exp(-M))))
             natural_deaths = Float64(rand(Binomial(Int64(Sardine.Nind), 1-exp(-(model.M_j)))))
-            fishing_deaths = total_deaths - natural_deaths
-                if natural_deaths > total_deaths
-                    natural_deaths = total_deaths
-                end
-            model.fished += fishing_deaths
-            model.fished0 += fishing_deaths
-            model.fishedW += fishing_deaths * Sardine.Ww
-            model.deadJ_nat += natural_deaths
-            Sardine.Nind -= total_deaths
-        end
 
+            if natural_deaths > total_deaths
+                natural_deaths = total_deaths
+            end
+
+            fishing_deaths = total_deaths - natural_deaths
+
+            Sardine.Nind -= total_deaths
+
+            #total deaths
+            model.fishedW += fishing_deaths * Sardine.Ww
+            model.fished += fishing_deaths
+            model.deadJ_nat += natural_deaths
+            model.natJ_biom += natural_deaths * Sardine.Ww
+
+                #keep track of the ages
+                if floor(Sardine.Age / 365.0 ) == 0.0
+                    model.fished0 += fishing_deaths
+                    model.fished0_biom += fishing_deaths * Sardine.Ww
+                    model.deadJ_nat0 += natural_deaths
+                    model.natJ_biom0 += natural_deaths * Sardine.Ww
+                elseif floor(Sardine.Age / 365.0 ) == 1.0
+                    model.fished1 += fishing_deaths
+                    model.fished1_biom += fishing_deaths * Sardine.Ww
+                    model.deadJ_nat1 += natural_deaths
+                    model.natJ_biom1 += natural_deaths * Sardine.Ww
+                end
+        end
     end
-#if less than 1 ind, superindividual dies
-    if  Sardine.Nind < 100000.0 && !Sardine.Dead
+#if less than 1a certain threshold of ind, superindividual dies
+    if  Sardine.Nind <= Sardine.Nind0 * model.death_threshold && !Sardine.Dead
             Sardine.Dead = true
             model.deadJ_nat += Sardine.Nind
     end
@@ -186,10 +218,20 @@ function juveDEB!(Sardine, model)
         # die due to starvation
         if ((model.Kappa_value * pC) < pS)
             model.deadJ_starved += Sardine.Nind
+            model.starvedJ_biom += Sardine.Nind * Sardine.Ww
+
+            #keep track of the ages
+            if (floor(Sardine.Age / 365.0 ) == 0.0)
+                model.deadJ_starved0 += Sardine.Nind
+                model.starvedJ_biom0 += Sardine.Nind * Sardine.Ww
+            elseif (floor(Sardine.Age / 365.0 ) == 1.0)
+                model.deadJ_starved1 += Sardine.Nind
+                model.starvedJ_biom1 += Sardine.Nind * Sardine.Ww
+            end
+
             Sardine.Dead = true
             return
         end
-
 
         deltaV = ((model.Kappa_value * pC - pS) / model.Eg) * model.DEB_timing
         if (deltaV < 0.0) 
@@ -324,25 +366,42 @@ function adultdie!(Sardine, model)
             # Update Sardine.Nind
             Sardine.Nind -= total_deaths
 
-            # Update model.fished and model.deadA_nat
+            # Update total mortality events
             model.fished += fishing_deaths
             model.fishedW += fishing_deaths * Sardine.Ww
             model.deadA_nat += natural_deaths
+            model.natA_biom += natural_deaths * Sardine.Ww
 
+            # differentiate mortality with age
             if floor(Sardine.Age / 365.0 ) == 0.0
                 model.fished0 += fishing_deaths
+                model.fished0_biom += fishing_deaths * Sardine.Ww
+                model.deadA_nat0 += natural_deaths
+                model.natA_biom0 += natural_deaths * Sardine.Ww
             elseif floor(Sardine.Age / 365.0 ) == 1.0
                 model.fished1 += fishing_deaths
+                model.fished1_biom += fishing_deaths * Sardine.Ww
+                model.deadA_nat1 += natural_deaths
+                model.natA_biom1 += natural_deaths * Sardine.Ww
             elseif floor(Sardine.Age / 365.0 ) == 2.0
                 model.fished2 += fishing_deaths
+                model.fished2_biom += fishing_deaths * Sardine.Ww
+                model.deadA_nat2 += natural_deaths
+                model.natA_biom2 += natural_deaths * Sardine.Ww
             elseif floor(Sardine.Age / 365.0 ) == 3.0
                 model.fished3 += fishing_deaths
+                model.fished3_biom += fishing_deaths * Sardine.Ww
+                model.deadA_nat3 += natural_deaths
+                model.natA_biom3 += natural_deaths * Sardine.Ww
             else
                 model.fished4more += fishing_deaths
+                model.fished4more_biom += fishing_deaths * Sardine.Ww
+                model.deadA_nat4more += natural_deaths
+                model.natA_biom4more += natural_deaths * Sardine.Ww
             end
      end
 
-    if Sardine.Nind < 100000.0
+    if Sardine.Nind <= Sardine.Nind0 * model.death_threshold && !Sardine.Dead
         Sardine.Dead = true
         model.deadA_nat += Sardine.Nind
     end
@@ -383,6 +442,26 @@ if !Sardine.Dead
     if ((model.Kappa_value * pC) < pS)
         if (Rdyn < ((pS - (model.Kappa_value * pC)) * model.DEB_timing))
             model.deadA_starved += Sardine.Nind
+            model.starvedA_biom += Sardine.Nind * Sardine.Ww
+
+            #keep track of the ages
+            if (floor(Sardine.Age / 365.0 ) == 0.0)
+                model.deadA_starved0 += Sardine.Nind
+                model.starvedA_biom0 += Sardine.Nind * Sardine.Ww
+            elseif (floor(Sardine.Age / 365.0 ) == 1.0)
+                model.deadA_starved1 += Sardine.Nind
+                model.starvedA_biom1 += Sardine.Nind * Sardine.Ww
+            elseif (floor(Sardine.Age / 365.0 ) == 2.0)
+                model.deadA_starved2 += Sardine.Nind
+                model.starvedA_biom2 += Sardine.Nind * Sardine.Ww
+            elseif (floor(Sardine.Age / 365.0 ) == 3.0)
+                model.deadA_starved3 += Sardine.Nind
+                model.starvedA_biom3 += Sardine.Nind * Sardine.Ww
+            else
+                model.deadA_starved4more += Sardine.Nind
+                model.starvedA_biom4more += Sardine.Nind * Sardine.Ww
+            end
+
             Sardine.Dead = true
             return
         else
