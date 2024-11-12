@@ -187,7 +187,9 @@ function generate_Adult(No_A, model, Nind = missing, Age = missing, t_puberty = 
             agent_Nind = Nind
         end
 
-        agent_Nind0 = 1e7 # depending on age, above, i put the Nind to ensure correct lifespan but I assume that they were 1e7 at age 0+
+        agent_Nind = Float64(agent_Nind)
+
+        agent_Nind0 = Float64(1e7) # depending on age, above, i put the Nind to ensure correct lifespan but I assume that they were 1e7 at age 0+
         
         agent_Lj_i = if ismissing(Lj)
             model.Lj
@@ -220,7 +222,7 @@ function generate_Adult(No_A, model, Nind = missing, Age = missing, t_puberty = 
 
         # Add agent to the model
         add_agent!(
-            Sardine, model, agent_type, agent_reproduction, agent_Nind,agent_Nind0, agent_Age, agent_L, agent_H,
+            Sardine, model, agent_type, agent_reproduction, agent_Nind, agent_Nind0, agent_Age, agent_L, agent_H,
             agent_maternal_EggEn, agent_superind_Neggs, agent_En, agent_Generation, agent_Dead,
             agent_f_i, agent_t_puberty, agent_Lw, agent_Ww, agent_R, agent_Scaled_En,
             agent_s_M_i, agent_pA, agent_Lb_i, agent_Lj_i, agent_metamorph, agent_CI, agent_GSI, agent_spawned
@@ -255,7 +257,7 @@ function generate_adult_pop(model, Lwclass = missing, Lw_biom = missing)
     agent_En_class = agent_f_i * model.Em * ((Lwclass * model.del_M)^3.0)
     agent_Ww_class = (model.w * (model.d_V * ((Lwclass * model.del_M) ^ 3.0) + model.w_E / model.mu_E * (agent_En_class + agent_R))) 
 
-    Nind = Lw_biom/agent_Ww_class
+    Nind = ceil(Int, Lw_biom/agent_Ww_class)
 
     # Define No_A based on Nind if Nind is greater than 1e7
     if Nind > 1e7
@@ -342,7 +344,7 @@ function generate_juvenile_pop(model, Lwclass = missing, Lw_biom = missing)
     # Set reserve energy
     agent_En_class = agent_f_i * model.Em * ((Lwclass * model.del_M)^3.0)
     agent_Ww_class = (model.w * (model.d_V * ((Lwclass * model.del_M) ^ 3.0) + model.w_E / model.mu_E * (agent_En_class + agent_R))) 
-    Nind = Lw_biom/agent_Ww_class
+    Nind = ceil(Int, Lw_biom/agent_Ww_class)
 
     # Define No_A based on Nind if Nind is greater than 1e7
     if Nind > 1e7

@@ -22,22 +22,22 @@ results = []
 num_runs = 1
 
 models = [
-model_initialize_parallel(3.0, 3.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.7e14, 1.0, 5.0, 0.945, 15.0, 0.9998,	1.08,	0.86,	0.69,	0.62,	0.48)
+model_initialize_parallel(0.0, 0.0, 10.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.7e14, 1.0, 5.0, 0.945, 15.0, 0.9998,	1.08,	0.86,	0.69,	0.62,	0.48)
 ]
 
-generate_adult_pop(models[1],10.5, 8338621693)
+generate_adult_pop(models[1],10.5, 100)
 generate_adult_pop(models[1],11.5, 17782674446)
-generate_adult_pop(models[1],12.5, 45801589448)
+generate_adult_pop(models[1],12.5, 100)
 generate_adult_pop(models[1],13.5, 74243858179)
-generate_adult_pop(models[1],14.5, 17782674446)
+generate_adult_pop(models[1],14.5, 100)
 generate_adult_pop(models[1],15.5, 19548896401)
-generate_adult_pop(models[1],16.5, 7964594040)
+generate_adult_pop(models[1],16.5, 100)
 generate_adult_pop(models[1],17.5, 1950639323)
-generate_adult_pop(models[1],18.5, 369339092)
+generate_adult_pop(models[1],18.5, 100)
 generate_adult_pop(models[1],19.5, 205142643)
-generate_juvenile_pop(models[1],5.5, 19696660)
+generate_juvenile_pop(models[1],5.5, 100)
 generate_juvenile_pop(models[1],6.5, 62083157)
-generate_juvenile_pop(models[1],7.5, 732803218)
+generate_juvenile_pop(models[1],7.5, 100)
 generate_juvenile_pop(models[1],8.5, 5840962724)
 generate_juvenile_pop(models[1],9.5, 9796965392)
 
@@ -59,7 +59,7 @@ for (i, model) in enumerate(models)
     #run!(model, 365*20; adata, mdata)
 
     #df_agent = run!(model, 16070+365*30; adata, mdata)
-    df_agent = run!(model, 365*5; adata, mdata)
+    df_agent = run!(model, 365*10; adata, mdata)
     push!(results, df_agent)
 
     end_time = Dates.now()
