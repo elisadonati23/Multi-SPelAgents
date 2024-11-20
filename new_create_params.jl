@@ -1,3 +1,10 @@
+#schedulers
+include("01dependencies.jl")
+include("03agents.jl")
+include("07agent_step!.jl")
+include("08simulation_step.jl")
+
+
 function create_params_dict(
     No_As, No_Js, No_Eggs, No_Aa, No_Ja, No_Egga,
     Wv, day_of_the_year, Xmax::Union{Float64, Vector{Float64}}, Temp::Union{Float64, Vector{Float64}},
@@ -57,7 +64,8 @@ function create_params_dict(
             :Xall => Xmax[1],
             :Xmax_value => Xmax[1],
             :Temp => Temp,
-            :Nsuperind => No_Aa + No_Ja + No_Egga + No_As + No_Js + No_Eggs
+            :Nsuperind => No_Aa + No_Ja + No_Egga + No_As + No_Js + No_Eggs,
+            :f => 0.8
         ),
         :DEB_parameters_all => Dict(
             :KappaX => 0.8,
@@ -369,38 +377,56 @@ prova = create_params_dict(
         )
     
         # Add agents to the model: Adults, Juveniles, and EggMass
-        generate_Adult(1, model)
-        generate_Juvenile(1, model)
-        generate_EggMass(1, model)
-    
-    
-        # Calculate the mean length-weight (Lw) for initialization
-        mean_Lw = calculate_mean_prop(model, "Lw")
-    
-        # Collect all agents in the model
-        agents = collect(values(allagents(model)))
-    
-        # Filter the agents based on type (Adults and Juveniles)
-        adults = filter(a -> a.type == :adult, agents)
-        juveniles = filter(a -> a.type == :juvenile, agents)
-    
-        # Determine the initial value of functional response (f)
-        if isempty(adults) && isempty(juveniles)    
-            model.f = 0.8
-        else
-            # sim_timing = 1 at initialization, so directly index Xmax and Tc
-            f = (model.Xmax[model.sim_timing] * model.Wv * model.KappaX) / 
-                (model.p_Am * model.Tc[model.sim_timing] * model.s_M * ((mean_Lw * model.del_M) ^ 2))
-    
-            # Ensure f is within the range [0, 1]
-            model.f = max(0, min(f, 1.0))
-        end
-    
-        # Assign the calculated f to all agents in the model
-        for agent in agents
-            agent.f_i = model.f
-        end
+        #generate_Adult(1, model)
+        #generate_Juvenile(1, model)
+        #generate_EggMass(1, model)
+    #
+    #
+        ## Calculate the mean length-weight (Lw) for initialization
+        #mean_Lw = calculate_mean_prop(model, "Lw")
+    #
+        ## Collect all agents in the model
+        #agents = collect(values(allagents(model)))
+    #
+        ## Filter the agents based on type (Adults and Juveniles)
+        #adults = filter(a -> a.type == :adult, agents)
+        #juveniles = filter(a -> a.type == :juvenile, agents)
+    #
+        ## Determine the initial value of functional response (f)
+        #if isempty(adults) && isempty(juveniles)    
+        #    model.f = 0.8
+        #else
+        #    # sim_timing = 1 at initialization, so directly index Xmax and Tc
+        #    f = (model.Xmax[model.sim_timing] * model.Wv * model.KappaX) / 
+        #        (model.p_Am * model.Tc[model.sim_timing] * model.s_M * ((mean_Lw * model.del_M) ^ 2))
+    #
+        #    # Ensure f is within the range [0, 1]
+        #    model.f = max(0, min(f, 1.0))
+        #end
+    #
+        ## Assign the calculated f to all agents in the model
+        #for agent in agents
+        #    agent.f_i = model.f
+        #end
     
         return model
     end
+    
+    model = model_initialize_parallel(
+        # Nind
+        1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+        #initial cond 
+        1.7e14, 1.0, 5.0, 15.0,
+        #Kappa
+        0.88, 0.9901, 
+        #Mfs
+        0.0, 0.0, 0.0,0.0,0.0,
+        #mfa
+        0.0,0.0,0.0,0.0,0.0,
+        #Ms
+        0.9998,	1.08,	0.86,	0.69,	0.62,	0.48,
+        #Ma
+        1.08,	0.86,	0.69,	0.62,	0.48)
+
+        
     

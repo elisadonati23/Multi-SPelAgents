@@ -3,11 +3,10 @@
 # Age at length and parameters are taken from AmP and DEB portal with 20°C as reference.
 # All rates and ages at length change with varying parameters.
 
-function generate_EggMass(No_Egg, model, Nind = missing, maternal_EggEn = missing, En = missing, Generation = missing)
-    # Initialize default agent properties for EggMass
+function generate_EggMass(No_Egg, species, model, Nind = missing, maternal_EggEn = missing, En = missing, Generation = missing)
+    # Initialize aspecific agent properties for EggMass
     agent_type = :eggmass
     agent_Age = 0.0
-    agent_L = model.L0
     agent_H = 0.0
     agent_spawned = 0.0
     agent_Dead = false
@@ -16,13 +15,8 @@ function generate_EggMass(No_Egg, model, Nind = missing, maternal_EggEn = missin
     agent_GSI = 0.0
     agent_Lj_i = 0.0
     agent_metamorph = false
-
-    # Set maternal egg energy
-    agent_maternal_EggEn = ismissing(maternal_EggEn) ? Float64(model.E0) : Float64(maternal_EggEn)
-
-    # Set generation
     agent_Generation = ismissing(Generation) ? 0.0 : Generation
-    agent_f_i = model.f
+    agent_f_i = model.initial_conditions[:f]
     agent_t_puberty = 0.0
     agent_Lw = 0.0
     agent_Ww = 0.0
@@ -33,6 +27,10 @@ function generate_EggMass(No_Egg, model, Nind = missing, maternal_EggEn = missin
     agent_Lb_i = 0.0
     agent_superind_Neggs = 0.0
 
+    agent_L = model.model.species_specific_DEB_params[species][:L0]
+    # Set maternal egg energy
+    agent_maternal_EggEn = ismissing(maternal_EggEn) ? Float64(model.species_specific_DEB_params[species][:E0]) : Float64(maternal_EggEn)
+
     # Generate EggMass agents
     for _ in 1:No_Egg
         # Set number of individuals in the superindividual
@@ -40,7 +38,7 @@ function generate_EggMass(No_Egg, model, Nind = missing, maternal_EggEn = missin
         agent_Nind0 = agent_Nind
 
         # Set reserve energy
-        agent_En = ismissing(En) ? model.E0 : Float64(En)
+        agent_En = ismissing(En) ? model.species_specific_DEB_params[species][:E0] : Float64(En)
 
         # Add agent to the model
         add_agent!(
@@ -53,7 +51,7 @@ function generate_EggMass(No_Egg, model, Nind = missing, maternal_EggEn = missin
     end
 end
 
-function generate_Juvenile(No_J, model, Nind = missing, Generation = 0.0, En = missing, Lb_i = model.Lb, Lw = missing, Ww = missing, Scaled_En = missing)
+function generate_Juvenile(No_J, species, model, Nind = missing, Generation = 0.0, En = missing, Lb_i = model.Lb, Lw = missing, Ww = missing, Scaled_En = missing)
 
     # Initialize default agent properties for Juvenile
     agent_type = :juvenile
