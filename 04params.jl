@@ -94,7 +94,6 @@ function create_params(
     sardine_p_Am = 554.351	  # Maximum assimilation power
     sardine_v_rate = 0.0216466  # Energy conductance
     sardine_del_M = 0.1152  # Shape coefficient (isomorph)
-    sardine_k_J = 0.002  # Maturity maintenance rate coefficient
     sardine_s_M = 2.25531  # Acceleration factor
     sardine_p_M = 438.602  # Volume-specific somatic maintenance
     sardine_Eg = 5017.55  # Cost per unit of structure
