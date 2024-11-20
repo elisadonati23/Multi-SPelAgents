@@ -347,7 +347,6 @@ function adultdie!(Sardine, model)
 
          
             if Mf == 0.0
-                println(Sardine.Nind)
                 total_deaths = natural_deaths = Float64(rand(Binomial(Int64(Sardine.Nind), 1-exp(-M))))
                 fishing_deaths = 0.0
             else

@@ -22,24 +22,24 @@ results = []
 num_runs = 1
 
 models = [
-model_initialize_parallel(0.0, 0.0, 10.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.7e14, 1.0, 5.0, 0.945, 15.0, 0.9998,	1.08,	0.86,	0.69,	0.62,	0.48)
+model_initialize_parallel(0.0, 0.0, 10.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.7e14, 1.0, 5.0, 0.8837, 15.0, 0.9998,	1.08,	0.86,	0.69,	0.62,	0.48)
 ]
 
 generate_adult_pop(models[1],10.5, 100)
-generate_adult_pop(models[1],11.5, 17782674446)
-generate_adult_pop(models[1],12.5, 100)
-generate_adult_pop(models[1],13.5, 74243858179)
-generate_adult_pop(models[1],14.5, 100)
-generate_adult_pop(models[1],15.5, 19548896401)
-generate_adult_pop(models[1],16.5, 100)
-generate_adult_pop(models[1],17.5, 1950639323)
-generate_adult_pop(models[1],18.5, 100)
-generate_adult_pop(models[1],19.5, 205142643)
+generate_adult_pop(models[1],11.5, 100)
+generate_adult_pop(models[1],12.5, 150)
+generate_adult_pop(models[1],13.5, 200)
+generate_adult_pop(models[1],14.5, 150)
+generate_adult_pop(models[1],15.5, 100)
+generate_adult_pop(models[1],16.5, 50)
+generate_adult_pop(models[1],17.5, 50)
+generate_adult_pop(models[1],18.5, 25)
+generate_adult_pop(models[1],19.5, 10)
 generate_juvenile_pop(models[1],5.5, 100)
-generate_juvenile_pop(models[1],6.5, 62083157)
+generate_juvenile_pop(models[1],6.5, 100)
 generate_juvenile_pop(models[1],7.5, 100)
-generate_juvenile_pop(models[1],8.5, 5840962724)
-generate_juvenile_pop(models[1],9.5, 9796965392)
+generate_juvenile_pop(models[1],8.5, 100)
+generate_juvenile_pop(models[1],9.5, 100)
 
 allagents(models[1])
 
