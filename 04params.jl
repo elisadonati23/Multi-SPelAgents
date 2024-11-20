@@ -171,87 +171,169 @@ function create_params(
             mean_batch_eggs = 0.0
             mean_spawning_events = 0.0
 
-            TotB = 0.0
-            JuvB = 0.0
-            AdB = 0.0
-            meanAdWw = 0.0
-            sdAdWw = 0.0
-            meanFAdWw = 0.0
-            sdFAdWw = 0.0
-            meanJuvWw = 0.0
-            sdJuvWw = 0.0
-            meanAdL = 0.0
-            sdAdL = 0.0
-            meanJuvL = 0.0
-            sdJuvL = 0.0
-            mean_tpuberty = 0.0
-            sd_tpuberty = 0.0
-            mean_Lw_puberty = 0.0
-            sd_Lw_puberty = 0.0
-            mean_Ww_puberty = 0.0
-            sd_Ww_puberty = 0.0
-            mean_Hjuve = 0.0
-            sd_Hjuve = 0.0
+            sardine_TotB = 0.0
+            sardine_JuvB = 0.0
+            sardine_AdB = 0.0
+            sardine_meanAdWw = 0.0
+            sardine_sdAdWw = 0.0
+            sardine_meanFAdWw = 0.0
+            sardine_sdFAdWw = 0.0
+            sardine_meanJuvWw = 0.0
+            sardine_sdJuvWw = 0.0
+            sardine_meanAdL = 0.0
+            sardine_sdAdL = 0.0
+            sardine_meanJuvL = 0.0
+            sardine_sdJuvL = 0.0
+            sardine_mean_tpuberty = 0.0
+            sardine_sd_tpuberty = 0.0
+            sardine_mean_Lw_puberty = 0.0
+            sardine_sd_Lw_puberty = 0.0
+            sardine_mean_Ww_puberty = 0.0
+            sardine_sd_Ww_puberty = 0.0
+            sardine_mean_Hjuve = 0.0
+            sardine_sd_Hjuve = 0.0
 
-            # natural mortality
-                #adults
-            deadA_nat = 0.0
-            deadA_nat0 = 0.0
-            deadA_nat1 = 0.0
-            deadA_nat2 = 0.0
-            deadA_nat3 = 0.0
-            deadA_nat4more = 0.0
-            natA_biom = 0.0
-            natA_biom0 = 0.0
-            natA_biom1 = 0.0
-            natA_biom2 = 0.0
-            natA_biom3 = 0.0
-            natA_biom4more = 0.0
+            sardine_# natural mortality
+            sardine_    #adults
+            sardine_deadA_nat = 0.0
+            sardine_deadA_nat0 = 0.0
+            sardine_deadA_nat1 = 0.0
+            sardine_deadA_nat2 = 0.0
+            sardine_deadA_nat3 = 0.0
+            sardine_deadA_nat4more = 0.0
+            sardine_natA_biom = 0.0
+            sardine_natA_biom0 = 0.0
+            sardine_natA_biom1 = 0.0
+            sardine_natA_biom2 = 0.0
+            sardine_natA_biom3 = 0.0
+            sardine_natA_biom4more = 0.0
 
-                #juvenile
-            deadJ_nat = 0.0
-            deadJ_nat0 = 0.0
-            deadJ_nat1 = 0.0
-            natJ_biom = 0.0
-            natJ_biom0 = 0.0
-            natJ_biom1 = 0.0
+            sardine_    #juvenile
+            sardine_deadJ_nat = 0.0
+            sardine_deadJ_nat0 = 0.0
+            sardine_deadJ_nat1 = 0.0
+            sardine_natJ_biom = 0.0
+            sardine_natJ_biom0 = 0.0
+            sardine_natJ_biom1 = 0.0
 
             # starving mortality
                 # adult
-            deadA_starved = 0.0
-            deadA_starved0 = 0.0
-            deadA_starved1 = 0.0
-            deadA_starved2 = 0.0
-            deadA_starved3 = 0.0
-            deadA_starved4more = 0.0
-            starvedA_biom = 0.0
-            starvedA_biom0 = 0.0
-            starvedA_biom1 = 0.0
-            starvedA_biom2 = 0.0
-            starvedA_biom3 = 0.0
-            starvedA_biom4more = 0.0
-                # juvenile
-            starvedJ_biom = 0.0
-            starvedJ_biom0 = 0.0
-            starvedJ_biom1 = 0.0
-            deadJ_starved = 0.0
-            deadJ_starved0 = 0.0
-            deadJ_starved1 = 0.0
+            sardine_deadA_starved = 0.0
+            sardine_deadA_starved0 = 0.0
+            sardine_deadA_starved1 = 0.0
+            sardine_deadA_starved2 = 0.0
+            sardine_deadA_starved3 = 0.0
+            sardine_deadA_starved4more = 0.0
+            sardine_starvedA_biom = 0.0
+            sardine_starvedA_biom0 = 0.0
+            sardine_starvedA_biom1 = 0.0
+            sardine_starvedA_biom2 = 0.0
+            sardine_starvedA_biom3 = 0.0
+            sardine_starvedA_biom4more = 0.0
+               # juvenile
+            sardine_starvedJ_biom = 0.0
+            sardine_starvedJ_biom0 = 0.0
+            sardine_starvedJ_biom1 = 0.0
+            sardine_deadJ_starved = 0.0
+            sardine_deadJ_starved0 = 0.0
+            sardine_deadJ_starved1 = 0.0
 
 
             # fishing mortality
-            fished = 0.0
-            fishedW = 0.0
-            fished0 = 0.0
-            fished1 = 0.0
-            fished2 = 0.0
-            fished3 = 0.0
-            fished4more = 0.0
-            fished0_biom = 0.0
-            fished1_biom = 0.0
-            fished2_biom = 0.0
-            fished3_biom = 0.0
-            fished4more_biom = 0.0
+            sardine_fished = 0.0
+            sardine_fishedW = 0.0
+            sardine_fished0 = 0.0
+            sardine_fished1 = 0.0
+            sardine_fished2 = 0.0
+            sardine_fished3 = 0.0
+            sardine_fished4more = 0.0
+            sardine_fished0_biom = 0.0
+            sardine_fished1_biom = 0.0
+            sardine_fished2_biom = 0.0
+            sardine_fished3_biom = 0.0
+            sardine_fished4more_biom = 0.0
+
+            # Anchovy output
+            anchovy_TotB = 0.0
+            anchovy_JuvB = 0.0
+            anchovy_AdB = 0.0
+            anchovy_meanAdWw = 0.0
+            anchovy_sdAdWw = 0.0
+            anchovy_meanFAdWw = 0.0
+            anchovy_sdFAdWw = 0.0
+            anchovy_meanJuvWw = 0.0
+            anchovy_sdJuvWw = 0.0
+            anchovy_meanAdL = 0.0
+            anchovy_sdAdL = 0.0
+            anchovy_meanJuvL = 0.0
+            anchovy_sdJuvL = 0.0
+            anchovy_mean_tpuberty = 0.0
+            anchovy_sd_tpuberty = 0.0
+            anchovy_mean_Lw_puberty = 0.0
+            anchovy_sd_Lw_puberty = 0.0
+            anchovy_mean_Ww_puberty = 0.0
+            anchovy_sd_Ww_puberty = 0.0
+            anchovy_mean_Hjuve = 0.0
+            anchovy_sd_Hjuve = 0.0
+
+            # natural mortality
+                #adults
+            anchovy_deadA_nat = 0.0
+            anchovy_deadA_nat0 = 0.0
+            anchovy_deadA_nat1 = 0.0
+            anchovy_deadA_nat2 = 0.0
+            anchovy_deadA_nat3 = 0.0
+            anchovy_deadA_nat4more = 0.0
+            anchovy_natA_biom = 0.0
+            anchovy_natA_biom0 = 0.0
+            anchovy_natA_biom1 = 0.0
+            anchovy_natA_biom2 = 0.0
+            anchovy_natA_biom3 = 0.0
+            anchovy_natA_biom4moreanchovy
+               #juvenile
+            anchovy_deadJ_nat = 0.0
+            anchovy_deadJ_nat0 = 0.0
+            anchovy_deadJ_nat1 = 0.0
+            anchovy_natJ_biom = 0.0
+            anchovy_natJ_biom0 = 0.0
+            anchovy_natJ_biom1 = 0.0
+
+            # starving mortality
+                # adult
+            anchovy_deadA_starved = 0.0
+            anchovy_deadA_starved0 = 0.0
+            anchovy_deadA_starved1 = 0.0
+            anchovy_deadA_starved2 = 0.0
+            anchovy_deadA_starved3 = 0.0
+            anchovy_deadA_starved4more = 0.0
+            anchovy_starvedA_biom = 0.0
+            anchovy_starvedA_biom0 = 0.0
+            anchovy_starvedA_biom1 = 0.0
+            anchovy_starvedA_biom2 = 0.0
+            anchovy_starvedA_biom3 = 0.0
+            anchovy_starvedA_biom4more = 0.0
+               # juvenile
+            anchovy_starvedJ_biom = 0.0
+            anchovy_starvedJ_biom0 = 0.0
+            anchovy_starvedJ_biom1 = 0.0
+            anchovy_deadJ_starved = 0.0
+            anchovy_deadJ_starved0 = 0.0
+            anchovy_deadJ_starved1 = 0.0
+
+
+            # fishing mortality
+            anchovy_fished = 0.0
+            anchovy_fishedW = 0.0
+            anchovy_fished0 = 0.0
+            anchovy_fished1 = 0.0
+            anchovy_fished2 = 0.0
+            anchovy_fished3 = 0.0
+            anchovy_fished4more = 0.0
+            anchovy_fished0_biom = 0.0
+            anchovy_fished1_biom = 0.0
+            anchovy_fished2_biom = 0.0
+            anchovy_fished3_biom = 0.0
+            anchovy_fished4more_biom = 0.0
 
     # Store all parameters in a dictionary for easy access in the model
  model_parameters = Dict(
