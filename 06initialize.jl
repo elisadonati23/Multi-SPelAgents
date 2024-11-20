@@ -44,7 +44,6 @@ function model_initialize_parallel(
         M4
     )
 
-
     # Create the Agent-Based Model (ABM) for Sardines
     model = ABM(
         Sardine;

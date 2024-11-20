@@ -1,5 +1,6 @@
 @agent struct Sardine(NoSpaceAgent)
     # Basic characteristics
+    species::Symbol           # :sardine, :anchovy
     type::Symbol              # :eggmass, :juvenile, :adult
     reproduction::Symbol      # :spawner, :nonspawner
     Nind::Float64             # Number of individuals in the superindividual - current
