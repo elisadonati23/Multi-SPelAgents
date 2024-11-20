@@ -131,16 +131,16 @@ function create_params(
     anchovy_Lb = 0.0133472
     anchovy_Lj = 0.232013
     anchovy_Lp = 1.50
-    anchovy_Ab = 6.56247	
-    anchovy_Ap = 202.166
-    anchovy_Am = 3461.0
-    anchovy_E0 = 1.47992
-    anchovy_ep_min = 0.218697
-    anchovy_E0_min = 0.3 # when you have a juvenile with the minimum enough energy to produce eggs in the reserve: it reflects the energy of the mother
-    anchovy_E0_max = 0.694024
-    anchovy_W0 = 0.000150792 # Addmypet
-    anchovy_L0 = 0.001  # Initial length in cm
-    anchovy_Ta = 8000.0  # Arrhenius temperature
+    anchovy_Ab = 6.0
+    anchovy_Ap = 292.0
+    anchovy_Am = 1825.0
+    anchovy_E0 = 0.0137527
+    anchovy_ep_min = 0.30 
+    anchovy_E0_min =  0.004
+    anchovy_E0_max =  0.0137527 
+    anchovy_L0 = 0.001
+    anchovy_W0 = 2.98e-6
+    anchovy_Ta = 9800.0  # Arrhenius temperature
     anchovy_Tr = 293.0   # Reference temperature
 
     # Derived parameters based on DEB theory
