@@ -3,6 +3,7 @@ include("01dependencies.jl")
 include("03agents.jl")
 include("07agent_step!.jl")
 include("08simulation_step.jl")
+include("02fx.jl")
 
 
 function create_params_dict(
@@ -395,9 +396,13 @@ prova = create_params_dict(
         )
     
         # Add agents to the model: Adults, Juveniles, and EggMass
-        generate_Adult(1, model)
-        generate_Juvenile(1, model)
-        generate_EggMass(1, model)
+        generate_Adult(No_As, model, :sardine)
+        generate_Juvenile(No_Js, model, :sardine)
+        generate_EggMass(No_Eggs, model, :sardine)
+
+        generate_Adult(No_Aa, model, :anchovy)
+        generate_Juvenile(No_Ja, model, :anchovy)
+        generate_EggMass(No_Egga, model, :anchovy)
     
     
         ## Calculate the mean length-weight (Lw) for initialization
@@ -411,21 +416,21 @@ prova = create_params_dict(
         juveniles = filter(a -> a.type == :juvenile, agents)
     
         ## Determine the initial value of functional response (f)
-        #if isempty(adults) && isempty(juveniles)    
-        #    model.f = 0.8
+        if isempty(adults) && isempty(juveniles)    
+            model.f = 0.8
         #else
-        #    # sim_timing = 1 at initialization, so directly index Xmax and Tc
-        #    f = (model.Xmax[model.sim_timing] * model.Wv * model.KappaX) / 
-        #        (model.p_Am * model.Tc[model.sim_timing] * model.s_M * ((mean_Lw * model.del_M) ^ 2))
-    #
-        #    # Ensure f is within the range [0, 1]
-        #    model.f = max(0, min(f, 1.0))
-        #end
-    #
+            # sim_timing = 1 at initialization, so directly index Xmax and Tc
+            f = (model.Xmax[model.sim_timing] * model.Wv * model.KappaX) / 
+                (model.p_Am * model.Tc[model.sim_timing] * model.s_M * ((mean_Lw * model.del_M) ^ 2))
+    
+        # Ensure f is within the range [0, 1]
+        model.initial_conditions[:f] = max(0, min(f, 1.0))
+        end
+    
         ## Assign the calculated f to all agents in the model
-        #for agent in agents
-        #    agent.f_i = model.f
-        #end
+        for agent in agents
+            agent.f_i = model.initial_conditions[:f]
+        end
     
         return model
     end
@@ -445,9 +450,3 @@ prova = create_params_dict(
         0.9998,	1.08,	0.86,	0.69,	0.62,	0.48,
         #Ma
         1.08,	0.86,	0.69,	0.62,	0.48)
-
-        generate_EggMass(1, model, :sardine)
-model.initial_conditions[:f]
-        
-model
-

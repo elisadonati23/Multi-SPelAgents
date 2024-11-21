@@ -67,10 +67,18 @@ end
                                                 # is xx_agent #
                                                 ###############
 
-sardine(a) = a isa Sardine
+Fish(a) = a isa Fish
                                    
 function is_eggmass(a)
     return a.type == :eggmass
+end
+
+function is_sardine(a)
+    return a.species == :sardine
+end
+
+function is_anchovy(a)
+    return a.species == :anchovy
 end
 
 function is_juvenile(a)
@@ -81,8 +89,8 @@ function is_adult(a)
     return a.type == :adult
 end
 
-function is_dead(sardine::Sardine)
-    return sardine.Dead == true
+function is_dead(fish::Fish)
+    return fish.Dead == true
 end
 
 function savemyfig(file_name)
