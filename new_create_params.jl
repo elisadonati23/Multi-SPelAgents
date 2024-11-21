@@ -60,7 +60,7 @@ function create_params_dict(
             :Xmax => Xmax[1],
             :Wv => Wv,
             :day_of_the_year => day_of_the_year,
-                # Initial conditions
+            :sim_timing => 1,
             :Xall => Xmax[1],
             :Xmax_value => Xmax[1],
             :Temp => Temp,
@@ -100,6 +100,14 @@ function create_params_dict(
                 :Lb => 0.0279366,
                 :Lj => 0.0630058,
                 :Lp => 1.19937,
+                :meanjL => 5.0,
+                :maxjL => 5.5,
+                :minjL => 4.5,
+                :sdjL => 0.5,
+                :meanaL => 15.0,
+                :maxaL => 20.0,
+                :minaL => 10.0,
+                :sdaL => 2.0,
                 :Ab => 6.56247,
                 :Ap => 202.166,
                 :Am => 3461.0,
@@ -128,6 +136,14 @@ function create_params_dict(
                 :Lb => 0.0133472,
                 :Lj => 0.232013,
                 :Lp => 1.50,
+                :meanjL => 3.5,
+                :maxjL => 4.5,
+                :minjL => 2.5,
+                :sdjL => 0.5,
+                :meanaL => 13.0,
+                :maxaL => 18.0,
+                :minaL => 8.0,
+                :sdaL => 2.0,
                 :Ab => 6.0,
                 :Ap => 292.0,
                 :Am => 1825.0,
@@ -145,14 +161,16 @@ function create_params_dict(
             )
         ),
         :derived_params => Dict(
-            :sardine_Em => 554.351 / 0.0216466,
-            :sardine_Lm => Kappas .* 554.351 .* 2.25531 ./ 438.602,
-            :sardine_g => 5017.55 ./ (Kappas .* (554.351 / 0.0216466)),
-            :sardine_k_M => 438.602 / 5017.55,
-            :anchovy_Em => 11.1372 / 0.01944,
-            :anchovy_Lm => Kappaa .* 11.1372 .* 17.3829 ./ 54.67,
-            :anchovy_g => 5077.0 ./ (Kappaa .* (11.1372 / 0.01944)),
-            :anchovy_k_M => 54.67 / 5077.0
+            :sardine => Dict(
+            :Em => 554.351 / 0.0216466,
+            :Lm => Kappas .* 554.351 .* 2.25531 ./ 438.602,
+            :g => 5017.55 ./ (Kappas .* (554.351 / 0.0216466)),
+            :k_M => 438.602 / 5017.55),
+            :anchovy => Dict(
+            :Em => 11.1372 / 0.01944,
+            :Lm => Kappaa .* 11.1372 .* 17.3829 ./ 54.67,
+            :g => 5077.0 ./ (Kappaa .* (11.1372 / 0.01944)),
+            :k_M => 54.67 / 5077.0)
         ),
         :output => Dict(
             :sardine => Dict(
@@ -371,27 +389,27 @@ prova = create_params_dict(
         )
         # Create the Agent-Based Model (ABM) for Sardines
         model = ABM(
-            Sardine;
+            Fish;
             properties = properties,
             model_step! = complex_step!
         )
     
         # Add agents to the model: Adults, Juveniles, and EggMass
-        #generate_Adult(1, model)
-        #generate_Juvenile(1, model)
-        #generate_EggMass(1, model)
-    #
-    #
+        generate_Adult(1, model)
+        generate_Juvenile(1, model)
+        generate_EggMass(1, model)
+    
+    
         ## Calculate the mean length-weight (Lw) for initialization
-        #mean_Lw = calculate_mean_prop(model, "Lw")
-    #
+        mean_Lw = calculate_mean_prop(model, "Lw")
+    
         ## Collect all agents in the model
-        #agents = collect(values(allagents(model)))
-    #
+        agents = collect(values(allagents(model)))
+    
         ## Filter the agents based on type (Adults and Juveniles)
-        #adults = filter(a -> a.type == :adult, agents)
-        #juveniles = filter(a -> a.type == :juvenile, agents)
-    #
+        adults = filter(a -> a.type == :adult, agents)
+        juveniles = filter(a -> a.type == :juvenile, agents)
+    
         ## Determine the initial value of functional response (f)
         #if isempty(adults) && isempty(juveniles)    
         #    model.f = 0.8
@@ -428,5 +446,8 @@ prova = create_params_dict(
         #Ma
         1.08,	0.86,	0.69,	0.62,	0.48)
 
+        generate_EggMass(1, model, :sardine)
+model.initial_conditions[:f]
         
-    
+model
+

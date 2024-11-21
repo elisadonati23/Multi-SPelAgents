@@ -1,4 +1,4 @@
-@agent struct Sardine(NoSpaceAgent)
+@agent struct Fish(NoSpaceAgent)
     # Basic characteristics
     species::Symbol           # :sardine, :anchovy
     type::Symbol              # :eggmass, :juvenile, :adult
