@@ -110,25 +110,34 @@ end
                                         ####################
 
 
-function get_bigger_agent(agent_type, model, feature)
+function get_bigger_agent(agent_type, species::Symbol, model, feature)
     all_agents = collect(values(allagents(model)))
     all_agents = filter(agent -> hasid(model, agent.id), all_agents)
+    # Filter agents based on the species argument
+    if species != :all
+        all_agents = filter(agent -> agent.species == species, all_agents)
+    end
     sorted_agents = sort((filter(agent -> isa(agent, agent_type), all_agents)), by=agent -> getfield(agent,Symbol(feature)), rev=true)
     agent_with_max_feature = first(sorted_agents)
     return agent_with_max_feature
 end
 
 
-function sort_agent(agent_type, model, feature)
+function sort_agent(agent_type, species::Symbol, model, feature)
     all_agents = collect(values(allagents(model)))
     all_agents = filter(agent -> hasid(model, agent.id), all_agents)
+    if species != :all
+        all_agents = filter(agent -> agent.species == species, all_agents)
+    end
     sorted_agents = sort((filter(agent -> isa(agent, agent_type), all_agents)), by=agent -> getfield(agent,Symbol(feature)), rev=true)
     return sorted_agents
 end 
 
-function calculate_mean_prop(model, prop; type = missing, age = missing)
+function calculate_mean_prop(model, species::Symbol, prop; type = missing, age = missing)
     all_agents = filter(agent -> hasid(model, agent.id), collect(values(allagents(model))))
-    
+    if species != :all
+        all_agents = filter(agent -> agent.species == species, all_agents)
+    end
     filtered_agents = filter(agent -> (ismissing(type) || agent.type == type) && (ismissing(age) || agent.Age >= age), all_agents)
 
     if isempty(filtered_agents)
@@ -140,9 +149,11 @@ function calculate_mean_prop(model, prop; type = missing, age = missing)
 end
 
 
-function calculate_sd_prop(model, prop; type = missing)
+function calculate_sd_prop(model, species::Symbol, prop; type = missing)
     all_agents = filter(agent -> hasid(model, agent.id), collect(values(allagents(model))))
-    
+    if species != :all
+        all_agents = filter(agent -> agent.species == species, all_agents)
+    end
     filtered_agents = if ismissing(type)
         # Filter agents based on agent types (juvenile, adult)
         filter(agent -> agent.type == :juvenile || agent.type == :adult, all_agents)
@@ -160,9 +171,11 @@ function calculate_sd_prop(model, prop; type = missing)
 end
 
 
-function calculate_sum_prop(model, prop; type = missing, Nind = false)
+function calculate_sum_prop(model, species::Symbol, prop; type = missing, Nind = false)
     all_agents = filter(agent -> hasid(model, agent.id), collect(values(allagents(model))))
-    
+    if species != :all
+        all_agents = filter(agent -> agent.species == species, all_agents)
+    end
     filtered_agents = if ismissing(type)
         # Filter agents based on agent types (not eggmass)
         filter(agent -> agent.type != :eggmass, all_agents)
@@ -183,8 +196,11 @@ function calculate_sum_prop(model, prop; type = missing, Nind = false)
     end
 end
 
-function calculate_real_assimilation(model)
+function calculate_real_assimilation(model, species::Symbol)
     all_agents = filter(agent -> hasid(model, agent.id), collect(values(allagents(model))))
+    if species != :all
+        all_agents = filter(agent -> agent.species == species, all_agents)
+    end
     #i Want adults and juveniles
     filtered_agents = filter(agent -> agent.type != :eggmass, all_agents)
 
@@ -197,12 +213,15 @@ function calculate_real_assimilation(model)
     end
 end
 
-function calculate_max_assimilation(model)
+function calculate_species_max_assimilation(model, species::Symbol)
+
     all_agents = collect(values(allagents(model)))
-    
+
+    all_agents = filter(agent -> agent.species == species, all_agents)
+
     # Filter agents based on agent types (juvenile, male, and female)
     filtered_agents = filter(agent -> agent.type == :juvenile || agent.type == :adult, all_agents)
-    
+    ind_deb_params = NamedTuple(model.species_specific_DEB_params[species])
     if isempty(filtered_agents)
         println("no agents to calculate assimilation, probably only eggs!")
         denom = missing
@@ -211,10 +230,10 @@ function calculate_max_assimilation(model)
         #type_values = [getfield(agent, Symbol("type")) for agent in filtered_agents]
         #generation_values = [getfield(agent, Symbol("Generation")) for agent in filtered_agents]
         #age_values = [getfield(agent, Symbol("Age")) for agent in filtered_agents]
-        p_Am_values = fill(model.p_Am, length(filtered_agents))
+        p_Am_values = fill(ind_deb_params[:p_Am], length(filtered_agents))
         s_M_i_values = [getfield(agent, Symbol("s_M_i")) for agent in filtered_agents]
         Lw_values = [getfield(agent, Symbol("Lw")) for agent in filtered_agents]
-        Tc_value = isa(model.Tc, Vector{Float64}) ? model.Tc[model.sim_timing] : model.Tc
+        Tc_value = isa(ind_deb_params[:Tc], Vector{Float64}) ? (ind_deb_params[:Tc])[model.initial_conditions[:sim_timing]] : ind_deb_params[:Tc]
         Nind_values = [getfield(agent, Symbol("Nind")) for agent in filtered_agents]
         #the total max assimilation of the Superindividuals
         # Perform element-wise operations and calculate the sum
@@ -223,19 +242,25 @@ function calculate_max_assimilation(model)
     return denom
 end
 
-function mean_eggs(model)
+function mean_eggs(model, species::Symbol)
     all_agents = collect(values(allagents(model)))
+    if species != :all
+        all_agents = filter(agent -> agent.species == species, all_agents)
+    end
     filtered_agents = filter(agent -> agent.type == :eggmass, all_agents)
     if isempty(filtered_agents)
         mean_nr_eggs = 0.0
     else
-    mean_nr_eggs = mean_nr_eggs = mean([agent.Nind for agent in filtered_agents])
+    mean_nr_eggs = mean([agent.Nind for agent in filtered_agents])
     end
     return mean_nr_eggs
 end
 
-function mean_spawning(model)
+function mean_spawning(model, species::Symbol)
     all_agents = collect(values(allagents(model)))
+    if species != :all
+        all_agents = filter(agent -> agent.species == species, all_agents)
+    end
     filtered_agents = filter(agent -> agent.type == :adult, all_agents)
     if isempty(filtered_agents)
         mean_spawned = 0.0
