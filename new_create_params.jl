@@ -39,17 +39,17 @@ function create_params_dict(
         )),
         :fishing_mortalities => Dict(
             :sardine => Dict(
-                :M_f0s => M_f0s / 365.0,
-                :M_f1s => M_f1s / 365.0,
-                :M_f2s => M_f2s / 365.0,
-                :M_f3s => M_f3s / 365.0,
-                :M_f4s => M_f4s / 365.0),
+                :M_f0 => M_f0s / 365.0,
+                :M_f1 => M_f1s / 365.0,
+                :M_f2 => M_f2s / 365.0,
+                :M_f3 => M_f3s / 365.0,
+                :M_f4 => M_f4s / 365.0),
             :anchovy => Dict(
-                :M_f0a => M_f0a / 365.0,
-                :M_f1a => M_f1a / 365.0,
-                :M_f2a => M_f2a / 365.0,
-                :M_f3a => M_f3a / 365.0,
-                :M_f4a => M_f4a / 365.0
+                :M_f0 => M_f0a / 365.0,
+                :M_f1 => M_f1a / 365.0,
+                :M_f2 => M_f2a / 365.0,
+                :M_f3 => M_f3a / 365.0,
+                :M_f4 => M_f4a / 365.0
         )),
         :initial_conditions => Dict(
             :No_As => No_As,
@@ -89,6 +89,7 @@ function create_params_dict(
         ),
         :species_specific_DEB_params => Dict(
             :sardine => Dict(
+                :Kappa => Kappas,
                 :p_Am => 554.351,
                 :v_rate => 0.0216466,
                 :del_M => 0.1152,
@@ -125,6 +126,7 @@ function create_params_dict(
                 :Tc_value => exp.(8000.0 / 293.0 .- 8000.0 ./ (Temp[1] .+ 273.0))
             ),
             :anchovy => Dict(
+                :Kappa => Kappaa,
                 :p_Am => 11.1372,
                 :v_rate => 0.01944,
                 :del_M => 0.1656,

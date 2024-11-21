@@ -1,67 +1,67 @@
-function update_Kappa!(model, Kappa::Float64)
-    model.Kappa_value = Kappa
+function update_Kappa!(model, Kappa::Float64, species::Symbol)
+    model.species_specific_DEB_params[species][:Kappa] = Kappa
 end
 
-function update_Kappa!(model, Kappa::Vector{Float64})
-    model.Kappa_value = Kappa[model.sim_timing]
+function update_Kappa!(model, Kappa::Vector{Float64}, species::Symbol)
+    model.species_specific_DEB_params[species][:Kappa] = Kappa[model.initial_conditions[:sim_timing]]
 end
 
-function update_MF0!(model, M_f0::Float64)
-    model.MF0_value = M_f0
+function update_MF0!(model, M_f0::Float64, species::Symbol)
+    model.fishing_mortalities[species][:M_f0] = M_f0
 end
 
 function update_MF0!(model, M_f0::Vector{Float64})
-    model.MF0_value = M_f0[model.sim_timing]
+    model.fishing_mortalities[species][:M_f0] = M_f0[model.initial_conditions[:sim_timing]]
 end
 
-function update_MF1!(model, M_f1::Float64)
-    model.MF1_value = M_f1
+function update_MF1!(model, M_f1::Float64, species::Symbol)
+    model.fishing_mortalities[species][:M_f1] = M_f1
 end
 
 function update_MF1!(model, M_f1::Vector{Float64})
-    model.MF1_value = M_f1[model.sim_timing]
+    model.fishing_mortalities[species][:M_f1] = M_f1[model.initial_conditions[:sim_timing]]
+
 end
 
 function update_MF2!(model, M_f2::Float64)
-    model.MF2_value = M_f2
+    model.fishing_mortalities[species][:M_f2] = M_f2
 end
 
-function update_MF2!(model, M_f2::Vector{Float64})
-    model.MF2_value = M_f2[model.sim_timing]
+function update_MF2!(model, M_f2::Vector{Float64}, species::Symbol)
+    model.fishing_mortalities[species][:M_f2] = M_f2[model.initial_conditions[:sim_timing]]
 end
 
 function update_MF3!(model, M_f3::Float64)
-    model.MF3_value = M_f3
+    model.fishing_mortalities[species][:M_f3] = M_f3
 end
 
-function update_MF3!(model, M_f3::Vector{Float64})
-    model.MF3_value = M_f3[model.sim_timing]
+function update_MF3!(model, M_f3::Vector{Float64}, species::Symbol)
+    model.fishing_mortalities[species][:M_f3] = M_f3[model.initial_conditions[:sim_timing]]   
 end
 
-function update_MF4!(model, M_f4::Float64)
-    model.MF4_value = M_f4
+function update_MF4!(model, M_f4::Float64, species::Symbol)
+    model.fishing_mortalities[species][:M_f4] = M_f4
 end
 
-function update_MF4!(model, M_f4::Vector{Float64})
-    model.MF4_value = M_f4[model.sim_timing]
+function update_MF4!(model, M_f4::Vector{Float64}, species::Symbol)
+    model.fishing_mortalities[species][:M_f4] = M_f4[model.initial_conditions[:sim_timing]]   
+
 end
 
-
-
-function update_Tc!(model, Tc::Float64)
-    model.Tc_value = Tc
+function update_Tc!(model, Tc::Float64, species::Symbol)
+    model.species_specific_DEB_params[species][:Tc_value] = Tc
 end
 
 function update_Tc!(model, Tc::Vector{Float64})
-    model.Tc_value = Tc[model.sim_timing]
+    model.species_specific_DEB_params[species][:Tc_value]  = Tc[model.initial_conditions[:sim_timing]]
 end
 
 function update_Xmax!(model, Xmax::Float64)
-    model.Xmax_value = Xmax
+    model.initial_conditions[:Xmax_value] = Xmax
 end
 
 function update_Xmax!(model, Xmax::Vector{Float64})
-    model.Xmax_value = Xmax[model.sim_timing]
+    model.initial_conditions[:Xmax_value]  = Xmax[model.initial_conditions[:sim_timing]]
 end
                                                 ###############
                                                 # is xx_agent #
@@ -109,43 +109,6 @@ end
                                         # agent properties #
                                         ####################
 
-function interquantiles_prop(model, prop, class_prop, agent_type = missing, assign = true, Wwquant = model.Ww_quantiles)
-    
-    # a function to assign interquantile classes of a property to specified agents.
-    filtered_agents = filter(agent -> hasid(model, agent.id) && (ismissing(agent_type) || agent.type == agent_type), collect(values(allagents(model))))
-    
-    #Calculate quantiles
-    # Wwquant are calculated at the beginning of the Simulation
-    #if specified they are the reference quantiles, otherwise the quantiles are calculated on the specified property
-    quantiles = ismissing(Wwquant) ? quantile([getproperty(a, prop) for a in filtered_agents], [0.25, 0.5, 0.75]) : Wwquant
-
-    if assign
-        for a in filtered_agents
-            class = getproperty(a, prop) <= quantiles[1] ? "Q1" :
-                    getproperty(a, prop) <= quantiles[2] ? "Q2" :
-                    getproperty(a, prop) <= quantiles[3] ? "Q3" : "Q4"
-            setproperty!(a, class_prop, class)
-        end
-    else
-        return quantiles
-    end
-end
-
-function interquantiles_prop_single(agent, model, prop, class_prop, assign = true, Wwquant = model.Ww_quantiles)
-    #Calculate quantiles
-    # Wwquant are calculated at the beginning of the Simulation
-    #if specified they are the reference quantiles, otherwise the quantiles are calculated on the specified property
-    quantiles = ismissing(Wwquant) ? quantile([getproperty(a, prop) for a in filtered_agents], [0.25, 0.5, 0.75]) : Wwquant
-
-    if assign
-            class = getproperty(agent, prop) <= quantiles[1] ? "Q1" :
-                    getproperty(agent, prop) <= quantiles[2] ? "Q2" :
-                    getproperty(agent, prop) <= quantiles[3] ? "Q3" : "Q4"
-            setproperty!(agent, class_prop, class)
-    else
-        return quantiles
-    end
-end
 
 function get_bigger_agent(agent_type, model, feature)
     all_agents = collect(values(allagents(model)))
