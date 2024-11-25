@@ -10,7 +10,7 @@
 end #-- it follows hatch! in complex step so same order of eggmass_step!()
 
 
-function eggaging!(Fish, model)
+function eggaging!(Fish, model) #indipendent of the species
     if !Fish.Dead
     Fish.Age += 1.0
     end
@@ -18,6 +18,16 @@ function eggaging!(Fish, model)
 end
 
 function eggDEB!(Fish, model)
+    deb_all = NamedTuple(model.DEB_all_params)
+
+if is_sardine(Fish)
+    deb_species = NamedTuple(model.DEB_species_specific_params[:sardine])
+    deb_derived = NamedTuple(model.DEB_derived_params[:sardine])
+else
+    deb_species = NamedTuple(model.DEB_species_specific_params[:anchovy])
+    deb_derived = NamedTuple(model.DEB_derived_params[:anchovy])
+end
+
     if !Fish.Dead
         # Fish Volume
         V = Fish.L^3.0
@@ -29,32 +39,30 @@ function eggDEB!(Fish, model)
         
         ## Energy fluxes
                 #Somatic maintenance
-        pS = (model.p_M * model.Tc_value) * V  #p_M_T*V
+        pS = (deb_species.p_M * deb_species.Tc_value) * V  #p_M_T*V
         # Mobilized energy
-        pC = ((Fish.maternal_EggEn / V) * (model.Eg * (model.v_rate * model.Tc_value) * (V ^ (2/3)) + pS)/(model.Kappa_value * (Fish.maternal_EggEn / V) + model.Eg))
-
+        pC = ((Fish.maternal_EggEn / V) * (deb_derived.Eg * (deb_all.v_rate * deb_species.Tc_value) * (V ^ (2/3)) + pS)/(deb_species[:Kappa] * (Fish.maternal_EggEn / V) + deb_derived.Eg))
 
         #Maturity maintenance
-        pJ = model.k_J * Fish.H * model.Tc_value
+        pJ = deb_all.k_J * Fish.H * deb_species.Tc_value
         
         ## Variation in the state variables
         # part of reserve used to increase complexity
         deltaEggEn = 0.0 - pC # must be negative because eggs do not eat 
         
         # Enrgy reserve is not enough to pay somatic maintenance:
-        if ((model.Kappa_value * pC) < pS)
-            model.dead_eggmass += 1.0
+        if ((deb_species.Kappa * pC) < pS)
+            model.output[Fish.species][:natural_mortality][:dead_eggmass] += 1.0
             Fish.Dead = true
             return
         end
         
-
-        deltaH =  (( 1.0 - model.Kappa_value) * pC - pJ)
+        deltaH =  (( 1.0 - deb_species.Kappa) * pC - pJ)
         if (deltaH < 0.0 )
             deltaH = 0.0
         end
     
-        deltaV = ((model.Kappa_value * pC - pS) / model.Eg)
+        deltaV = ((deb_species.Kappa * pC - pS) / deb_derived.Eg)
         if (deltaV < 0.0)
             deltaV = 0.0
         end
@@ -68,34 +76,43 @@ function eggDEB!(Fish, model)
 end
 
 function egghatch!(Fish, model)
+
+    if is_sardine(Fish)
+        deb_species = NamedTuple(model.DEB_species_specific_params[:sardine])
+        deb_derived = NamedTuple(model.DEB_derived_params[:sardine])
+    else
+        deb_species = NamedTuple(model.DEB_species_specific_params[:anchovy])
+        deb_derived = NamedTuple(model.DEB_derived_params[:anchovy])
+    end
+
     if !Fish.Dead && (Fish.H >= model.Hb)
         # If egg survived starvation In deb()! and has enough complexity, it becomes a juvenile
         Fish.type = :juvenile
-        Fish.f_i = model.f # if model is initialized only with eggs, this value is set to 0.8, otherwise from the model
-        Fish.Lw = (Fish.L / model.del_M)
+        Fish.f_i = model.initial_conditions[:f] # if model is initialized only with eggs, this value is set to 0.8, otherwise from the model
+        Fish.Lw = (Fish.L / deb_species.del_M)
         Fish.Lb_i = Fish.L
-        Fish.Age = model.Ap * (Fish.Lw * model.del_M) / model.Lp
+        Fish.Age = deb_species.Ap * (Fish.Lw * deb.species.del_M) / deb_species.Lp
         #Fish.H = model.Hp * (Fish.Lw * model.del_M) / model.Lp
-        Fish.Nind = Float64(ceil((1 - model.M_egg) * Float64((Fish.Nind))))
+        Fish.Nind = Float64(ceil((1 - model.natural_mortalities[Fish.species][:M_egg]) * Float64((Fish.Nind))))
         Fish.Nind0 = Fish.Nind
         
-        Fish.s_M_i = if model.Hb >= Fish.H
+        Fish.s_M_i = if deb_species.Hb >= Fish.H
             1.0
-        elseif model.Hb < Fish.H < model.Hj
-            Fish.Lw * model.del_M / Fish.Lb_i
+        elseif deb_species.Hb < Fish.H < deb_species.Hj
+            Fish.Lw * deb_species.del_M / Fish.Lb_i
         else
-            model.s_M
+            deb_species.s_M
         end
 
         # 0.8 is f = functional response: I start juvenile starts exogenous feeding with not limiting capacity;
         # this allow to calculate first pA and then update real and maximum assimilation in the evolve_environment function
         # once they enter DEB module, pA is updated with the real assimilation
         
-        Fish.pA = Fish.f_i * model.p_Am * model.Tc_value* Fish.s_M_i * ((Fish.Lw * model.del_M)^2.0)
-        Fish.Ww = (model.w * (model.d_V * ((Fish.Lw * model.del_M) ^ 3.0) + model.w_E / model.mu_E *(Fish.En + 0.0))) #R
-        Fish.Scaled_En = Fish.En / ( model.Em * ((Fish.Lw * model.del_M)^3.0))
+        Fish.pA = Fish.f_i * deb_species.p_Am * deb_species.Tc_value* Fish.s_M_i * ((Fish.Lw * deb_species.del_M)^2.0)
+        Fish.Ww = (model.DEB_all_params[:w] * (model.DEB_all_params[:d_V] * ((Fish.Lw * deb_species.del_M) ^ 3.0) + model.DEB_all_params[:w_E] / model.DEB_all_params[:mu_E] *(Fish.En + 0.0))) #R
+        Fish.Scaled_En = Fish.En / ( deb_derived.Em * ((Fish.Lw * deb_species.del_M)^3.0))
         Fish.t_puberty = Fish.Age
-        model.dead_eggmass += 1.0                                              
+        model.output[Fish.species][:natural_mortality][:dead_eggmass] += 1.0                                              
         return
     end
     return
