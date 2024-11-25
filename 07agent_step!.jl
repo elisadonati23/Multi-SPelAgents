@@ -133,6 +133,14 @@ end
 
 function juvedie!(Fish, model)
 
+    if is_sardine(Fish)
+        natM = NamedTuple(model.natural_mortalities[:sardine])
+        fishM = NamedTuple(model.fishing_mortalities[:sardine])
+    else
+        natM = NamedTuple(model.natural_mortalities[:anchovy])
+        fishM = NamedTuple(model.fishing_mortalities[:anchovy])
+    end
+
     #set mortality: adding fishing mortality if lenght is higher than 10cm (recruitment)
     # Initialize deaths
     natural_deaths = 0.0
@@ -142,29 +150,29 @@ function juvedie!(Fish, model)
     if !Fish.Dead && Fish.Nind >= 100000.0
 
         # 1st case: Fish too small to be fished
-        if Fish.Lw < 10.0 || model.MF0_value == 0.0
+        if Fish.Lw < 10.0 || fishM.M_f0 == 0.0
             # only natural mortality
-            natural_deaths = Float64(rand(Binomial(Int64(Fish.Nind), 1-exp(-(model.M_j)))))
+            natural_deaths = Float64(rand(Binomial(Int64(Fish.Nind), 1-exp(-(natM.M0)))))
             Fish.Nind -= natural_deaths
-            model.deadJ_nat += natural_deaths
-            model.natJ_biom += natural_deaths * Fish.Ww
+            model.output[Fish.species][:natural_mortality][:deadJ_nat] += natural_deaths
+            model.output[Fish.species][:natural_mortality][:natJ_biom] += natural_deaths * Fish.Ww
 
             #keep track of the age
             if floor(Fish.Age / 365.0 ) == 0.0
-                model.deadJ_nat0 += natural_deaths
-                model.natJ_biom0 += natural_deaths * Fish.Ww
+                model.output[Fish.species][:natural_mortality][:deadJ_nat0] += natural_deaths
+                model.output[Fish.species][:natural_mortality][:natJ_biom0] += natural_deaths * Fish.Ww
             elseif floor(Fish.Age / 365.0 ) == 1.0
-                model.deadJ_nat1 += natural_deaths
-                model.natJ_biom1 += natural_deaths * Fish.Ww
+                model.output[Fish.species][:natural_mortality][:deadJ_nat1] += natural_deaths
+                model.output[Fish.species][:natural_mortality][:natJ_biom1] += natural_deaths * Fish.Ww
             end
         end
 
         #juveniles that are big enough to be fished
-        if Fish.Lw > 10.0 && !(model.MF0_value == 0.0)
-            M = model.M_j + ((model.MF0_value)/365.0)
+        if Fish.Lw > 10.0 && !(fishM.M_f0 == 0.0)
+            M = natM.M0 + ((fishM.M_f0)/365.0)
 
             total_deaths = Float64(rand(Binomial(Int64(Fish.Nind), 1-exp(-M))))
-            natural_deaths = Float64(rand(Binomial(Int64(Fish.Nind), 1-exp(-(model.M_j)))))
+            natural_deaths = Float64(rand(Binomial(Int64(Fish.Nind), 1-exp(-(natM.M0)))))
 
             if natural_deaths > total_deaths
                 natural_deaths = total_deaths
@@ -175,48 +183,56 @@ function juvedie!(Fish, model)
             Fish.Nind -= total_deaths
 
             #total deaths
-            model.fishedW += fishing_deaths * Fish.Ww
-            model.fished += fishing_deaths
-            model.deadJ_nat += natural_deaths
-            model.natJ_biom += natural_deaths * Fish.Ww
+            model.output[Fish.species][:fishing][:fishedW] += fishing_deaths * Fish.Ww
+            model.output[Fish.species][:fishing][:fished] += fishing_deaths
+            model.output[Fish.species][:fishing][:deadJ_nat] += natural_deaths
+            model.output[Fish.species][:fishing][:natJ_biom] += natural_deaths * Fish.Ww
 
                 #keep track of the ages
                 if floor(Fish.Age / 365.0 ) == 0.0
-                    model.fished0 += fishing_deaths
-                    model.fished0_biom += fishing_deaths * Fish.Ww
-                    model.deadJ_nat0 += natural_deaths
-                    model.natJ_biom0 += natural_deaths * Fish.Ww
+                    model.output[Fish.species][:fishing][:fished0] += fishing_deaths
+                    model.output[Fish.species][:fishing][:fished0_biom] += fishing_deaths * Fish.Ww
+                    model.output[Fish.species][:fishing][:deadJ_nat0] += natural_deaths
+                    model.output[Fish.species][:fishing][:natJ_biom0] += natural_deaths * Fish.Ww
                 elseif floor(Fish.Age / 365.0 ) == 1.0
-                    model.fished1 += fishing_deaths
-                    model.fished1_biom += fishing_deaths * Fish.Ww
-                    model.deadJ_nat1 += natural_deaths
-                    model.natJ_biom1 += natural_deaths * Fish.Ww
+                    model.output[Fish.species][:fishing][:fished1] += fishing_deaths
+                    model.output[Fish.species][:fishing][:fished1_biom] += fishing_deaths * Fish.Ww
+                    model.output[Fish.species][:fishing][:deadJ_nat1] += natural_deaths
+                    model.output[Fish.species][:fishing][:natJ_biom1] += natural_deaths * Fish.Ww
                 end
         end
     end
 #if less than 1a certain threshold of ind, superindividual dies
-    if  Fish.Nind <= Fish.Nind0 * model.death_threshold && !Fish.Dead
+    if  Fish.Nind <= Fish.Nind0 * model.natural_mortalities[Fish.species][:death_threshold] && !Fish.Dead
             Fish.Dead = true
-            model.deadJ_nat += Fish.Nind
+            model.output[Fish.species][:fishing][:deadJ_nat] += Fish.Nind
     end
 return
 end
 
 function juveDEB!(Fish, model)
 
+    if is_sardine(Fish)
+        deb_species = NamedTuple(model.DEB_species_specific_params[:sardine])
+        deb_derived = NamedTuple(model.DEB_derived_params[:sardine])
+    else
+        deb_species = NamedTuple(model.DEB_species_specific_params[:anchovy])
+        deb_derived = NamedTuple(model.DEB_derived_params[:anchovy])
+    end
+
     if !Fish.Dead
 
-        Fish.f_i = model.f #if no one is eating (=model initilized with eggs), it is set to 0.8)
+        Fish.f_i = model.initial_conditions[:f] #if no one is eating (=model initilized with eggs), it is set to 0.8)
 
         # juvenile store energy into maturation state variable and eventually they mature
 
         #initialize the state variables before the fluxes
-        Vdyn = (Fish.Lw * model.del_M) ^ 3.0
+        Vdyn = (Fish.Lw * deb_species.del_M) ^ 3.0
         Endyn = Fish.En
         Hdyn = Fish.H
         Rdyn = Fish.R
 
-        p_M_T = model.p_M * model.Tc_value 
+        p_M_T = deb_species.p_M * deb_species.Tc_value 
 
         #initialize the variation in the state variables
         deltaV = 0.0
@@ -224,27 +240,27 @@ function juveDEB!(Fish, model)
         deltaH = 0.0
         deltaR = 0.0
 
-        v_T = model.v_rate * model.Tc_value
+        v_T = model.DEB_all_params[:v_rate] * deb_species.Tc_value
 
         # Energy fluxes
-        pA = (Fish.f_i * model.p_Am* model.Tc_value * Fish.s_M_i * (Vdyn ^ (2/3)))
+        pA = (Fish.f_i * deb_species.p_Am* deb_species.Tc_value * deb_species.s_M_i * (Vdyn ^ (2/3)))
         pS = p_M_T * Vdyn
-        pC = ((Endyn/Vdyn) * (model.Eg * v_T * Fish.s_M_i * (Vdyn ^ (2/3)) + pS) / (model.Kappa_value * (Endyn/ Vdyn) + model.Eg))
-        pJ = model.k_J * Hdyn * model.Tc_value
-        deltaEn = (pA - pC) * model.DEB_timing
+        pC = ((Endyn/Vdyn) * (deb_derived.Eg * v_T * Fish.s_M_i * (Vdyn ^ (2/3)) + pS) / (deb_species.Kappa * (Endyn/ Vdyn) + deb_derived.Eg))
+        pJ = model.DEB_parameters_all[:k_J] * Hdyn * deb_species.Tc_value
+        deltaEn = pA - pC
 
         # die due to starvation
-        if ((model.Kappa_value * pC) < pS)
-            model.deadJ_starved += Fish.Nind
-            model.starvedJ_biom += Fish.Nind * Fish.Ww
+        if ((deb_species.Kappa * pC) < pS)
+            model.output[Fish.species][:starvation][:deadJ_starved] += Fish.Nind
+            model.output[Fish.species][:starvation][:starvedJ_biom] += Fish.Nind * Fish.Ww
 
             #keep track of the ages
             if (floor(Fish.Age / 365.0 ) == 0.0)
-                model.deadJ_starved0 += Fish.Nind
-                model.starvedJ_biom0 += Fish.Nind * Fish.Ww
+                model.output[Fish.species][:starvation][:deadJ_starved0] += Fish.Nind
+                model.output[Fish.species][:starvation][:starvedJ_biom0] += Fish.Nind * Fish.Ww
             elseif (floor(Fish.Age / 365.0 ) == 1.0)
-                model.deadJ_starved1 += Fish.Nind
-                model.starvedJ_biom1 += Fish.Nind * Fish.Ww
+                model.output[Fish.species][:starvation][:deadJ_starved1] += Fish.Nind
+                model.output[Fish.species][:starvation][:starvedJ_biom1] += Fish.Nind * Fish.Ww
             end
 
             Fish.Dead = true
@@ -252,13 +268,13 @@ function juveDEB!(Fish, model)
         end
 
 
-        deltaV = ((model.Kappa_value * pC - pS) / model.Eg) * model.DEB_timing
+        deltaV = ((deb_species.Kappa * pC - pS) / deb_derived.Eg)
         if (deltaV < 0.0) 
         deltaV = 0.0
         end
 
         # maturing energy
-        deltaH = (((1.0 - model.Kappa_value) * pC - pJ) * model.DEB_timing)
+        deltaH = ((1.0 - deb_species.Kappa) * pC - pJ)
         if deltaH < 0.0
             deltaH = 0.0
         end
@@ -266,50 +282,57 @@ function juveDEB!(Fish, model)
         # update state variables
         Fish.En = Endyn + deltaEn
         V = Vdyn + deltaV
-        Fish.Lw = (V ^ (1/3)) / model.del_M
+        Fish.Lw = (V ^ (1/3)) / deb_species.del_M
         Fish.H = Hdyn + deltaH
         Fish.R = Rdyn + deltaR
-        Fish.Ww = (model.w *(model.d_V * V + model.w_E/ model.mu_E * (Fish.En + Fish.R)))
-        Fish.Scaled_En = Fish.En / (model.Em * (( Fish.Lw * model.del_M)^3.0))
+        Fish.Ww = (model.DEB_all_params[:w] *(model.DEB_all_params[:d_V] * V + model.DEB_all_params[:w_E]/ model.DEB_all_params[:mu_E] * (Fish.En + Fish.R)))
+        Fish.Scaled_En = Fish.En / (deb_derived.Em * (( Fish.Lw * deb_species.del_M)^3.0))
 
         #check whether Lm is a vector or a float
 
-        Fish.L = Fish.Lw * model.del_M
-        Fish.pA = Fish.f_i * model.p_Am * model.Tc_value * Fish.s_M_i * ((Fish.Lw * model.del_M)^2.0)
+        Fish.L = Fish.Lw * deb_species.del_M
+        Fish.pA = Fish.f_i * deb_species.p_Am * deb_species.Tc_value * Fish.s_M_i * ((Fish.Lw * deb_species.del_M)^2.0)
   
         # adjust acceleration factor
         # before birth is 1
         if !Fish.metamorph
-           if Fish.H <= model.Hb
+           if Fish.H <= deb_species.Hb
                 Fish.s_M_i = 1.0
-            elseif model.Hb < Fish.H < model.Hj
-                Fish.s_M_i = (Fish.Lw * model.del_M) / Fish.Lb_i
-            elseif Fish.H >= model.Hj
-                Fish.Lj_i = Fish.Lw * model.del_M
+            elseif deb_species.Hb < Fish.H < deb_species.Hj
+                Fish.s_M_i = (Fish.Lw * deb_species.del_M) / Fish.Lb_i
+            elseif Fish.H >= deb_species.Hj
+                Fish.Lj_i = Fish.Lw * deb_species.del_M
                 Fish.s_M_i = Fish.Lj_i / Fish.Lb_i
                 Fish.metamorph = true
-                println("s_M_i: ", Fish.s_M_i, " Lj_i: ", Fish.Lj_i, " Lb_i: ", Fish.Lb_i)
+                #println("s_M_i: ", Fish.s_M_i, " Lj_i: ", Fish.Lj_i, " Lb_i: ", Fish.Lb_i)
             end
         end
 
-        Fish.pA = Fish.f_i * model.p_Am * model.Tc_value * Fish.s_M_i * ((Fish.Lw * model.del_M)^2.0)
+        Fish.pA = Fish.f_i * deb_species.p_Am * deb_species.Tc_value * Fish.s_M_i * ((Fish.Lw * deb_species.del_M)^2.0)
         Fish.CI = 100 * Fish.Ww / (Fish.Lw^3)
     end
 return
 end
 
 function juvemature!(Fish, model)
-    if !Fish.Dead && (Fish.H >= model.Hp)
+
+    if is_sardine(Fish)
+        deb_species = NamedTuple(model.DEB_species_specific_params[:sardine])
+    else
+        deb_species = NamedTuple(model.DEB_species_specific_params[:anchovy])
+    end
+
+    if !Fish.Dead && (Fish.H >= deb_species.Hp)
          #Keep the same number of individuals which survived up to now in juvenile superind
          Fish.type = :adult
          Fish.R = 0.0
-         Fish.pA = Fish.f_i * model.p_Am * model.Tc_value * Fish.s_M_i * ((Fish.Lw * model.del_M)^2.0) #perchè non alla 2/3?
+         Fish.pA = Fish.f_i * deb_species.p_Am * deb_species.Tc_value * Fish.s_M_i * ((Fish.Lw * deb_species.del_M)^2.0) #perchè non alla 2/3?
          Fish.Generation += 1.0
     end
     return
 end
 
-function juveaging!(Fish, model)
+function juveaging!(Fish, model) #indipendent of the species
     if !Fish.Dead
     Fish.Age += 1.0
     Fish.t_puberty += 1.0
