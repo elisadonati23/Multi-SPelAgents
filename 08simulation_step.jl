@@ -2,13 +2,13 @@
 #   Wraps     #
 ###############
 
-function parallel_sardine_step!(Sardine, model)
-    if Sardine.type == :eggmass
-        parallel_eggmass_step!(Sardine, model)  # DEB + aging + hatch
-    elseif Sardine.type == :juvenile
-        parallel_juvenile_step!(Sardine, model)  # Die + DEB + mature + aging
-    elseif Sardine.type == :adult
-        parallel_adult_step!(Sardine, model)    # Die + DEB + aging 
+function parallel_step!(Fish, model)
+    if Fish.type == :eggmass
+        parallel_eggmass_step!(Fish, model)  # DEB + aging + hatch
+    elseif Fish.type == :juvenile
+        parallel_juvenile_step!(Fish, model)  # Die + DEB + mature + aging
+    elseif Fish.type == :adult
+        parallel_adult_step!(Fish, model)    # Die + DEB + aging 
     end
 end
 
@@ -18,43 +18,27 @@ end
 
 function evolve_environment!(model)
     # Day counter
-    if model.day_of_the_year == 365.0
-        model.day_of_the_year = 1.0
-        model.year += 1.0
-        model.fishedW = 0.0
-        model.fished0 = 0.0
-        model.fished1 = 0.0
-        model.fished2 = 0.0
-        model.fished3 = 0.0
-        model.fished4more = 0.0
+    if model.initial_conditions[:day_of_the_year] == 365.0
+        model.initial_conditions[:day_of_the_year] = 1.0
+        model.initial_conditions[:year] += 1.0
+        #fished biomass goes to zero
+        reset_nested_dict_values!(model[:output][:sardine][:fishing], 0.0)
+        reset_nested_dict_values!(model[:output][:anchovy][:fishing], 0.0)
     else
-        model.day_of_the_year += 1.0
+        model.initial_conditions[:day_of_the_year] += 1.0
     end
 
 
     # Increase simulation timing
-    model.sim_timing += 1
+    model.initial_conditions[:sim_timing] += 1
 
-    # Update time-dependent parameters
-    update_Tc!(model, model.Tc_value)
-    update_Kappa!(model, model.Kappa_value)
-    update_Xmax!(model, model.Xmax_value)
-    update_MF0!(model, model.M_f0)
-    update_MF1!(model, model.M_f1)
-    update_MF2!(model, model.M_f2)
-    update_MF3!(model, model.M_f3)
-    update_MF4!(model, model.M_f4)
-    
+    # Update time-dependent parameters, food, temperature, Kappa and fishing mortalities
+    update_timeseries(model, :sardine)
+    update_timeseries(model, :anchovy)
 
     # Calculate Xall
-    Xall = model.Xmax_value - (calculate_real_assimilation(model) / model.KappaX) / model.Wv
+    model.initial_conditions[:Xall] = max(0, (model.initial_conditions[:Xmax_value] - (calculate_real_assimilation(model) / model.DEB_parameters_all[:KappaX]) / model.initial_conditions[:Wv]))
     
-    if Xall < 0.0  
-        Xall = 0.0 
-    end
-    
-    model.Xall = Xall
-
     # Update response function f
     max_assimilation = calculate_max_assimilation(model)
     
@@ -81,86 +65,48 @@ end
 
 function update_outputs!(model)
     agents = collect(values(allagents(model)))
-    model.Nsuperind = length(agents)
-    
-    adults = filter(a -> a.type == :adult, agents)
-    adults_juv = filter(a -> a.type == :adult || a.type == :juvenile, agents)
-    if !isempty(adults_juv)
-        # B plot: take into account Nind
-        model.TotB = calculate_sum_prop(model, "Ww", Nind = true)
-        model.JuvB = calculate_sum_prop(model, "Ww", type = :juvenile, Nind = true)
-        model.AdB = calculate_sum_prop(model, "Ww", type = :adult, Nind = true)
+    model.initial_conditions[:Nsuperind] = length(agents)
 
+    adults_juv_sard = filter(a -> (a.type == :adult || a.type == :juvenile) && a.species == :sardine, agents)
+    adults_juv_anch = filter(a -> (a.type == :adult || a.type == :juvenile) && a.species == :anchovy, agents)
+
+for species in [:sardine, :anchovy]            
+    adults_juv = species == :sardine ? adults_juv_sard : adults_juv_anch 
+        if !isempty(adults_juv)
+            # B plot: take into account Nind
+        model.output[species][:lifehistory][:TotB] = calculate_sum_prop(model, :anchovy, "Ww", Nind = true)
+        model.output[species][:lifehistory][:JuvB] = calculate_sum_prop(model,:anchovy, "Ww", type = :juvenile, Nind = true)
+        model.output[species][:lifehistory][:AdB] = calculate_sum_prop(model, :anchovy, "Ww", type = :adult, Nind = true)
 
         # Mean weight (Ww) plot
-        model.meanAdWw = calculate_mean_prop(model, "Ww", type = :adult, age = 3.0)
-        model.sdAdWw =  calculate_sd_prop(model, "Ww", type = :adult)
-        model.meanJuvWw = calculate_mean_prop(model, "Ww", type = :juvenile)
-        model.sdJuvWw = calculate_sd_prop(model, "Ww", type = :juvenile)
+        model.output[species][:lifehistory][:meanAdWw] = calculate_mean_prop(model,:anchovy, "Ww", type = :adult, age = 3.0)
+        model.output[species][:lifehistory][:sdAdWw] =  calculate_sd_prop(model,:anchovy, "Ww", type = :adult)
+        model.output[species][:lifehistory][:meanJuvWw] = calculate_mean_prop(model,:anchovy, "Ww", type = :juvenile)
+        model.output[species][:lifehistory][:sdJuvWw] = calculate_sd_prop(model,:anchovy, "Ww", type = :juvenile)
         
-
         # Mean length (Lw) plot
-        model.meanAdL = calculate_mean_prop(model, "Lw", type = :adult)
-        model.sdAdL = calculate_sd_prop(model, "Lw", type = :adult)
-        model.meanJuvL = calculate_mean_prop(model, "Lw", type = :juvenile)
-        model.sdJuvL = calculate_sd_prop(model, "Lw", type = :juvenile)
+        model.output[species][:lifehistory][:meanAdL] = calculate_mean_prop(model,:anchovy, "Lw", type = :adult)
+        model.output[species][:lifehistory][:sdAdL] = calculate_sd_prop(model,:anchovy, "Lw", type = :adult)
+        model.output[species][:lifehistory][:meanJuvL] = calculate_mean_prop(model, :anchovy, "Lw", type = :juvenile)
+        model.output[species][:lifehistory][:sdJuvL] = calculate_sd_prop(model, :anchovy, "Lw", type = :juvenile)
 
         # Mean time to puberty plot
-        model.mean_tpuberty = calculate_mean_prop(model, "t_puberty", type = :adult)
-        model.sd_tpuberty = calculate_sd_prop(model, "t_puberty", type = :adult)
+        model.output[species][:lifehistory][:mean_tpuberty] = calculate_mean_prop(model,:anchovy, "t_puberty", type = :adult)
+        model.output[species][:lifehistory][:sd_tpuberty] = calculate_sd_prop(model, :anchovy, "t_puberty", type = :adult)
 
         # Mean juvenile maturation energy plot
-        model.mean_Hjuve = calculate_mean_prop(model, "H", type = :juvenile)
-        model.sd_Hjuve = calculate_sd_prop(model, "H", type = :juvenile)
+        model.output[species][:lifehistory][:mean_Hjuve] = calculate_mean_prop(model,:anchovy, "H", type = :juvenile)
+        model.output[species][:lifehistory][:sd_Hjuve] = calculate_sd_prop(model,:anchovy, "H", type = :juvenile)
+        end
     end
-
     return
 end
 
 function reset_variables(model)
-        # natural mortality
-        #adults
-        model.deadA_nat = 0.0
-        model.deadA_nat1 = 0.0
-        model.deadA_nat2 = 0.0
-        model.deadA_nat3 = 0.0
-        model.deadA_nat4more = 0.0
-        model.natA_biom = 0.0
-        model.natA_biom0 = 0.0
-        model.natA_biom1 = 0.0
-        model.natA_biom2 = 0.0
-        model.natA_biom3 = 0.0
-        model.natA_biom4more = 0.0
-    
-            #juvenile
-        model.deadJ_nat = 0.0
-        model.deadJ_nat0 = 0.0
-        model.deadJ_nat1 = 0.0
-        model.natJ_biom = 0.0
-        model.natJ_biom0 = 0.0
-        model.natJ_biom1 = 0.0
-    
-        # starving mortality
-            # adult
-        model.deadA_starved = 0.0
-        model.deadA_starved0 = 0.0
-        model.deadA_starved1 = 0.0
-        model.deadA_starved2 = 0.0
-        model.deadA_starved3 = 0.0
-        model.deadA_starved4more = 0.0
-        model.starvedA_biom = 0.0
-        model.starvedA_biom0 = 0.0
-        model.starvedA_biom1 = 0.0
-        model.starvedA_biom2 = 0.0
-        model.starvedA_biom3 = 0.0
-        model.starvedA_biom4more = 0.0
-            # juvenile
-        model.starvedJ_biom = 0.0
-        model.starvedJ_biom0 = 0.0
-        model.starvedJ_biom1 = 0.0
-        model.deadJ_starved = 0.0
-        model.deadJ_starved0 = 0.0
-        model.deadJ_starved1 = 0.0
+    reset_nested_dict_values!(model[:output][:sardine][:natural_mortality], 0.0)
+    reset_nested_dict_values!(model[:output][:anchovy][:natural_mortality], 0.0)
+    reset_nested_dict_values!(model[:output][:sardine][:starvation], 0.0)
+    reset_nested_dict_values!(model[:output][:anchovy][:starvation], 0.0)
     return
 end
 
@@ -170,7 +116,7 @@ end
 
 mutable struct scheduler_Adults end
 
-function (sEA::scheduler_Adults)(model::ABM)
+function (sEA::scheduler_Adults)(model::ABM) 
     ids = [agent.id for agent in values(allagents(model))] 
     ids = filter!(id -> hasid(model, id) && (model[id].type == :adult), ids)
     return ids
@@ -185,8 +131,8 @@ function complex_step!(model)
     remove_all!(model, is_dead)
 
     # Parallel processing for Sardine agents
-    Threads.@threads for sardine in collect(values(allagents(model)))
-        parallel_sardine_step!(sardine, model)
+    Threads.@threads for fish in collect(values(allagents(model)))
+        parallel_step!(fish, model)
     end 
 
     # Remove all dead agents
@@ -197,23 +143,34 @@ function complex_step!(model)
     adult_ids = filter!(id -> hasid(model, id) && model[id].type == :adult, copy(sEA_ids))
 
     # Handle spawning for adult agents
-    for sardine in adult_ids
-        adultspawn!(model[sardine], model)  # Set if the sardine is a spawner or not, determine the Nind to cluster in a new superindividual (egg)
+    for fish in adult_ids
+        adultspawn!(model[fish], model)  # Set if the sardine is a spawner or not, determine the Nind to cluster in a new superindividual (egg)
     end
 
     # Filter spawners for creating new EggMass agents
-    spawners = filter!(id -> hasid(model, id) && model[id].reproduction == :spawner, copy(sEA_ids))
-
+    sard_spawners = filter!(id -> hasid(model, id) && model[id].reproduction == :spawner && species == :sardine, copy(sEA_ids))
+    anch_spawners = filter!(id -> hasid(model, id) && model[id].reproduction == :spawner && species == :anchovy, copy(sEA_ids))
+    
     remove_all!(model, is_dead)
 
-    if !isempty(spawners)
+    if !isempty(sard_spawners)
         # Create new born daily superindividuals
         prop_values = [getfield(model[agent], :superind_Neggs) for agent in spawners]
         mean_Egg_energy = mean([getfield(model[agent], :maternal_EggEn) for agent in spawners])
         max_generation = maximum([getfield(model[agent], :Generation) for agent in spawners]) + 1.0
         tot_Neggs = sum(prop_values)
         #function generate_EggMass(No_Egg, model, Nind = missing, maternal_EggEn = missing, En = missing, Generation = missing)
-        generate_EggMass(1, model, tot_Neggs, mean_Egg_energy, mean_Egg_energy, max_generation)
+        generate_EggMass(1, model, :sardine, tot_Neggs, mean_Egg_energy, mean_Egg_energy, max_generation)
+    end
+
+    if !isempty(anch_spawners)
+        # Create new born daily superindividuals
+        prop_values = [getfield(model[agent], :superind_Neggs) for agent in spawners]
+        mean_Egg_energy = mean([getfield(model[agent], :maternal_EggEn) for agent in spawners])
+        max_generation = maximum([getfield(model[agent], :Generation) for agent in spawners]) + 1.0
+        tot_Neggs = sum(prop_values)
+        #function generate_EggMass(No_Egg, model, Nind = missing, maternal_EggEn = missing, En = missing, Generation = missing)
+        generate_EggMass(1, model, :anchovy, tot_Neggs, mean_Egg_energy, mean_Egg_energy, max_generation)
     end
 
     remove_all!(model, is_dead)

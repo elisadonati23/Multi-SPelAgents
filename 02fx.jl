@@ -10,7 +10,7 @@ function update_MF0!(model, M_f0::Float64, species::Symbol)
     model.fishing_mortalities[species][:M_f0] = M_f0
 end
 
-function update_MF0!(model, M_f0::Vector{Float64})
+function update_MF0!(model, M_f0::Vector{Float64},species::Symbol)
     model.fishing_mortalities[species][:M_f0] = M_f0[model.initial_conditions[:sim_timing]]
 end
 
@@ -18,12 +18,12 @@ function update_MF1!(model, M_f1::Float64, species::Symbol)
     model.fishing_mortalities[species][:M_f1] = M_f1
 end
 
-function update_MF1!(model, M_f1::Vector{Float64})
+function update_MF1!(model, M_f1::Vector{Float64},species::Symbol)
     model.fishing_mortalities[species][:M_f1] = M_f1[model.initial_conditions[:sim_timing]]
 
 end
 
-function update_MF2!(model, M_f2::Float64)
+function update_MF2!(model, M_f2::Float64,species::Symbol)
     model.fishing_mortalities[species][:M_f2] = M_f2
 end
 
@@ -31,7 +31,7 @@ function update_MF2!(model, M_f2::Vector{Float64}, species::Symbol)
     model.fishing_mortalities[species][:M_f2] = M_f2[model.initial_conditions[:sim_timing]]
 end
 
-function update_MF3!(model, M_f3::Float64)
+function update_MF3!(model, M_f3::Float64,species::Symbol)
     model.fishing_mortalities[species][:M_f3] = M_f3
 end
 
@@ -52,7 +52,7 @@ function update_Tc!(model, Tc::Float64, species::Symbol)
     model.species_specific_DEB_params[species][:Tc_value] = Tc
 end
 
-function update_Tc!(model, Tc::Vector{Float64})
+function update_Tc!(model, Tc::Vector{Float64}species::Symbol)
     model.species_specific_DEB_params[species][:Tc_value]  = Tc[model.initial_conditions[:sim_timing]]
 end
 
@@ -62,6 +62,28 @@ end
 
 function update_Xmax!(model, Xmax::Vector{Float64})
     model.initial_conditions[:Xmax_value]  = Xmax[model.initial_conditions[:sim_timing]]
+end
+
+function update_timeseries(model, species::Symbol)
+    update_Tc!(model, model.species_specific_DEB_params[species][:Tc_value], species)
+    update_Kappa!(model, model.species_specific_DEB_params[species][:Kappa], species)
+    update_Xmax!(model, model.initial_conditions[:Xmax_value])
+    update_MF0!(model, model.fishing_mortalities[species][:M_f0], species)
+    update_MF1!(model, model.fishing_mortalities[species][:M_f1], species)
+    update_MF2!(model, model.fishing_mortalities[species][:M_f2], species)
+    update_MF3!(model, model.fishing_mortalities[species][:M_f3], species)
+    update_MF4!(model, model.fishing_mortalities[species][:M_f4], species)
+end
+
+function reset_nested_dict_values!(nested_dict, value_to_assign)
+    # Iterate over the keys of the outer dictionary
+    for outer_key in keys(nested_dict)
+        # Iterate over the keys of the inner dictionary
+        for inner_key in keys(nested_dict[outer_key])
+            # Assign the value to each element
+            nested_dict[outer_key][inner_key] = value_to_assign
+        end
+    end
 end
                                                 ###############
                                                 # is xx_agent #
