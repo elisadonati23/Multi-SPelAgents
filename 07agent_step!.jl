@@ -18,7 +18,7 @@ function eggaging!(Fish, model) #indipendent of the species
 end
 
 function eggDEB!(Fish, model)
-    deb_all = NamedTuple(model.DEB_all_params)
+    deb_all = NamedTuple(model.DEB_parameters_all)
 
 if is_sardine(Fish)
     deb_species = NamedTuple(model.DEB_species_specific_params[:sardine])
@@ -109,7 +109,7 @@ function egghatch!(Fish, model)
         # once they enter DEB module, pA is updated with the real assimilation
         
         Fish.pA = Fish.f_i * deb_species.p_Am * deb_species.Tc_value* Fish.s_M_i * ((Fish.Lw * deb_species.del_M)^2.0)
-        Fish.Ww = (model.DEB_all_params[:w] * (model.DEB_all_params[:d_V] * ((Fish.Lw * deb_species.del_M) ^ 3.0) + model.DEB_all_params[:w_E] / model.DEB_all_params[:mu_E] *(Fish.En + 0.0))) #R
+        Fish.Ww = (model.DEB_parameters_all[:w] * (model.DEB_parameters_all[:d_V] * ((Fish.Lw * deb_species.del_M) ^ 3.0) + model.DEB_parameters_all[:w_E] / model.DEB_parameters_all[:mu_E] *(Fish.En + 0.0))) #R
         Fish.Scaled_En = Fish.En / ( deb_derived.Em * ((Fish.Lw * deb_species.del_M)^3.0))
         Fish.t_puberty = Fish.Age
         model.output[Fish.species][:natural_mortality][:dead_eggmass] += 1.0                                              
@@ -147,7 +147,7 @@ function juvedie!(Fish, model)
     total_deaths = 0.0
     fishing_deaths = 0.0
     
-    if !Fish.Dead && Fish.Nind >= 100000.0
+    if !Fish.Dead && Fish.Nind >= Fish.Nind0 * model.natural_mortalities[Fish.species][:death_threshold]
 
         # 1st case: Fish too small to be fished
         if Fish.Lw < 10.0 || fishM.M_f0 == 0.0
@@ -169,7 +169,7 @@ function juvedie!(Fish, model)
 
         #juveniles that are big enough to be fished
         if Fish.Lw > 10.0 && !(fishM.M_f0 == 0.0)
-            M = natM.M0 + ((fishM.M_f0)/365.0)
+            M = natM.M0 + fishM.M_f0
 
             total_deaths = Float64(rand(Binomial(Int64(Fish.Nind), 1-exp(-M))))
             natural_deaths = Float64(rand(Binomial(Int64(Fish.Nind), 1-exp(-(natM.M0)))))
@@ -185,27 +185,27 @@ function juvedie!(Fish, model)
             #total deaths
             model.output[Fish.species][:fishing][:fishedW] += fishing_deaths * Fish.Ww
             model.output[Fish.species][:fishing][:fished] += fishing_deaths
-            model.output[Fish.species][:fishing][:deadJ_nat] += natural_deaths
-            model.output[Fish.species][:fishing][:natJ_biom] += natural_deaths * Fish.Ww
+            model.output[Fish.species][:natural_mortality][:deadJ_nat] += natural_deaths
+            model.output[Fish.species][:natural_mortality][:natJ_biom] += natural_deaths * Fish.Ww
 
                 #keep track of the ages
                 if floor(Fish.Age / 365.0 ) == 0.0
                     model.output[Fish.species][:fishing][:fished0] += fishing_deaths
                     model.output[Fish.species][:fishing][:fished0_biom] += fishing_deaths * Fish.Ww
-                    model.output[Fish.species][:fishing][:deadJ_nat0] += natural_deaths
-                    model.output[Fish.species][:fishing][:natJ_biom0] += natural_deaths * Fish.Ww
+                    model.output[Fish.species][:natural_mortality][:deadJ_nat0] += natural_deaths
+                    model.output[Fish.species][:natural_mortality][:natJ_biom0] += natural_deaths * Fish.Ww
                 elseif floor(Fish.Age / 365.0 ) == 1.0
                     model.output[Fish.species][:fishing][:fished1] += fishing_deaths
                     model.output[Fish.species][:fishing][:fished1_biom] += fishing_deaths * Fish.Ww
-                    model.output[Fish.species][:fishing][:deadJ_nat1] += natural_deaths
-                    model.output[Fish.species][:fishing][:natJ_biom1] += natural_deaths * Fish.Ww
+                    model.output[Fish.species][:natural_mortality][:deadJ_nat1] += natural_deaths
+                    model.output[Fish.species][:natural_mortalitys][:natJ_biom1] += natural_deaths * Fish.Ww
                 end
         end
     end
 #if less than 1a certain threshold of ind, superindividual dies
     if  Fish.Nind <= Fish.Nind0 * model.natural_mortalities[Fish.species][:death_threshold] && !Fish.Dead
             Fish.Dead = true
-            model.output[Fish.species][:fishing][:deadJ_nat] += Fish.Nind
+            model.output[Fish.species][:natural_mortality][:deadJ_nat] += Fish.Nind
     end
 return
 end
@@ -240,7 +240,7 @@ function juveDEB!(Fish, model)
         deltaH = 0.0
         deltaR = 0.0
 
-        v_T = model.DEB_all_params[:v_rate] * deb_species.Tc_value
+        v_T = model.DEB_parameters_all[:v_rate] * deb_species.Tc_value
 
         # Energy fluxes
         pA = (Fish.f_i * deb_species.p_Am* deb_species.Tc_value * deb_species.s_M_i * (Vdyn ^ (2/3)))
@@ -285,7 +285,7 @@ function juveDEB!(Fish, model)
         Fish.Lw = (V ^ (1/3)) / deb_species.del_M
         Fish.H = Hdyn + deltaH
         Fish.R = Rdyn + deltaR
-        Fish.Ww = (model.DEB_all_params[:w] *(model.DEB_all_params[:d_V] * V + model.DEB_all_params[:w_E]/ model.DEB_all_params[:mu_E] * (Fish.En + Fish.R)))
+        Fish.Ww = (model.DEB_parameters_all[:w] *(model.DEB_parameters_all[:d_V] * V + model.DEB_parameters_all[:w_E]/ model.DEB_parameters_all[:mu_E] * (Fish.En + Fish.R)))
         Fish.Scaled_En = Fish.En / (deb_derived.Em * (( Fish.Lw * deb_species.del_M)^3.0))
 
         #check whether Lm is a vector or a float
@@ -359,6 +359,14 @@ end
 
 function adultdie!(Fish, model)
 
+    if is_sardine(Fish)
+        natM = NamedTuple(model.natural_mortalities[:sardine])
+        fishM = NamedTuple(model.fishing_mortalities[:sardine])
+    else
+        natM = NamedTuple(model.natural_mortalities[:anchovy])
+        fishM = NamedTuple(model.fishing_mortalities[:anchovy])
+    end
+
     # Initialize deaths
     natural_deaths = 0.0
     total_deaths = 0.0
@@ -369,20 +377,20 @@ function adultdie!(Fish, model)
 
          #set the new AGE DEPENDENT MORTALITIES -- If Mf is not 0, it is added to M
          if floor(Fish.Age / 365.0 ) == 0.0
-             Mf = (model.MF0_value/365.0)
-             M = model.M0 + Mf
+             Mf = fishM.M_f0
+             M = natM.M0 + Mf
          elseif floor(Fish.Age / 365.0 ) == 1.0
-            Mf = (model.MF1_value/365.0)
-             M = model.M1 + Mf
+            Mf = fishM.M_f1
+            M = natM.M1 + Mf
          elseif floor(Fish.Age / 365.0 ) == 2.0
-            Mf = (model.MF2_value/365.0)
-             M = model.M2 + Mf
+            Mf = fishM.M_f2
+            M = natM.M2 + Mf
          elseif floor(Fish.Age / 365.0 ) == 3.0
-            Mf =  (model.MF3_value/365.0)
-             M = model.M3 + Mf
+            Mf = fishM.M_f3
+            M = natM.M3 + Mf
          else
-            Mf = (model.MF4_value/365.0)
-            M = model.M4 + Mf
+            Mf = fishM.M_f4
+            M = natM.M4 + Mf
          end
 
          
@@ -408,44 +416,45 @@ function adultdie!(Fish, model)
             # Update Fish.Nind
             Fish.Nind -= total_deaths
 
-            # Update total mortality events
-            model.fished += fishing_deaths
-            model.fishedW += fishing_deaths * Fish.Ww
-            model.deadA_nat += natural_deaths
-            model.natA_biom += natural_deaths * Fish.Ww
+            #total deaths
+            model.output[Fish.species][:fishing][:fishedW] += fishing_deaths * Fish.Ww
+            model.output[Fish.species][:fishing][:fished] += fishing_deaths
+            model.output[Fish.species][:natural_mortality][:deadJ_nat] += natural_deaths
+            model.output[Fish.species][:natural_mortality][:natJ_biom] += natural_deaths * Fish.Ww
+
 
             # differentiate mortality with age
             if floor(Fish.Age / 365.0 ) == 0.0
-                model.fished0 += fishing_deaths
-                model.fished0_biom += fishing_deaths * Fish.Ww
-                model.deadA_nat0 += natural_deaths
-                model.natA_biom0 += natural_deaths * Fish.Ww
+                model.output[Fish.species][:fishing][:fished0] += fishing_deaths
+                model.output[Fish.species][:fishing][:fished0_biom] += fishing_deaths * Fish.Ww
+                model.output[Fish.species][:natural_mortality][:deadA_nat0] += natural_deaths
+                model.output[Fish.species][:natural_mortality][:natA_biom0] += natural_deaths * Fish.Ww
             elseif floor(Fish.Age / 365.0 ) == 1.0
-                model.fished1 += fishing_deaths
-                model.fished1_biom += fishing_deaths * Fish.Ww
-                model.deadA_nat1 += natural_deaths
-                model.natA_biom1 += natural_deaths * Fish.Ww
+                model.output[Fish.species][:fishing][:fished1] += fishing_deaths
+                model.output[Fish.species][:fishing][:fished1_biom] += fishing_deaths * Fish.Ww
+                model.output[Fish.species][:natural_mortality][:deadA_nat1] += natural_deaths
+                model.output[Fish.species][:natural_mortality][:natA_biom1] += natural_deaths * Fish.Ww
             elseif floor(Fish.Age / 365.0 ) == 2.0
-                model.fished2 += fishing_deaths
-                model.fished2_biom += fishing_deaths * Fish.Ww
-                model.deadA_nat2 += natural_deaths
-                model.natA_biom2 += natural_deaths * Fish.Ww
+                model.output[Fish.species][:fishing][:fished2] += fishing_deaths
+                model.output[Fish.species][:fishing][:fished2_biom] += fishing_deaths * Fish.Ww
+                model.output[Fish.species][:natural_mortality][:deadA_nat2] += natural_deaths
+                model.output[Fish.species][:natural_mortality][:natA_biom2] += natural_deaths * Fish.Ww
             elseif floor(Fish.Age / 365.0 ) == 3.0
-                model.fished3 += fishing_deaths
-                model.fished3_biom += fishing_deaths * Fish.Ww
-                model.deadA_nat3 += natural_deaths
-                model.natA_biom3 += natural_deaths * Fish.Ww
+                model.output[Fish.species][:fishing][:fished3] += fishing_deaths
+                model.output[Fish.species][:fishing][:fished3_biom] += fishing_deaths * Fish.Ww
+                model.output[Fish.species][:natural_mortality][:deadA_nat3] += natural_deaths
+                model.output[Fish.species][:natural_mortality][:natA_biom3] += natural_deaths * Fish.Ww
             else
-                model.fished4more += fishing_deaths
-                model.fished4more_biom += fishing_deaths * Fish.Ww
-                model.deadA_nat4more += natural_deaths
-                model.natA_biom4more += natural_deaths * Fish.Ww
+                model.output[Fish.species][:fishing][:fished4more] += fishing_deaths
+                model.output[Fish.species][:fishing][:fished4more_biom] += fishing_deaths * Fish.Ww
+                model.output[Fish.species][:natural_mortality][:deadA_nat4more] += natural_deaths
+                model.output[Fish.species][:natural_mortality][:natA_biom4more] += natural_deaths * Fish.Ww
             end
      end
 
     if Fish.Nind <= Fish.Nind0 * model.death_threshold && !Fish.Dead
         Fish.Dead = true
-        model.deadA_nat += Fish.Nind
+        model.output[Fish.species][:natural_mortality][:deadA_nat] += Fish.Nind
     end
     return
 end
@@ -453,14 +462,22 @@ end
 
 function adultDEB!(Fish, model)
 
+    if is_sardine(Fish)
+        deb_species = NamedTuple(model.DEB_species_specific_params[:sardine])
+        deb_derived = NamedTuple(model.DEB_derived_params[:sardine])
+    else
+        deb_species = NamedTuple(model.DEB_species_specific_params[:anchovy])
+        deb_derived = NamedTuple(model.DEB_derived_params[:anchovy])
+    end
+
 if !Fish.Dead
     Fish.f_i = model.f
-    Vdyn = (Fish.Lw * model.del_M) ^ 3.0
+    Vdyn = (Fish.Lw * deb_species.del_M) ^ 3.0
     Endyn = Fish.En
-    Hdyn = model.Hp
+    Hdyn = deb_species.Hp
     Rdyn = Fish.R
 
-    p_M_T = model.p_M * model.Tc_value # this should be in the update environment module
+    p_M_T = deb_species.p_M * deb_species.Tc_value # this should be in the update environment module
     
     deltaV = 0.0
     deltaEn  = 0.0
@@ -469,51 +486,51 @@ if !Fish.Dead
     
     # Energy fluxes
     
-    pA = (Fish.f_i * model.p_Am * model.Tc_value * Fish.s_M_i * (Vdyn ^ (2/3)))
+    pA = (Fish.f_i * deb_species.p_Am * deb_species.Tc_value * Fish.s_M_i * (Vdyn ^ (2/3)))
     pS = p_M_T * Vdyn
-    pC = ((Endyn/Vdyn) * (model.Eg * (model.v_rate * model.Tc_value) * Fish.s_M_i * (Vdyn ^ (2/3)) + pS) / (model.Kappa_value * (Endyn/ Vdyn) + model.Eg))
-    pJ = model.k_J * Hdyn  * model.Tc_value # should not take into account the temperature?
-    deltaEn = (pA - pC) * model.DEB_timing
-    
-    deltaV = ((model.Kappa_value * pC - pS) / model.Eg) * model.DEB_timing #pG
+    pC = ((Endyn/Vdyn) * (deb_derived.Eg * (model.DEB_parameters_all[:v_rate] * deb_species.Tc_value) * Fish.s_M_i * (Vdyn ^ (2/3)) + pS) / (deb_species.Kappa * (Endyn/ Vdyn) + deb_derived.Eg))
+    pJ = model.DEB_parameters_all[:k_J] * Hdyn  * deb_species.Tc_value # should not take into account the temperature?
+    deltaEn = (pA - pC)
+
+    deltaV = ((deb_species.Kappa * pC - pS) / deb_derived.Eg)#pG
     if (deltaV < 0.0) 
         deltaV = 0.0
     end
     
     #starvation
-    if ((model.Kappa_value * pC) < pS)
-        if (Rdyn < ((pS - (model.Kappa_value * pC)) * model.DEB_timing))
-            model.deadA_starved += Fish.Nind
-            model.starvedA_biom += Fish.Nind * Fish.Ww
+    if ((deb_species.Kappa * pC) < pS)
+        if (Rdyn < ((pS - (deb_species.Kappa * pC))))
+            model.output[Fish.species][:starvation][:deadA_starved] += Fish.Nind
+            model.output[Fish.species][:starvation][:starvedA_biom] += Fish.Nind * Fish.Ww
 
             #keep track of the ages
             if (floor(Fish.Age / 365.0 ) == 0.0)
-                model.deadA_starved0 += Fish.Nind
-                model.starvedA_biom0 += Fish.Nind * Fish.Ww
+                model.output[Fish.species][:starvation][:deadA_starved0] += Fish.Nind
+                model.output[Fish.species][:starvation][:starvedA_biom0] += Fish.Nind * Fish.Ww
             elseif (floor(Fish.Age / 365.0 ) == 1.0)
-                model.deadA_starved1 += Fish.Nind
-                model.starvedA_biom1 += Fish.Nind * Fish.Ww
+                model.output[Fish.species][:starvation][:deadA_starved1] += Fish.Nind
+                model.output[Fish.species][:starvation][:starvedA_biom1] += Fish.Nind * Fish.Ww
             elseif (floor(Fish.Age / 365.0 ) == 2.0)
-                model.deadA_starved2 += Fish.Nind
-                model.starvedA_biom2 += Fish.Nind * Fish.Ww
+                model.output[Fish.species][:starvation][:deadA_starved2] += Fish.Nind
+                model.output[Fish.species][:starvation][:starvedA_biom2] += Fish.Nind * Fish.Ww
             elseif (floor(Fish.Age / 365.0 ) == 3.0)
-                model.deadA_starved3 += Fish.Nind
-                model.starvedA_biom3 += Fish.Nind * Fish.Ww
+                model.output[Fish.species][:starvation][:deadA_starved3] += Fish.Nind
+                model.output[Fish.species][:starvation][:starvedA_biom3] += Fish.Nind * Fish.Ww
             else
-                model.deadA_starved4more += Fish.Nind
-                model.starvedA_biom4more += Fish.Nind * Fish.Ww
+                model.output[Fish.species][:starvation][:deadA_starved4more] += Fish.Nind
+                model.output[Fish.species][:starvation][:starvedA_biom4more] += Fish.Nind * Fish.Ww
             end
 
             Fish.Dead = true
             return
         else
             #take energy from repro reserve in case of starvation
-            Rdyn = (Rdyn - (pS - (model.Kappa_value * pC)) * model.DEB_timing)
+            Rdyn = (Rdyn - (pS - (deb_species.Kappa * pC)))
         end
     end
 
     #maturing energy
-    deltaR = (((1- model.Kappa_value)* pC - pJ)* model.DEB_timing)
+    deltaR = (((1- deb_species.Kappa)* pC - pJ))
 
     if (deltaR < 0.0)
         deltaR = 0.0
@@ -521,16 +538,16 @@ if !Fish.Dead
     
     Fish.En = Endyn + deltaEn
     V = Vdyn + deltaV
-    Fish.Lw = (V ^ (1/3)) / model.del_M
+    Fish.Lw = (V ^ (1/3)) / deb_species.del_M
     Fish.H = Hdyn + deltaH
     Fish.R = Rdyn + deltaR
-    Fish.Ww = (model.w *(model.d_V * V + model.w_E/ model.mu_E * (Fish.En + Fish.R)))
-    Fish.L = Fish.Lw * model.del_M
-    Fish.Scaled_En= Fish.En / (model.Em * (( Fish.Lw * model.del_M)^3.0))
-    Fish.pA = Fish.f_i * model.p_Am * model.Tc_value * Fish.s_M_i * ((Fish.Lw * model.del_M)^2.0)
+    Fish.Ww = (model.DEB_parameters_all[:w] *(model.DEB_parameters_all[:d_V] * V + model.DEB_parameters_all[:w_E]/model.DEB_parameters_all[:mu_E] * (Fish.En + Fish.R)))
+    Fish.L = Fish.Lw * deb_species.del_M
+    Fish.Scaled_En= Fish.En / (deb_derived.Em * (( Fish.Lw * deb_species.del_M)^3.0))
+    Fish.pA = Fish.f_i * deb_species.p_Am * deb_species.Tc_value * Fish.s_M_i * ((Fish.Lw * deb_species.del_M)^2.0)
     Fish.CI = 100 * Fish.Ww / (Fish.Lw^3)
-    Fish.GSI = (model.w * (model.w_E / model.mu_E) * Fish.R) / Fish.Ww * 100
-    Fish.Scaled_En = Fish.En / (model.Em * (( Fish.Lw * model.del_M)^3.0))
+    Fish.GSI = (model.DEB_parameters_all[:w] * (model.DEB_parameters_all[:w_E] / model.DEB_parameters_all[:mu_E]) * Fish.R) / Fish.Ww * 100
+    Fish.Scaled_En = Fish.En / (deb_derived.Em * (( Fish.Lw * deb_species.del_M)^3.0))
 
 end
 return
@@ -548,21 +565,31 @@ function adultspawn!(Fish, model)
     Fish.reproduction = :nonspawner
     Fish.superind_Neggs = 0.0
 
-#1st condition to reproduce not being dead
-if  ((model.repro_start <= model.day_of_the_year <= 365.0) || (1.0 <= model.day_of_the_year <= model.repro_end))
+    
+if is_sardine(Fish)
+    first_cond = ((model.DEB_parameters_all[:repro_start_sardine] <= model.day_of_the_year <= 365.0) || (1.0 <= model.day_of_the_year <= model.DEB_parameters_all[:repro_end_sardine]))
+    deb_species = NamedTuple(model.DEB_species_specific_params[:sardine])
+    fecundity = 400.0
+else
+    first_cond = ((model.DEB_parameters_all[:repro_start_anchovy] <= model.initial_conditions[:day_of_the_year] <= model.DEB_parameters_all[:repro_end_anchovy]))
+    deb_species = NamedTuple(model.DEB_species_specific_params[:anchovy])
+    fecundity = 450.0
+end
+
+    if first_cond
           
             # 3th condition: random number between 0 and 1 is smaller than the probability of spawning, then reproduction occurs
             #(rand() <= model.prob_dict[model.day_of_the_year])
 
-            Wg = (model.w * (model.w_E / model.mu_E) * Fish.R)
+            Wg = (model.DEB_parameters_all[:w] * (model.DEB_parameters_all[:w_E] / model.DEB_parameters_all[:mu_E]) * Fish.R)
             free_weight = Fish.Ww - Wg
             #eggs from all females
-            superind_Neggs_value = Float64(400.0 * free_weight) * ceil((Fish.Nind/2.0)) 
+            superind_Neggs_value = Float64(fecundity * free_weight) * ceil((Fish.Nind/2.0)) 
             #eggs from one female
-            Neggs_value_single = Float64(400.0 * free_weight) #420 standard number of eggs per weight of female
+            Neggs_value_single = Float64(fecundity * free_weight) #420 standard number of eggs per weight of female
 
             # Then determine the energy content of the eggs from maternal effects
-            Fish.maternal_EggEn = Float64(((model.E0_max - model.E0_min) / (1.0- model.ep_min)) * (Fish.Scaled_En - model.ep_min)) + model.E0_min
+            Fish.maternal_EggEn = Float64(((deb_species.E0_max - deb_species.E0_min) / (1.0- deb_species.ep_min)) * (Fish.Scaled_En - deb_species.ep_min)) + deb_species.E0_min
             # spawned energy of a single female, we assume it's the same for all female and male
             spawned_en = Neggs_value_single *  Fish.maternal_EggEn #Fish.R * Kappa_valueR / spawn_period 
 
