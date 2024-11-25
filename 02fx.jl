@@ -52,7 +52,7 @@ function update_Tc!(model, Tc::Float64, species::Symbol)
     model.species_specific_DEB_params[species][:Tc_value] = Tc
 end
 
-function update_Tc!(model, Tc::Vector{Float64}species::Symbol)
+function update_Tc!(model, Tc::Vector{Float64}, species::Symbol)
     model.species_specific_DEB_params[species][:Tc_value]  = Tc[model.initial_conditions[:sim_timing]]
 end
 
@@ -156,10 +156,15 @@ function sort_agent(agent_type, species::Symbol, model, feature)
 end 
 
 function calculate_mean_prop(model, species::Symbol, prop; type = missing, age = missing)
+
     all_agents = filter(agent -> hasid(model, agent.id), collect(values(allagents(model))))
+
     if species != :all
         all_agents = filter(agent -> agent.species == species, all_agents)
+    else
+        all_agents = filter(agent -> agent.species == :sardine || agent.species == :anchovy, all_agents)
     end
+
     filtered_agents = filter(agent -> (ismissing(type) || agent.type == type) && (ismissing(age) || agent.Age >= age), all_agents)
 
     if isempty(filtered_agents)
@@ -235,7 +240,7 @@ function calculate_real_assimilation(model, species::Symbol)
     end
 end
 
-function calculate_species_max_assimilation(model, species::Symbol)
+function calculate_max_assimilation(model, species::Symbol)
 
     all_agents = collect(values(allagents(model)))
 
@@ -259,7 +264,7 @@ function calculate_species_max_assimilation(model, species::Symbol)
         Nind_values = [getfield(agent, Symbol("Nind")) for agent in filtered_agents]
         #the total max assimilation of the Superindividuals
         # Perform element-wise operations and calculate the sum
-        denom = sum(Nind_values .* (p_Am_values .* Tc_value .* s_M_i_values .* ((Lw_values .* model.del_M) .^ 2)))
+        denom = sum(Nind_values .* (p_Am_values .* Tc_value .* s_M_i_values .* ((Lw_values .* model.species_specific_DEB_params[species][:del_M]) .^ 2)))
     end
     return denom
 end

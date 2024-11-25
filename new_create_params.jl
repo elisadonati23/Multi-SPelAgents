@@ -4,6 +4,8 @@ include("03agents.jl")
 include("07agent_step!.jl")
 include("08simulation_step.jl")
 include("02fx.jl")
+include("06initialize.jl")
+include("05generate.jl")
 
 
 function create_params_dict(
@@ -35,8 +37,8 @@ function create_params_dict(
                 :M1a => M1a / 365.0,
                 :M2a => M2a / 365.0,
                 :M3a => M3a / 365.0,
-                :M4a => M4a / 365.0
-        )),
+                :M4a => M4a / 365.0)
+                ),
         :fishing_mortalities => Dict(
             :sardine => Dict(
                 :M_f0 => M_f0s / 365.0,
@@ -49,8 +51,8 @@ function create_params_dict(
                 :M_f1 => M_f1a / 365.0,
                 :M_f2 => M_f2a / 365.0,
                 :M_f3 => M_f3a / 365.0,
-                :M_f4 => M_f4a / 365.0
-        )),
+                :M_f4 => M_f4a / 365.0)
+                ),
         :initial_conditions => Dict(
             :No_As => No_As,
             :No_Js => No_Js,
@@ -66,7 +68,7 @@ function create_params_dict(
             :Xmax_value => Xmax[1],
             :Temp => Temp,
             :Nsuperind => No_Aa + No_Ja + No_Egga + No_As + No_Js + No_Eggs,
-            :f => 0.8
+            :f => 0.8,
             :year => 1.0
         ),
         :DEB_parameters_all => Dict(
@@ -363,83 +365,11 @@ prova = create_params_dict(
     1.08,	0.86,	0.69,	0.62,	0.48)
 
 
-    function model_initialize_parallel(
-        No_As, No_Js, No_Eggs, No_Aa, No_Ja, No_Egga,
-        Wv, day_of_the_year, Xmax::Union{Float64, Vector{Float64}}, Temp::Union{Float64, Vector{Float64}},
-        Kappas::Union{Float64, Vector{Float64}}, Kappaa::Union{Float64, Vector{Float64}},
-        M_f0s::Union{Float64, Vector{Float64}}, M_f1s::Union{Float64, Vector{Float64}},
-        M_f2s::Union{Float64, Vector{Float64}}, M_f3s::Union{Float64, Vector{Float64}},
-        M_f4s::Union{Float64, Vector{Float64}}, M_f0a::Union{Float64, Vector{Float64}},
-        M_f1a::Union{Float64, Vector{Float64}}, M_f2a::Union{Float64, Vector{Float64}},
-        M_f3a::Union{Float64, Vector{Float64}}, M_f4a::Union{Float64, Vector{Float64}},
-        M_egg::Float64, M0s::Float64, M1s::Float64, M2s::Float64, M3s::Float64, M4s::Float64,
-        M0a::Float64, M1a::Float64, M2a::Float64, M3a::Float64, M4a::Float64
-    )
-    
-        # Generate model parameters using the provided inputs
-    
-        properties = create_params_dict(
-            No_As, No_Js, No_Eggs, No_Aa, No_Ja, No_Egga,
-            Wv, day_of_the_year, Xmax::Union{Float64, Vector{Float64}}, Temp::Union{Float64, Vector{Float64}},
-            Kappas::Union{Float64, Vector{Float64}}, Kappaa::Union{Float64, Vector{Float64}},
-            M_f0s::Union{Float64, Vector{Float64}}, M_f1s::Union{Float64, Vector{Float64}},
-            M_f2s::Union{Float64, Vector{Float64}}, M_f3s::Union{Float64, Vector{Float64}},
-            M_f4s::Union{Float64, Vector{Float64}}, M_f0a::Union{Float64, Vector{Float64}},
-            M_f1a::Union{Float64, Vector{Float64}}, M_f2a::Union{Float64, Vector{Float64}},
-            M_f3a::Union{Float64, Vector{Float64}}, M_f4a::Union{Float64, Vector{Float64}},
-            M_egg::Float64, M0s::Float64, M1s::Float64, M2s::Float64, M3s::Float64, M4s::Float64,
-            M0a::Float64, M1a::Float64, M2a::Float64, M3a::Float64, M4a::Float64
-        )
-        # Create the Agent-Based Model (ABM) for Sardines
-        model = ABM(
-            Fish;
-            properties = properties,
-            model_step! = complex_step!
-        )
-    
-        # Add agents to the model: Adults, Juveniles, and EggMass
-        generate_Adult(No_As, model, :sardine)
-        generate_Juvenile(No_Js, model, :sardine)
-        generate_EggMass(No_Eggs, model, :sardine)
 
-        generate_Adult(No_Aa, model, :anchovy)
-        generate_Juvenile(No_Ja, model, :anchovy)
-        generate_EggMass(No_Egga, model, :anchovy)
-    
-    
-        ## Calculate the mean length-weight (Lw) for initialization
-        mean_Lw = calculate_mean_prop(model, "Lw")
-    
-        ## Collect all agents in the model
-        agents = collect(values(allagents(model)))
-    
-        ## Filter the agents based on type (Adults and Juveniles)
-        adults = filter(a -> a.type == :adult, agents)
-        juveniles = filter(a -> a.type == :juvenile, agents)
-    
-        ## Determine the initial value of functional response (f)
-        if isempty(adults) && isempty(juveniles)    
-            model.f = 0.8
-        #else
-            # sim_timing = 1 at initialization, so directly index Xmax and Tc
-            f = (model.Xmax[model.sim_timing] * model.Wv * model.KappaX) / 
-                (model.p_Am * model.Tc[model.sim_timing] * model.s_M * ((mean_Lw * model.del_M) ^ 2))
-    
-        # Ensure f is within the range [0, 1]
-        model.initial_conditions[:f] = max(0, min(f, 1.0))
-        end
-    
-        ## Assign the calculated f to all agents in the model
-        for agent in agents
-            agent.f_i = model.initial_conditions[:f]
-        end
-    
-        return model
-    end
     
     model = model_initialize_parallel(
         # Nind
-        1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+        1000.0, 1000.0, 1000.0, 1000.0, 1000.0, 1000.0,
         #initial cond 
         1.7e14, 1.0, 5.0, 15.0,
         #Kappa
@@ -452,3 +382,5 @@ prova = create_params_dict(
         0.9998,	1.08,	0.86,	0.69,	0.62,	0.48,
         #Ma
         1.08,	0.86,	0.69,	0.62,	0.48)
+
+        model.initial_conditions[:f]

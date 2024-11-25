@@ -37,29 +37,28 @@ function evolve_environment!(model)
     update_timeseries(model, :anchovy)
 
     # Calculate Xall
-    model.initial_conditions[:Xall] = max(0, (model.initial_conditions[:Xmax_value] - (calculate_real_assimilation(model) / model.DEB_parameters_all[:KappaX]) / model.initial_conditions[:Wv]))
+    model.initial_conditions[:Xall] = max(0, (model.initial_conditions[:Xmax_value] - (calculate_real_assimilation(model, :all) / model.DEB_parameters_all[:KappaX]) / model.initial_conditions[:Wv]))
     
     # Update response function f
-    max_assimilation = calculate_max_assimilation(model)
+    max_assimilation = calculate_max_assimilation(model, :sardine) + calculate_max_assimilation(model, :anchovy)
     
     if ismissing(max_assimilation) || max_assimilation == 0.0 || isnan(max_assimilation)
         f = 0.0
     else
         # Ratio between available food and what is consumed based on size and Tc
-        f = (model.Xmax_value * model.Wv * model.KappaX) / max_assimilation
+        f = (model.initial_conditions[:Xmax_value] * model.initial_conditions[:Wv] * model.DEB_parameters_all[:KappaX]) / max_assimilation
     end
 
     # Ensure that f is bounded between 0 and 1
-    model.f = max(0, min(f, 1.0))
+    model.initial_conditions[:f] = max(0, min(f, 1.0))
 
     adults_juve = filter(a -> a.type == :adult || a.type == :juvenile, collect(values(allagents(model))))
 
     # If there are no adults or juveniles, set f to 0.8.
     # This prevents numerical instability when there are no agents in the model that feed exogenously.
     if isempty(adults_juve)
-        model.f = 0.8 
+        model.initial_conditions[:f] = 0.8 
     end
-
     return
 end
 
