@@ -16,19 +16,19 @@ function create_params_dict(
         :natural_mortalities => Dict(
             :sardine => Dict(
                 :M_egg => M_egg,
-                :M0 => M0 ./ 365.0,
-                :M1 => M1 ./ 365.0,
-                :M2 => M2 ./ 365.0,
-                :M3 => M3 ./ 365.0,
-                :M4 => M4 ./ 365.0,
+                :M0 => M0s ./ 365.0,
+                :M1 => M1s ./ 365.0,
+                :M2 => M2s ./ 365.0,
+                :M3 => M3s ./ 365.0,
+                :M4 => M4s ./ 365.0,
                 :death_threshold => 0.01),
             :anchovy => Dict(
                 :M_egg => M_egg,
-                :M0 => M0 ./ 365.0,
-                :M1 => M1 ./ 365.0,
-                :M2 => M2 ./ 365.0,
-                :M3 => M3 ./ 365.0,
-                :M4 => M4 ./ 365.0,
+                :M0 => M0a ./ 365.0,
+                :M1 => M1a ./ 365.0,
+                :M2 => M2a ./ 365.0,
+                :M3 => M3a ./ 365.0,
+                :M4 => M4a ./ 365.0,
                 :death_threshold => 0.01)
                 ),
         :fishing_mortalities => Dict(
@@ -339,3 +339,7 @@ function create_params_dict(
             )
     return model_parameters
 end
+
+
+
+    
