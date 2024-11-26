@@ -1,517 +1,341 @@
-function create_params(
-    No_As,  
-    No_Js, 
-    No_Eggs,
-    No_Aa,  
-    No_Ja, 
-    No_Egga,  
-    M_f0s::Union{Float64, Vector{Float64}},
-    M_f1s::Union{Float64, Vector{Float64}},
-    M_f2s::Union{Float64, Vector{Float64}},
-    M_f3s::Union{Float64, Vector{Float64}},
-    M_f4s::Union{Float64, Vector{Float64}},
-    M_f0a::Union{Float64, Vector{Float64}},
-    M_f1a::Union{Float64, Vector{Float64}},
-    M_f2a::Union{Float64, Vector{Float64}},
-    M_f3a::Union{Float64, Vector{Float64}},
-    M_f4a::Union{Float64, Vector{Float64}},  # Fishing mortality (from 0 to 4 /year)
-    Wv,
-    day_of_the_year,
-    Xmax::Union{Float64, Vector{Float64}},
-    Kappas::Union{Float64, Vector{Float64}},
-    Kappaa::Union{Float64, Vector{Float64}},
-    Temp::Union{Float64, Vector{Float64}},
-    M_egg::Float64,
-    M0s::Float64,
-    M1s::Float64,
-    M2s::Float64,
-    M3s::Float64,
-    M4s::Float64,
-    M0a::Float64,
-    M1a::Float64,
-    M2a::Float64,
-    M3a::Float64,
-    M4a::Float64
+function create_params_dict(
+    No_As, No_Js, No_Eggs, No_Aa, No_Ja, No_Egga,
+    Wv, day_of_the_year, Xmax::Union{Float64, Vector{Float64}}, Temp::Union{Float64, Vector{Float64}},
+    Kappas::Union{Float64, Vector{Float64}}, Kappaa::Union{Float64, Vector{Float64}},
+    M_f0s::Union{Float64, Vector{Float64}}, M_f1s::Union{Float64, Vector{Float64}},
+    M_f2s::Union{Float64, Vector{Float64}}, M_f3s::Union{Float64, Vector{Float64}},
+    M_f4s::Union{Float64, Vector{Float64}}, M_f0a::Union{Float64, Vector{Float64}},
+    M_f1a::Union{Float64, Vector{Float64}}, M_f2a::Union{Float64, Vector{Float64}},
+    M_f3a::Union{Float64, Vector{Float64}}, M_f4a::Union{Float64, Vector{Float64}},
+    M_egg::Float64, M0s::Float64, M1s::Float64, M2s::Float64, M3s::Float64, M4s::Float64,
+    M0a::Float64, M1a::Float64, M2a::Float64, M3a::Float64, M4a::Float64
 )
-    # Fixed parameters
-    M_egg = M_egg
-    M0s = M0s / 365.0   # Mortality rates per day
-    M1s = M1s / 365.0
-    M2s = M2s / 365.0
-    M3s = M3s / 365.0
-    M4s = M4s / 365.0
-    M0a = M0a / 365.0   # Mortality rates per day
-    M1a = M1a / 365.0
-    M2a = M2a / 365.0
-    M3a = M3a / 365.0
-    M4a = M4a / 365.0
 
+    # Define the dictionary
+    model_parameters = Dict(
+        :natural_mortalities => Dict(
+            :sardine => Dict(
+                :M_egg => M_egg,
+                :M0 => M0 ./ 365.0,
+                :M1 => M1 ./ 365.0,
+                :M2 => M2 ./ 365.0,
+                :M3 => M3 ./ 365.0,
+                :M4 => M4 ./ 365.0,
+                :death_threshold => 0.01),
+            :anchovy => Dict(
+                :M_egg => M_egg,
+                :M0 => M0 ./ 365.0,
+                :M1 => M1 ./ 365.0,
+                :M2 => M2 ./ 365.0,
+                :M3 => M3 ./ 365.0,
+                :M4 => M4 ./ 365.0,
+                :death_threshold => 0.01)
+                ),
+        :fishing_mortalities => Dict(
+            :sardine => Dict(
+                :M_f0 => M_f0s ./ 365.0,
+                :M_f1 => M_f1s ./ 365.0,
+                :M_f2 => M_f2s ./ 365.0,
+                :M_f3 => M_f3s ./ 365.0,
+                :M_f4 => M_f4s ./ 365.0),
+            :anchovy => Dict(
+                :M_f0 => M_f0a ./ 365.0,
+                :M_f1 => M_f1a ./ 365.0,
+                :M_f2 => M_f2a ./ 365.0,
+                :M_f3 => M_f3a ./ 365.0,
+                :M_f4 => M_f4a ./ 365.0)
+                ),
+        :initial_conditions => Dict(
+            :No_As => No_As,
+            :No_Js => No_Js,
+            :No_Eggs => No_Eggs,
+            :No_Aa => No_Aa,
+            :No_Ja => No_Ja,
+            :No_Egga => No_Egga,
+            :Xmax => Xmax[1],
+            :Wv => Wv,
+            :day_of_the_year => day_of_the_year,
+            :sim_timing => 1,
+            :Xall => Xmax[1],
+            :Xmax_value => Xmax[1],
+            :Temp => Temp,
+            :Nsuperind => No_Aa + No_Ja + No_Egga + No_As + No_Js + No_Eggs,
+            :f => 0.8,
+            :year => 1.0
+        ),
+        :DEB_parameters_all => Dict(
+            :KappaX => 0.8,
+            :KappaR => 0.95,
+            :Fm => 6.5,
+            :k_J => 0.002,
+            :d_V => 0.2,
+            :mu_V => 500000.0,
+            :mu_E => 550000.0,
+            :w_V => 23.9,
+            :w_E => 23.9,
+            :w => 5.0,
+            :Sex_ratio => 0.5,
+            :repro_start_sardine => 270.0,
+            :repro_end_sardine => 90.0,
+            :total_repro_sardine => 10,
+            :repro_start_anchovy => 90.0,
+            :repro_end_anchovy => 270.0,
+            :std_dev => 60
+        ),
+        :species_specific_DEB_params => Dict(
+            :sardine => Dict(
+                :Kappa => Kappas,
+                :p_Am => 554.351,
+                :v_rate => 0.0216466,
+                :del_M => 0.1152,
+                :s_M => 2.25531,
+                :p_M => 438.602,
+                :Eg => 5017.55,
+                :Hb => 0.0157489,
+                :Hj => 0.187349,
+                :Hp => 4553.63,
+                :Lb => 0.0279366,
+                :Lj => 0.0630058,
+                :Lp => 1.19937,
+                :meanjL => 5.0,
+                :maxjL => 5.5,
+                :minjL => 4.5,
+                :sdjL => 0.5,
+                :meanaL => 15.0,
+                :maxaL => 20.0,
+                :minaL => 10.0,
+                :sdaL => 2.0,
+                :Ab => 6.56247,
+                :Ap => 202.166,
+                :Am => 3461.0,
+                :E0 => 1.47992,
+                :ep_min => 0.218697,
+                :E0_min => 0.3,
+                :E0_max => 0.694024,
+                :L0 => 0.001,
+                :W0 => 0.000150792,
+                :Ta => 8000.0,
+                :Tr => 293.0,
+                # Arrhenius temperature function (can be a value or vector depending on Temp)
+                :Tc => exp.(8000.0 / 293.0 .- 8000.0 ./ (Temp .+ 273.0)),
+                :Tc_value => exp.(8000.0 / 293.0 .- 8000.0 ./ (Temp[1] .+ 273.0))
+            ),
+            :anchovy => Dict(
+                :Kappa => Kappaa,
+                :p_Am => 11.1372,
+                :v_rate => 0.01944,
+                :del_M => 0.1656,
+                :s_M => 17.3829,
+                :p_M => 54.67,
+                :Eg => 5077.0,
+                :Hb => 0.0001223,
+                :Hj => 0.6471,
+                :Hp => 244.0,
+                :Lb => 0.0133472,
+                :Lj => 0.232013,
+                :Lp => 1.50,
+                :meanjL => 3.5,
+                :maxjL => 4.5,
+                :minjL => 2.5,
+                :sdjL => 0.5,
+                :meanaL => 13.0,
+                :maxaL => 18.0,
+                :minaL => 8.0,
+                :sdaL => 2.0,
+                :Ab => 6.0,
+                :Ap => 292.0,
+                :Am => 1825.0,
+                :E0 => 0.0137527,
+                :ep_min => 0.30,
+                :E0_min => 0.004,
+                :E0_max => 0.0137527,
+                :L0 => 0.001,
+                :W0 => 2.98e-6,
+                :Ta => 9800.0,
+                :Tr => 293.0,
+                # Arrhenius temperature function (can be a value or vector depending on Temp)
+                :Tc => exp.(9800.0 / 293.0 .- 9800.0 ./ (Temp .+ 273.0)),
+                :Tc_value => exp.(9800.0 / 293.0 .- 9800.0 ./ (Temp[1] .+ 273.0))
+            )
+        ),
+        :derived_params => Dict(
+            :sardine => Dict(
+            :Em => 554.351 / 0.0216466,
+            :Lm => Kappas .* 554.351 .* 2.25531 ./ 438.602,
+            :g => 5017.55 ./ (Kappas .* (554.351 / 0.0216466)),
+            :k_M => 438.602 / 5017.55),
+            :anchovy => Dict(
+            :Em => 11.1372 / 0.01944,
+            :Lm => Kappaa .* 11.1372 .* 17.3829 ./ 54.67,
+            :g => 5077.0 ./ (Kappaa .* (11.1372 / 0.01944)),
+            :k_M => 54.67 / 5077.0)
+        ),
+        :output => Dict(
+            :sardine => Dict(
+                :lifehistory => Dict(
+                    :TotB => 0.0,
+                    :JuvB => 0.0,
+                    :AdB => 0.0,
+                    :meanAdWw => 0.0,
+                    :sdAdWw => 0.0,
+                    :meanFAdWw => 0.0,
+                    :sdFAdWw => 0.0,
+                    :meanJuvWw => 0.0,
+                    :sdJuvWw => 0.0,
+                    :meanAdL => 0.0,
+                    :sdAdL => 0.0,
+                    :meanJuvL => 0.0,
+                    :sdJuvL => 0.0,
+                    :mean_tpuberty => 0.0,
+                    :sd_tpuberty => 0.0,
+                    :mean_Lw_puberty => 0.0,
+                    :sd_Lw_puberty => 0.0,
+                    :mean_Ww_puberty => 0.0,
+                    :sd_Ww_puberty => 0.0,
+                    :mean_Hjuve => 0.0,
+                    :sd_Hjuve => 0.0),
 
-    death_threshold = 0.01
+                :starvation => Dict(
+                    # starving mortality
+                    :deadJ_starved => 0.0,
+                    :deadJ_starved0 => 0.0,
+                    :deadJ_starved1 => 0.0,
+                    :starvedJ_biom => 0.0,
+                    :starvedJ_biom0 => 0.0,
+                    :starvedJ_biom1 => 0.0,
+                    :deadA_starved => 0.0,
+                    :deadA_starved0 => 0.0,
+                    :deadA_starved1 => 0.0,
+                    :deadA_starved2 => 0.0,
+                    :deadA_starved3 => 0.0,
+                    :deadA_starved4more => 0.0,
+                    :starvedA_biom => 0.0,
+                    :starvedA_biom0 => 0.0,
+                    :starvedA_biom1 => 0.0,
+                    :starvedA_biom2 => 0.0,
+                    :starvedA_biom3 => 0.0,
+                    :starvedA_biom4more => 0.0),
 
-    # Variable parameters
-    Kappa_value_s = Kappas[1] #KAppa rule value
-    Kappa_value_a = Kappaa[1] #KAppa rule value
+                :fishing => Dict(
+                    #fishing mortality
+                    :fished => 0.0,
+                    :fishedW => 0.0,
+                    :fished0 => 0.0,
+                    :fished1 => 0.0,
+                    :fished2 => 0.0,
+                    :fished3 => 0.0,
+                    :fished4more => 0.0,
+                    :fished0_biom => 0.0,
+                    :fished1_biom => 0.0,
+                    :fished2_biom => 0.0,
+                    :fished3_biom => 0.0,
+                    :fished4more_biom => 0.0),
 
-    MF0s_value = M_f0s[1]
-    MF1s_value = M_f1s[1]
-    MF2s_value = M_f2s[1]
-    MF3s_value = M_f3s[1]
-    MF4s_value = M_f4s[1]
-    MF0a_value = M_f0a[1]
-    MF1a_value = M_f1a[1]
-    MF2a_value = M_f2a[1]
-    MF3a_value = M_f3a[1]
-    MF4a_value = M_f4a[1]
+                :natural_mortality => Dict(
+                    :dead_eggmass => 0.0,
+                    :deadJ_nat => 0.0,
+                    :deadJ_nat0 => 0.0,
+                    :deadJ_nat1 => 0.0,
+                    :natJ_biom => 0.0,
+                    :natJ_biom0 => 0.0,
+                    :natJ_biom1 => 0.0,
 
-    # Default values for various parameters
-    f = 1.0 
-    r_food = 0.5
-    DEB_timing = 1.0
-    sim_timing = 1
+                    :deadA_nat => 0.0,
+                    :deadA_nat0 => 0.0,
+                    :deadA_nat1 => 0.0,
+                    :deadA_nat2 => 0.0,
+                    :deadA_nat3 => 0.0,
+                    :deadA_nat4more => 0.0,
+                    :natA_biom => 0.0,
+                    :natA_biom0 => 0.0,
+                    :natA_biom1 => 0.0,
+                    :natA_biom2 => 0.0,
+                    :natA_biom3 => 0.0,
+                    :natA_biom4more => 0.0)
+                    ),
+            :anchovy => Dict(
+                :lifehistory => Dict(
+                    :TotB => 0.0,
+                    :JuvB => 0.0,
+                    :AdB => 0.0,
+                    :meanAdWw => 0.0,
+                    :sdAdWw => 0.0,
+                    :meanFAdWw => 0.0,
+                    :sdFAdWw => 0.0,
+                    :meanJuvWw => 0.0,
+                    :sdJuvWw => 0.0,
+                    :meanAdL => 0.0,
+                    :sdAdL => 0.0,
+                    :meanJuvL => 0.0,
+                    :sdJuvL => 0.0,
+                    :mean_tpuberty => 0.0,
+                    :sd_tpuberty => 0.0,
+                    :mean_Lw_puberty => 0.0,
+                    :sd_Lw_puberty => 0.0,
+                    :mean_Ww_puberty => 0.0,
+                    :sd_Ww_puberty => 0.0,
+                    :mean_Hjuve => 0.0,
+                    :sd_Hjuve => 0.0),
 
-    # common DEB params
-    KappaX = 0.8  # Digestion efficiency
-    KappaR = 0.95  # Repro efficiency
-    Fm = 6.5  # Maximum specific searching rate
-    k_J = 0.002  # Maturity maintenance rate coefficient
-    d_V = 0.2  # Volume-specific density of structure
-    mu_V = 500000.0  # Chemical potential of structure
-    mu_E = 550000.0  # Chemical potential of reserve
-    w_V = 23.9  # Molecular weight of structure
-    w_E = 23.9  # Molecular weight of reserve
-    w = 5.0  # Conversion factor for energy to mass
-    Sex_ratio = 0.5
-    repro_start_sardine = 270.0  # Sardines reproduction starts in October
-    repro_end_sardine= 90.0     # Sardines reproduction ends in April
-    total_repro_sardine = 10
-    std_dev = 60
-    repro_start_anchovy = 90.0  # Sardines reproduction starts in October
-    repro_end_anchovy = 270.0 
+                :starvation => Dict(
+                    # starving mortality
+                    :deadJ_starved => 0.0,
+                    :deadJ_starved0 => 0.0,
+                    :deadJ_starved1 => 0.0,
+                    :starvedJ_biom => 0.0,
+                    :starvedJ_biom0 => 0.0,
+                    :starvedJ_biom1 => 0.0,
+                    :deadA_starved => 0.0,
+                    :deadA_starved0 => 0.0,
+                    :deadA_starved1 => 0.0,
+                    :deadA_starved2 => 0.0,
+                    :deadA_starved3 => 0.0,
+                    :deadA_starved4more => 0.0,
+                    :starvedA_biom => 0.0,
+                    :starvedA_biom0 => 0.0,
+                    :starvedA_biom1 => 0.0,
+                    :starvedA_biom2 => 0.0,
+                    :starvedA_biom3 => 0.0,
+                    :starvedA_biom4more => 0.0),
 
-    # DEB model parameters species specific
+                :fishing => Dict(
+                    #fishing mortality
+                    :fished => 0.0,
+                    :fishedW => 0.0,
+                    :fished0 => 0.0,
+                    :fished1 => 0.0,
+                    :fished2 => 0.0,
+                    :fished3 => 0.0,
+                    :fished4more => 0.0,
+                    :fished0_biom => 0.0,
+                    :fished1_biom => 0.0,
+                    :fished2_biom => 0.0,
+                    :fished3_biom => 0.0,
+                    :fished4more_biom => 0.0),
 
-    sardine_p_Am = 554.351	  # Maximum assimilation power
-    sardine_v_rate = 0.0216466  # Energy conductance
-    sardine_del_M = 0.1152  # Shape coefficient (isomorph)
-    sardine_s_M = 2.25531  # Acceleration factor
-    sardine_p_M = 438.602  # Volume-specific somatic maintenance
-    sardine_Eg = 5017.55  # Cost per unit of structure
+                :natural_mortality => Dict(
+                    :dead_eggmass => 0.0,
+                    :deadJ_nat => 0.0,
+                    :deadJ_nat0 => 0.0,
+                    :deadJ_nat1 => 0.0,
+                    :natJ_biom => 0.0,
+                    :natJ_biom0 => 0.0,
+                    :natJ_biom1 => 0.0,
 
-    anchovy_p_Am = 11.1372	  # Maximum assimilation power
-    anchovy_v_rate = 0.01944  # Energy conductance
-    anchovy_del_M = 0.1656  # Shape coefficient (isomorph)
-    anchovy_s_M = 17.3829  # Acceleration factor
-    anchovy_p_M = 54.67  # Volume-specific somatic maintenance
-    anchovy_Eg = 5077.00  # Cost per unit of structure
-
-    # Growth, puberty, and reproduction parameters
-
-    sardine_Hb = 0.0157489
-    sardine_Hj = 0.187349 #0.3478
-    sardine_Hp = 4553.63
-    sardine_Lb = 0.0279366
-    sardine_Lj = 0.0630058
-    sardine_Lp = 1.19937
-    sardine_Ab = 6.56247	
-    sardine_Ap = 202.166
-    sardine_Am = 3461.0
-    sardine_E0 = 1.47992
-    sardine_ep_min = 0.218697
-    sardine_E0_min = 0.3 # when you have a juvenile with the minimum enough energy to produce eggs in the reserve: it reflects the energy of the mother
-    sardine_E0_max = 0.694024
-    sardine_W0 = 0.000150792 # Addmypet
-    sardine_L0 = 0.001  # Initial length in cm
-    sardine_Ta = 8000.0  # Arrhenius temperature
-    sardine_Tr = 293.0   # Reference temperature
-
-    anchovy_Hb = 0.0001223
-    anchovy_Hj = 0.6471 #0.3478
-    anchovy_Hp = 244.0
-    anchovy_Lb = 0.0133472
-    anchovy_Lj = 0.232013
-    anchovy_Lp = 1.50
-    anchovy_Ab = 6.0
-    anchovy_Ap = 292.0
-    anchovy_Am = 1825.0
-    anchovy_E0 = 0.0137527
-    anchovy_ep_min = 0.30 
-    anchovy_E0_min =  0.004
-    anchovy_E0_max =  0.0137527 
-    anchovy_L0 = 0.001
-    anchovy_W0 = 2.98e-6
-    anchovy_Ta = 9800.0  # Arrhenius temperature
-    anchovy_Tr = 293.0   # Reference temperature
-
-    # Derived parameters based on DEB theory
-    sardine_Em = sardine_p_Am / sardine_v_rate  # Maximum reserve density
-    sardine_Lm = Kappas .* sardine_p_Am .* sardine_s_M ./ sardine_p_M  # Maximum length (can be a vector if Kappa is a vector)
-    sardine_Kx = sardine_p_Am * sardine_s_M / (KappaX * Fm)  # Half-saturation coefficient
-    sardine_g = sardine_Eg ./ (Kappas .* sardine_Em)  # Energy investment ratio
-    sardine_k_M = sardine_p_M / sardine_Eg  # Somatic maintenance rate coefficient
-
-    anchovy_Em = anchovy_p_Am / anchovy_v_rate  # Maximum reserve density
-    anchovy_Lm = Kappaa .* anchovy_p_Am .* anchovy_s_M ./ anchovy_p_M  # Maximum length (can be a vector if Kappa is a vector)
-    anchovy_g = anchovy_Eg ./ (Kappaa .* anchovy_Em)  # Energy investment ratio
-    anchovy_k_M = anchovy_p_M / anchovy_Eg  # Somatic maintenance rate coefficient
-    anchovy_spawn_period = days_between_dates(repro_start_anchovy, repro_end_anchovy)  # Duration of the spawning period
-
-    # Initial conditions
-    Xall = Xmax[1]
-    Xmax_value = Xmax[1]
-
-    # Arrhenius temperature function (can be a value or vector depending on Temp)
-    Tc = exp.(Ta / Tr .- Ta ./ (Temp .+ 273.0))
-    Tc_value = Tc[1]
-
-            # Initialize output variables
-            Nsuperind = No_As + No_Js + No_Eggs + No_Aa + No_Ja + No_Egga
-            year = 1.0
-            dead_eggmass = 0
-            mean_batch_eggs = 0.0
-            mean_spawning_events = 0.0
-
-            sardine_TotB = 0.0
-            sardine_JuvB = 0.0
-            sardine_AdB = 0.0
-            sardine_meanAdWw = 0.0
-            sardine_sdAdWw = 0.0
-            sardine_meanFAdWw = 0.0
-            sardine_sdFAdWw = 0.0
-            sardine_meanJuvWw = 0.0
-            sardine_sdJuvWw = 0.0
-            sardine_meanAdL = 0.0
-            sardine_sdAdL = 0.0
-            sardine_meanJuvL = 0.0
-            sardine_sdJuvL = 0.0
-            sardine_mean_tpuberty = 0.0
-            sardine_sd_tpuberty = 0.0
-            sardine_mean_Lw_puberty = 0.0
-            sardine_sd_Lw_puberty = 0.0
-            sardine_mean_Ww_puberty = 0.0
-            sardine_sd_Ww_puberty = 0.0
-            sardine_mean_Hjuve = 0.0
-            sardine_sd_Hjuve = 0.0
-
-            sardine_# natural mortality
-            sardine_    #adults
-            sardine_deadA_nat = 0.0
-            sardine_deadA_nat0 = 0.0
-            sardine_deadA_nat1 = 0.0
-            sardine_deadA_nat2 = 0.0
-            sardine_deadA_nat3 = 0.0
-            sardine_deadA_nat4more = 0.0
-            sardine_natA_biom = 0.0
-            sardine_natA_biom0 = 0.0
-            sardine_natA_biom1 = 0.0
-            sardine_natA_biom2 = 0.0
-            sardine_natA_biom3 = 0.0
-            sardine_natA_biom4more = 0.0
-
-            sardine_    #juvenile
-            sardine_deadJ_nat = 0.0
-            sardine_deadJ_nat0 = 0.0
-            sardine_deadJ_nat1 = 0.0
-            sardine_natJ_biom = 0.0
-            sardine_natJ_biom0 = 0.0
-            sardine_natJ_biom1 = 0.0
-
-            # starving mortality
-                # adult
-            sardine_deadA_starved = 0.0
-            sardine_deadA_starved0 = 0.0
-            sardine_deadA_starved1 = 0.0
-            sardine_deadA_starved2 = 0.0
-            sardine_deadA_starved3 = 0.0
-            sardine_deadA_starved4more = 0.0
-            sardine_starvedA_biom = 0.0
-            sardine_starvedA_biom0 = 0.0
-            sardine_starvedA_biom1 = 0.0
-            sardine_starvedA_biom2 = 0.0
-            sardine_starvedA_biom3 = 0.0
-            sardine_starvedA_biom4more = 0.0
-               # juvenile
-            sardine_starvedJ_biom = 0.0
-            sardine_starvedJ_biom0 = 0.0
-            sardine_starvedJ_biom1 = 0.0
-            sardine_deadJ_starved = 0.0
-            sardine_deadJ_starved0 = 0.0
-            sardine_deadJ_starved1 = 0.0
-
-
-            # fishing mortality
-            sardine_fished = 0.0
-            sardine_fishedW = 0.0
-            sardine_fished0 = 0.0
-            sardine_fished1 = 0.0
-            sardine_fished2 = 0.0
-            sardine_fished3 = 0.0
-            sardine_fished4more = 0.0
-            sardine_fished0_biom = 0.0
-            sardine_fished1_biom = 0.0
-            sardine_fished2_biom = 0.0
-            sardine_fished3_biom = 0.0
-            sardine_fished4more_biom = 0.0
-
-            # Anchovy output
-            anchovy_TotB = 0.0
-            anchovy_JuvB = 0.0
-            anchovy_AdB = 0.0
-            anchovy_meanAdWw = 0.0
-            anchovy_sdAdWw = 0.0
-            anchovy_meanFAdWw = 0.0
-            anchovy_sdFAdWw = 0.0
-            anchovy_meanJuvWw = 0.0
-            anchovy_sdJuvWw = 0.0
-            anchovy_meanAdL = 0.0
-            anchovy_sdAdL = 0.0
-            anchovy_meanJuvL = 0.0
-            anchovy_sdJuvL = 0.0
-            anchovy_mean_tpuberty = 0.0
-            anchovy_sd_tpuberty = 0.0
-            anchovy_mean_Lw_puberty = 0.0
-            anchovy_sd_Lw_puberty = 0.0
-            anchovy_mean_Ww_puberty = 0.0
-            anchovy_sd_Ww_puberty = 0.0
-            anchovy_mean_Hjuve = 0.0
-            anchovy_sd_Hjuve = 0.0
-
-            # natural mortality
-                #adults
-            anchovy_deadA_nat = 0.0
-            anchovy_deadA_nat0 = 0.0
-            anchovy_deadA_nat1 = 0.0
-            anchovy_deadA_nat2 = 0.0
-            anchovy_deadA_nat3 = 0.0
-            anchovy_deadA_nat4more = 0.0
-            anchovy_natA_biom = 0.0
-            anchovy_natA_biom0 = 0.0
-            anchovy_natA_biom1 = 0.0
-            anchovy_natA_biom2 = 0.0
-            anchovy_natA_biom3 = 0.0
-            anchovy_natA_biom4moreanchovy
-               #juvenile
-            anchovy_deadJ_nat = 0.0
-            anchovy_deadJ_nat0 = 0.0
-            anchovy_deadJ_nat1 = 0.0
-            anchovy_natJ_biom = 0.0
-            anchovy_natJ_biom0 = 0.0
-            anchovy_natJ_biom1 = 0.0
-
-            # starving mortality
-                # adult
-            anchovy_deadA_starved = 0.0
-            anchovy_deadA_starved0 = 0.0
-            anchovy_deadA_starved1 = 0.0
-            anchovy_deadA_starved2 = 0.0
-            anchovy_deadA_starved3 = 0.0
-            anchovy_deadA_starved4more = 0.0
-            anchovy_starvedA_biom = 0.0
-            anchovy_starvedA_biom0 = 0.0
-            anchovy_starvedA_biom1 = 0.0
-            anchovy_starvedA_biom2 = 0.0
-            anchovy_starvedA_biom3 = 0.0
-            anchovy_starvedA_biom4more = 0.0
-               # juvenile
-            anchovy_starvedJ_biom = 0.0
-            anchovy_starvedJ_biom0 = 0.0
-            anchovy_starvedJ_biom1 = 0.0
-            anchovy_deadJ_starved = 0.0
-            anchovy_deadJ_starved0 = 0.0
-            anchovy_deadJ_starved1 = 0.0
-
-
-            # fishing mortality
-            anchovy_fished = 0.0
-            anchovy_fishedW = 0.0
-            anchovy_fished0 = 0.0
-            anchovy_fished1 = 0.0
-            anchovy_fished2 = 0.0
-            anchovy_fished3 = 0.0
-            anchovy_fished4more = 0.0
-            anchovy_fished0_biom = 0.0
-            anchovy_fished1_biom = 0.0
-            anchovy_fished2_biom = 0.0
-            anchovy_fished3_biom = 0.0
-            anchovy_fished4more_biom = 0.0
-
-    # Store all parameters in a dictionary for easy access in the model
- model_parameters = Dict(
-
-     :No_A => Float64(No_A),
-     :No_J => Float64(No_J),
-     :No_Egg => Float64(No_Egg),
-     :Temp => Temp,
-     :Tc_value => Tc_value,
-     :Kappa_value => Kappa_value,
-     :M_f0 => M_f0,
-     :M_f1 => M_f1,
-     :M_f2 => M_f2,
-     :M_f3 => M_f3,
-     :M_f4 => M_f4,
-     :MF0_value => MF0_value,
-     :MF1_value => MF1_value,
-     :MF2_value => MF2_value,
-     :MF3_value => MF3_value,
-     :MF4_value => MF4_value,
-     :Wv => Wv,
-     :day_of_the_year => day_of_the_year,
-     :year => year,
-     :f => f,
-     :Xmax_value => Xmax_value, 
-     :M_egg => M_egg,
-     :M_j => M_j,
-     :M0 => M0,
-     :M1 => M1,
-     :M2 => M2,
-     :M3 => M3,
-     :M4 => M4,
-     :death_threshold => death_threshold,
-     :r_food => r_food,
-     :DEB_timing => DEB_timing,
-     :day_of_the_year => day_of_the_year,
-     :sim_timing => sim_timing,
-     :mean_batch_eggs => mean_batch_eggs,
-     :mean_spawning_events => mean_spawning_events,
-     :fished => fished,
-     :fishedW => fishedW,
-     :repro_start => repro_start,
-     :repro_end => repro_end,
-     :peak1_sardine => peak1_sardine,
-     :peak2_sardine => peak2_sardine,
-     :total_repro_sardine => total_repro_sardine,
-     :std_dev => std_dev,
-     :repro_period => repro_period,
-     :daily_repro_probabilities => daily_repro_probabilities,
-     :p_Am => p_Am,
-     :v_rate => v_rate,
-     :Kappa => Kappa,
-     :KappaX => KappaX,
-     :KappaR => KappaR,
-     :Fm => Fm,
-     :del_M => del_M,
-     :k_J => k_J,
-     :s_M => s_M,
-     :p_M => p_M,
-     :Eg => Eg,
-     :d_V => d_V,
-     :mu_V => mu_V,
-     :mu_E => mu_E,
-     :w_V => w_V,
-     :w_E => w_E,
-     :w => w,
-     :Hb => Hb,
-     :Hj => Hj,
-     :Hp => Hp,
-     :Lb => Lb,
-     :Lj => Lj,
-     :Lp => Lp,
-     :Ab => Ab,
-     :Ap => Ap,
-     :Am => Am,
-     :E0 => E0,
-     :ep_min => ep_min,
-     :E0_min => E0_min,
-     :E0_max => E0_max,
-     :W0 => W0,
-     :L0 => L0,
-     :Ta => Ta,
-     :Tr => Tr,
-     :Tc => Tc,
-     :Em => Em,
-     :Lm => Lm,
-     :Kx => Kx,
-     :g => g,
-     :k_M => k_M,
-     :Xall => Xall,
-     :spawn_period => spawn_period,
-     :Sex_ratio => Sex_ratio,
-     :DEB_timing => DEB_timing,
-     :Xmax => Xmax,
-     :prob_dict => prob_dict,
-     :TotB => TotB,
-     :JuvB => JuvB,
-     :AdB => AdB,
-     :meanAdWw => meanAdWw,
-     :sdAdWw => sdAdWw,
-     :meanFAdWw => meanFAdWw,
-     :sdFAdWw => sdFAdWw,
-     :meanJuvWw => meanJuvWw,
-     :sdJuvWw => sdJuvWw,
-     :meanAdL => meanAdL,
-     :sdAdL => sdAdL,
-     :meanJuvL => meanJuvL,
-     :sdJuvL => sdJuvL,
-     :mean_tpuberty => mean_tpuberty,
-     :sd_tpuberty => sd_tpuberty,
-     :mean_Lw_puberty => mean_Lw_puberty,
-     :sd_Lw_puberty => sd_Lw_puberty,
-     :mean_Ww_puberty => mean_Ww_puberty,
-     :sd_Ww_puberty => sd_Ww_puberty,
-     :mean_Hjuve => mean_Hjuve,
-     :sd_Hjuve => sd_Hjuve,
-
-     :Nsuperind => Nsuperind,
-
-     # starving mortality
-     :deadJ_starved => deadJ_starved,
-     :deadJ_starved0 => deadJ_starved0,
-     :deadJ_starved1 => deadJ_starved1,
-     :starvedJ_biom => starvedJ_biom,
-     :starvedJ_biom0 => starvedJ_biom0,
-     :starvedJ_biom1 => starvedJ_biom1,
-     :deadA_starved => deadA_starved,
-     :deadA_starved0 => deadA_starved0,
-     :deadA_starved1 => deadA_starved1,
-     :deadA_starved2 => deadA_starved2,
-     :deadA_starved3 => deadA_starved3,
-     :deadA_starved4more => deadA_starved4more,
-     :starvedA_biom => starvedA_biom,
-     :starvedA_biom0 => starvedA_biom0,
-     :starvedA_biom1 => starvedA_biom1,
-     :starvedA_biom2 => starvedA_biom2,
-     :starvedA_biom3 => starvedA_biom3,
-     :starvedA_biom4more => starvedA_biom4more,
-
-     #fishing mortality
-     :fished => fished,
-     :fishedW => fishedW,
-     :fished0 => fished0,
-     :fished1 => fished1,
-     :fished2 => fished2,
-     :fished3 => fished3,
-     :fished4more => fished4more,
-     :fished0_biom => fished0_biom,
-     :fished1_biom => fished1_biom,
-     :fished2_biom => fished2_biom,
-     :fished3_biom => fished3_biom,
-     :fished4more_biom => fished4more_biom,
-
-
-     :dead_eggmass => dead_eggmass,
-
-     #natural mortality
-     :deadJ_nat => deadJ_nat,
-     :deadJ_nat0 => deadJ_nat0,
-     :deadJ_nat1 => deadJ_nat1,
-     :natJ_biom => natJ_biom,
-     :natJ_biom0 => natJ_biom0,
-     :natJ_biom1 => natJ_biom1,
-
-     :deadA_nat => deadA_nat,
-     :deadA_nat0 => deadA_nat0,
-     :deadA_nat1 => deadA_nat1,
-     :deadA_nat2 => deadA_nat2,
-     :deadA_nat3 => deadA_nat3,
-     :deadA_nat4more => deadA_nat4more,
-     :natA_biom => natA_biom,
-     :natA_biom0 => natA_biom0,
-     :natA_biom1 => natA_biom1,
-     :natA_biom2 => natA_biom2,
-     :natA_biom3 => natA_biom3,
-     :natA_biom4more => natA_biom4more,
-     
- )
-                        
- return model_parameters            
+                    :deadA_nat => 0.0,
+                    :deadA_nat0 => 0.0,
+                    :deadA_nat1 => 0.0,
+                    :deadA_nat2 => 0.0,
+                    :deadA_nat3 => 0.0,
+                    :deadA_nat4more => 0.0,
+                    :natA_biom => 0.0,
+                    :natA_biom0 => 0.0,
+                    :natA_biom1 => 0.0,
+                    :natA_biom2 => 0.0,
+                    :natA_biom3 => 0.0,
+                    :natA_biom4more => 0.0)
+                    )
+                )
+            )
+    return model_parameters
 end
