@@ -345,6 +345,7 @@ function adultdie!(Sardine, model)
             M = model.M4 + Mf
          end
 
+         println(Sardine.Nind)
          
             if Mf == 0.0
                 total_deaths = natural_deaths = Float64(rand(Binomial(Int64(Sardine.Nind), 1-exp(-M))))

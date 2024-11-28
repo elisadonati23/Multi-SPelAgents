@@ -267,7 +267,7 @@ function generate_adult_pop(model, Lwclass = missing, Lw_biom = missing)
     agent_En_class = agent_f_i * model.Em * ((Lwclass * model.del_M)^3.0)
     agent_Ww_class = (model.w * (model.d_V * ((Lwclass * model.del_M) ^ 3.0) + model.w_E / model.mu_E * (agent_En_class + agent_R))) 
 
-    Nind = Lw_biom/agent_Ww_class
+    Nind = Int64(floor(Lw_biom/agent_Ww_class))
 
     # Define No_A based on Nind if Nind is greater than 1e7
     if Nind > 1e7
@@ -356,7 +356,7 @@ function generate_juvenile_pop(model, Lwclass = missing, Lw_biom = missing)
     # Set reserve energy
     agent_En_class = agent_f_i * model.Em * ((Lwclass * model.del_M)^3.0)
     agent_Ww_class = (model.w * (model.d_V * ((Lwclass * model.del_M) ^ 3.0) + model.w_E / model.mu_E * (agent_En_class + agent_R))) 
-    Nind = Lw_biom/agent_Ww_class
+    Nind = Int64(floor(Lw_biom/agent_Ww_class))
 
     # Define No_A based on Nind if Nind is greater than 1e7
     if Nind > 1e7
