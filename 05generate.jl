@@ -361,7 +361,7 @@ function generate_juvenile_pop(model, Lwclass = missing, Lw_biom = missing)
     # Define No_A based on Nind if Nind is greater than 1e7
     if Nind > 1e7
         No_J = ceil(Int, Nind / 1e7)
-        agent_Nind = ceil(Int, Nind / No_A)
+        agent_Nind = ceil(Int, Nind / No_J)
         agent_Nind0 = agent_Nind
     else
         No_J = 1
