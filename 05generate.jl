@@ -16,6 +16,9 @@ function generate_EggMass(No_Egg, model, Nind = missing, maternal_EggEn = missin
     agent_GSI = 0.0
     agent_Lj_i = 0.0
     agent_metamorph = false
+    agent_Wg = 0.0
+    agent_Hp_i = model.Hp + (randn() * 0.01 * model.Hp)
+    agent_pM_i = model.p_M + (randn() * 0.01 * model.p_M)
 
     # Set maternal egg energy
     agent_maternal_EggEn = ismissing(maternal_EggEn) ? Float64(model.E0) : Float64(maternal_EggEn)
@@ -44,10 +47,10 @@ function generate_EggMass(No_Egg, model, Nind = missing, maternal_EggEn = missin
 
         # Add agent to the model
         add_agent!(
-            Sardine, model, agent_type, agent_reproduction, agent_Nind,agent_Nind0, agent_Age, agent_L, agent_H,
+            Sardine, model, agent_type, agent_reproduction, agent_Nind, agent_Nind0, agent_Age, agent_L, agent_H,
             agent_maternal_EggEn, agent_superind_Neggs, agent_En, agent_Generation, agent_Dead,
-            agent_f_i, agent_t_puberty, agent_Lw, agent_Ww, agent_R, agent_Scaled_En,
-            agent_s_M_i, agent_pA, agent_Lb_i, agent_Lj_i, agent_metamorph, agent_CI, agent_GSI, agent_spawned
+            agent_f_i, agent_t_puberty, agent_Lw, agent_Ww, agent_Wg, agent_R, agent_Scaled_En,
+            agent_s_M_i, agent_pA, agent_Lb_i, agent_Lj_i, agent_metamorph, agent_Hp_i, agent_pM_i, agent_CI, agent_GSI, agent_spawned
         )
 
     end
@@ -64,6 +67,9 @@ function generate_Juvenile(No_J, model, Nind = missing, Generation = 0.0, En = m
     agent_spawned = 0.0
     agent_Dead = false
     agent_reproduction = :nonspawner
+    agent_Wg = 0.0
+    agent_Hp_i = model.Hp + (randn() * 0.01 * model.Hp)
+    agent_pM_i = model.p_M + (randn() * 0.01 * model.p_M)
     
     # Silenced features
     agent_maternal_EggEn = model.E0
@@ -121,8 +127,8 @@ function generate_Juvenile(No_J, model, Nind = missing, Generation = 0.0, En = m
         add_agent!(
             Sardine, model, agent_type, agent_reproduction, agent_Nind, agent_Nind0, agent_Age, agent_L, agent_H,
             agent_maternal_EggEn, agent_superind_Neggs, agent_En, agent_Generation, agent_Dead,
-            agent_f_i, agent_t_puberty, agent_Lw, agent_Ww, agent_R, agent_Scaled_En,
-            agent_s_M_i, agent_pA, agent_Lb_i, agent_Lj_i, agent_metamorph, agent_CI, agent_GSI, agent_spawned
+            agent_f_i, agent_t_puberty, agent_Lw, agent_Ww, agent_Wg, agent_R, agent_Scaled_En,
+            agent_s_M_i, agent_pA, agent_Lb_i, agent_Lj_i, agent_metamorph, agent_Hp_i, agent_pM_i, agent_CI, agent_GSI, agent_spawned
         )
 
     end
@@ -140,6 +146,9 @@ function generate_Adult(No_A, model, Nind = missing, Age = missing, t_puberty = 
     agent_spawned = 0.0
     agent_Dead = false
     agent_metamorph = true
+    agent_Wg = 0.0
+    agent_Hp_i = model.Hp
+    agent_pM_i = model.p_M + (randn() * 0.01 * model.p_M)
 
     # Set maturation energy
     agent_H = ismissing(H) ? model.Hp : H
@@ -220,10 +229,10 @@ function generate_Adult(No_A, model, Nind = missing, Age = missing, t_puberty = 
 
         # Add agent to the model
         add_agent!(
-            Sardine, model, agent_type, agent_reproduction, agent_Nind,agent_Nind0, agent_Age, agent_L, agent_H,
+            Sardine, model, agent_type, agent_reproduction, agent_Nind, agent_Nind0, agent_Age, agent_L, agent_H,
             agent_maternal_EggEn, agent_superind_Neggs, agent_En, agent_Generation, agent_Dead,
-            agent_f_i, agent_t_puberty, agent_Lw, agent_Ww, agent_R, agent_Scaled_En,
-            agent_s_M_i, agent_pA, agent_Lb_i, agent_Lj_i, agent_metamorph, agent_CI, agent_GSI, agent_spawned
+            agent_f_i, agent_t_puberty, agent_Lw, agent_Ww, agent_Wg, agent_R, agent_Scaled_En,
+            agent_s_M_i, agent_pA, agent_Lb_i, agent_Lj_i, agent_metamorph, agent_Hp_i, agent_pM_i, agent_CI, agent_GSI, agent_spawned
         )
     end
 
@@ -246,8 +255,11 @@ function generate_adult_pop(model, Lwclass = missing, Lw_biom = missing)
         agent_Dead = false
         agent_metamorph = true
         agent_H = model.Hp
+        agent_Hp_i = model.Hp
         agent_s_M_i = model.Lj / model.Lb
         agent_Generation = 0.0
+        agent_Wg = 0.0
+        agent_pM_i = model.p_M * (randn() * 0.01 * model.p_M)
 
     #Lw class - biom relationship - based on MEDIAS
     agent_R =  0.0
@@ -293,8 +305,7 @@ function generate_adult_pop(model, Lwclass = missing, Lw_biom = missing)
 
          # depending on age, above, i put the Nind to ensure correct lifespan but I assume that they were 1e7 at age 0+
         
-        agent_Lj_i = 
-            model.Lj
+        agent_Lj_i = model.Lj
 
 
         # Set time to puberty
@@ -312,8 +323,8 @@ function generate_adult_pop(model, Lwclass = missing, Lw_biom = missing)
         add_agent!(
             Sardine, model, agent_type, agent_reproduction, agent_Nind, agent_Nind0, agent_Age, agent_L, agent_H,
             agent_maternal_EggEn, agent_superind_Neggs, agent_En, agent_Generation, agent_Dead,
-            agent_f_i, agent_t_puberty, agent_Lw, agent_Ww, agent_R, agent_Scaled_En,
-            agent_s_M_i, agent_pA, agent_Lb_i, agent_Lj_i, agent_metamorph, agent_CI, agent_GSI, agent_spawned
+            agent_f_i, agent_t_puberty, agent_Lw, agent_Ww, agent_Wg, agent_R, agent_Scaled_En,
+            agent_s_M_i, agent_pA, agent_Lb_i, agent_Lj_i, agent_metamorph, agent_Hp_i, agent_pM_i, agent_CI, agent_GSI, agent_spawned
         )
     end
     return
@@ -336,6 +347,9 @@ function generate_juvenile_pop(model, Lwclass = missing, Lw_biom = missing)
         agent_spawned = 0.0
         agent_Dead = false
         agent_Generation = 0.0
+        agent_Wg = 0.0
+        agent_Hp_i = model.Hp + (randn() * 0.01 * model.Hp)
+        agent_pM_i = model.p_M * (randn() * 0.01 * model.p_M)
 
     #Lw class - biom relationship - based on MEDIAS
     agent_R =  0.0
@@ -395,8 +409,8 @@ function generate_juvenile_pop(model, Lwclass = missing, Lw_biom = missing)
         add_agent!(
             Sardine, model, agent_type, agent_reproduction, agent_Nind, agent_Nind0, agent_Age, agent_L, agent_H,
             agent_maternal_EggEn, agent_superind_Neggs, agent_En, agent_Generation, agent_Dead,
-            agent_f_i, agent_t_puberty, agent_Lw, agent_Ww, agent_R, agent_Scaled_En,
-            agent_s_M_i, agent_pA, agent_Lb_i, agent_Lj_i, agent_metamorph, agent_CI, agent_GSI, agent_spawned
+            agent_f_i, agent_t_puberty, agent_Lw, agent_Ww, agent_Wg, agent_R, agent_Scaled_En,
+            agent_s_M_i, agent_pA, agent_Lb_i, agent_Lj_i, agent_metamorph, agent_Hp_i, agent_pM_i, agent_CI, agent_GSI, agent_spawned
         )
     end
     return

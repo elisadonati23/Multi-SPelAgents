@@ -49,7 +49,7 @@ function create_params(
     peak2_sardine = missing
     total_repro_sardine = 10
     std_dev = 60
-
+    fecundity = 400.0 # number of eggs per gram of free female weight
     death_threshold = 0.01
 
     repro_period = vcat(270.0:365.0, 1.0:90.0)  # Reproduction period covering the year-end
@@ -249,6 +249,7 @@ function create_params(
         :repro_end => repro_end,
         :peak1_sardine => peak1_sardine,
         :peak2_sardine => peak2_sardine,
+        :fecundity => fecundity,
         :total_repro_sardine => total_repro_sardine,
         :std_dev => std_dev,
         :repro_period => repro_period,
