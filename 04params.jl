@@ -54,18 +54,20 @@ function create_params(
 
     repro_period = vcat(270.0:365.0, 1.0:90.0)  # Reproduction period covering the year-end
 
-    # DEB model parameters
+    ##################
+
+    # DEB model parameters - NEW PARAMETRIZATION
     Sex_ratio = 0.5
-    p_Am = 396.002  # surface-area Maximum assimilation {pAm}
-    v_rate = 0.0172  # Energy conductance
+    p_Am = 554.351	  # Maximum assimilation power
+    v_rate = 0.0216466  # Energy conductance
     KappaX = 0.8  # Digestion efficiency
     KappaR = 0.95  # Repro efficiency
     Fm = 6.5  # Maximum specific searching rate
     del_M = 0.1152  # Shape coefficient (isomorph)
     k_J = 0.002  # Maturity maintenance rate coefficient
-    s_M = 3.093  # acceleration coefficient
-    p_M = 396.195  # Volume-specific somatic maintenance [pM]
-    Eg = 5197.37  # Cost per unit of structure
+    s_M = 2.25531  # Acceleration factor
+    p_M = 438.602  # Volume-specific somatic maintenance
+    Eg = 5017.55  # Cost per unit of structure
     d_V = 0.2  # Volume-specific density of structure
     mu_V = 500000.0  # Chemical potential of structure
     mu_E = 550000.0  # Chemical potential of reserve
@@ -75,23 +77,25 @@ function create_params(
 
     # Growth, puberty, and reproduction parameters
 
-    Hb = 0.0112
-    Hj = 0.3478 #0.3478
-    Hp = 3013.0
-    Lb = 0.0321
-    Lj = 0.0993
-    Lp = 1.3832
-    Ab = 8.0
-    Ap = 234.0
-    Am = 2920.0
-    E0 = 0.966581
-    ep_min = 0.25
-    E0_min = 0.389 # when you have a juvenile with the minimum enough energy to produce eggs in the reserve: it reflects the energy of the mother
-    E0_max = 0.967
-    W0 = 0.00021 # Addmypet
+    Hb = 0.0157489
+    Hj = 0.187349 #0.3478
+    Hp = 4553.63
+    Lb = 0.0279366
+    Lj = 0.0630058
+    Lp = 1.19937
+    Ab = 6.56247	
+    Ap = 202.166
+    Am = 3461.0
+    E0 = 1.47992
+    ep_min = 0.218697
+    E0_min = 0.3 # when you have a juvenile with the minimum enough energy to produce eggs in the reserve: it reflects the energy of the mother
+    E0_max = 0.694024
+    W0 = 0.000150792 # Addmypet
     L0 = 0.001  # Initial length in cm
     Ta = 8000.0  # Arrhenius temperature
     Tr = 293.0   # Reference temperature
+
+    ####################
 
     # Derived parameters based on DEB theory
     Em = p_Am / v_rate  # Maximum reserve density
