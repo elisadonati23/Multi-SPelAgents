@@ -280,7 +280,7 @@ return
 end
 
 function juvemature!(Sardine, model)
-    if !Sardine.Dead && (Sardine.H >= model.Hp)
+    if !Sardine.Dead && (Sardine.H >= Sardine.Hp_i)
          #Keep the same number of individuals which survived up to now in juvenile superind
          Sardine.type = :adult
          Sardine.R = 0.0
