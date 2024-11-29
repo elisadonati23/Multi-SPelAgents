@@ -505,31 +505,31 @@ function adultspawn!(Sardine, model)
 
     Sardine.reproduction = :nonspawner
     Sardine.superind_Neggs = 0.0
-
-#1st condition to reproduce not being dead
-#if (!Sardine.Dead && Sardine.Nind >= 100000.0)  &&
+    reprostart = model.repro_start + randn() * 5 * model.repro_start
+    reproend = model.repro_end + randn() * 5 * model.repro_end
 
     #2nd condition: being in the repro period
-    if (model.repro_start <= model.day_of_the_year <= model.repro_end)
+    if (reprostart <= model.day_of_the_year <= reproend)
           
             # 3th condition: random number between 0 and 1 is smaller than the probability of spawning, then reproduction occurs
             #(rand() <= model.prob_dict[model.day_of_the_year])
 
             Wg = (model.w * (model.w_E / model.mu_E) * Sardine.R)
             free_weight = Sardine.Ww - Wg
+            fecundity = 450.0 + randn() * 50.0 * 450.0
             #eggs from all females
-            superind_Neggs_value = Float64(460.0 * free_weight) * ceil((Sardine.Nind/2.0)) 
+            superind_Neggs_value = Float64(fecundity * free_weight) * ceil((Sardine.Nind/2.0)) 
             #eggs from one female
-            Neggs_value_single = Float64(460.0 * free_weight) #420 standard number of eggs per weight of female
+            Neggs_value_single = Float64(fecundity * free_weight) #420 standard number of eggs per weight of female
 
 
             # Then determine the energy content of the eggs from maternal effects
-            Sardine.maternal_EggEn = Float64(((model.E0_max - model.E0_min) / (1.0- model.ep_min)) * (Sardine.Scaled_En - model.ep_min)) + model.E0_min
+            Sardine.maternal_EggEn = Float64((((model.E0_max - model.E0_min) / (1.0- model.ep_min)) * (Sardine.Scaled_En - model.ep_min)) + model.E0_min) + randn() * 0.01 * model.E0_min
             # spawned energy of a single female, we assume it's the same for all female and male
             spawned_en = Neggs_value_single *  Sardine.maternal_EggEn #Sardine.R * Kappa_valueR / spawn_period 
 
             # and if the energy to be spawned is lower than the energy available, spawn!
-            if (spawned_en <= Sardine.R * model.KappaR) #* Kappa_valueR)
+            if (spawned_en <= Sardine.R * (model.KappaR + randn() * 0.01 * model.KappaR)) #* Kappa_valueR)
                 #Nind males and females lose the same amount of spawned energy
                 Sardine.superind_Neggs = superind_Neggs_value
                 Sardine.reproduction = :spawner
