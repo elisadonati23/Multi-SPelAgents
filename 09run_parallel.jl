@@ -53,7 +53,7 @@ model -> model.output[:anchovy][:lifehistory][:TotB],
     df_agent = run!(model, 50; adata, mdata)
 
     push!(results, df_agent)
-
+df_agent
     end_time = Dates.now()
     duration = end_time - start_time
     minutes = duration / Dates.Minute(1)

@@ -28,8 +28,8 @@ function generate_EggMass(No_Egg, model, species::Symbol, Nind = missing, matern
     agent_Lb_i = 0.0
     agent_superind_Neggs = 0.0
     agent_Wg = 0.0
-    agent_Hp_i = model.species_specific_DEB_params[Fish.species][:Hp] + (randn() * 0.01 * odel.species_specific_DEB_params[Fish.species][:Hp])
-    agent_pM_i = model.species_specific_DEB_params[Fish.species][:p_M] + (randn() * 0.01 * model.species_specific_DEB_params[Fish.species][:p_M])
+    agent_Hp_i = model.species_specific_DEB_params[species][:Hp] + (randn() * 0.01 * model.species_specific_DEB_params[species][:Hp])
+    agent_pM_i = model.species_specific_DEB_params[species][:p_M] + (randn() * 0.01 * model.species_specific_DEB_params[species][:p_M])
 
     agent_L = model.species_specific_DEB_params[species][:L0]
     # Set maternal egg energy
@@ -71,8 +71,8 @@ function generate_Juvenile(No_J, model, species::Symbol, Nind = missing, Generat
     agent_reproduction = :nonspawner
     agent_superind_Neggs = 0.0  # EggMass
     agent_Wg = 0.0
-    agent_Hp_i = model.species_specific_DEB_params[Fish.species][:Hp] + (randn() * 0.01 * odel.species_specific_DEB_params[Fish.species][:Hp])
-    agent_pM_i = model.species_specific_DEB_params[Fish.species][:p_M] + (randn() * 0.01 * model.species_specific_DEB_params[Fish.species][:p_M])
+    agent_Hp_i = model.species_specific_DEB_params[species][:Hp] + (randn() * 0.01 * model.species_specific_DEB_params[species][:Hp])
+    agent_pM_i = model.species_specific_DEB_params[species][:p_M] + (randn() * 0.01 * model.species_specific_DEB_params[species][:p_M])
 
     
     # Silenced features
@@ -152,8 +152,8 @@ function generate_Adult(No_A, model, species::Symbol, Nind = missing, Age = miss
     agent_Dead = false
     agent_metamorph = true
     agent_Wg = 0.0
-    agent_Hp_i = model.species_specific_DEB_params[Fish.species][:Hp]
-    agent_pM_i = model.species_specific_DEB_params[Fish.species][:p_M] + (randn() * 0.01 * model.species_specific_DEB_params[Fish.species][:p_M])
+    agent_Hp_i = model.species_specific_DEB_params[species][:Hp]
+    agent_pM_i = model.species_specific_DEB_params[species][:p_M] + (randn() * 0.01 * model.species_specific_DEB_params[species][:p_M])
 
 
     # Set maturation energy
@@ -271,8 +271,8 @@ function generate_adult_pop(model, species, Lwclass = missing, Lw_biom = missing
         agent_s_M_i = ind_DEB_params.Lj / ind_DEB_params.Lb
         agent_Generation = 0.0
         agent_Wg = 0.0
-        agent_Hp_i = model.species_specific_DEB_params[Fish.species][:Hp]
-        agent_pM_i = model.species_specific_DEB_params[Fish.species][:p_M] + (randn() * 0.01 * model.species_specific_DEB_params[Fish.species][:p_M])
+        agent_Hp_i = model.species_specific_DEB_params[species][:Hp]
+        agent_pM_i = model.species_specific_DEB_params[species][:p_M] + (randn() * 0.01 * model.species_specific_DEB_params[species][:p_M])
     
 
     #Lw class - biom relationship - based on MEDIAS
@@ -361,8 +361,8 @@ function generate_juvenile_pop(model, species, Lwclass = missing, Lw_biom = miss
         agent_Dead = false
         agent_Generation = 0.0
         agent_Wg = 0.0
-        agent_Hp_i = model.species_specific_DEB_params[Fish.species][:Hp] + (randn() * 0.01 * odel.species_specific_DEB_params[Fish.species][:Hp])
-        agent_pM_i = model.species_specific_DEB_params[Fish.species][:p_M] + (randn() * 0.01 * model.species_specific_DEB_params[Fish.species][:p_M])
+        agent_Hp_i = model.species_specific_DEB_params[species][:Hp] + (randn() * 0.01 * model.species_specific_DEB_params[species][:Hp])
+        agent_pM_i = model.species_specific_DEB_params[species][:p_M] + (randn() * 0.01 * model.species_specific_DEB_params[species][:p_M])
     
 
     #Lw class - biom relationship - based on MEDIAS
