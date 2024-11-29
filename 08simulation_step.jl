@@ -102,10 +102,10 @@ for species in [:sardine, :anchovy]
 end
 
 function reset_variables(model)
-    reset_nested_dict_values!(model[:output][:sardine][:natural_mortality], 0.0)
-    reset_nested_dict_values!(model[:output][:anchovy][:natural_mortality], 0.0)
-    reset_nested_dict_values!(model[:output][:sardine][:starvation], 0.0)
-    reset_nested_dict_values!(model[:output][:anchovy][:starvation], 0.0)
+    reset_nested_dict_values!(model.output[:sardine][:natural_mortality], 0.0)
+    reset_nested_dict_values!(model.output[:anchovy][:natural_mortality], 0.0)
+    reset_nested_dict_values!(model.output[:sardine][:starvation], 0.0)
+    reset_nested_dict_values!(model.output[:anchovy][:starvation], 0.0)
     return
 end
 
@@ -147,8 +147,8 @@ function complex_step!(model)
     end
 
     # Filter spawners for creating new EggMass agents
-    sard_spawners = filter!(id -> hasid(model, id) && model[id].reproduction == :spawner && species == :sardine, copy(sEA_ids))
-    anch_spawners = filter!(id -> hasid(model, id) && model[id].reproduction == :spawner && species == :anchovy, copy(sEA_ids))
+    sard_spawners = filter!(id -> hasid(model, id) && model[id].reproduction == :spawner && model[id].species == :sardine, copy(sEA_ids))
+    anch_spawners = filter!(id -> hasid(model, id) && model[id].reproduction == :spawner && model[id].species == :anchovy, copy(sEA_ids))
     
     remove_all!(model, is_dead)
 

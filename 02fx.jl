@@ -78,10 +78,16 @@ end
 function reset_nested_dict_values!(nested_dict, value_to_assign)
     # Iterate over the keys of the outer dictionary
     for outer_key in keys(nested_dict)
-        # Iterate over the keys of the inner dictionary
-        for inner_key in keys(nested_dict[outer_key])
-            # Assign the value to each element
-            nested_dict[outer_key][inner_key] = value_to_assign
+        # Check if the value is a dictionary
+        if isa(nested_dict[outer_key], Dict)
+            # Iterate over the keys of the inner dictionary
+            for inner_key in keys(nested_dict[outer_key])
+                # Assign the value to each element
+                nested_dict[outer_key][inner_key] = value_to_assign
+            end
+        else
+            # If the value is not a dictionary, assign the value directly
+            nested_dict[outer_key] = value_to_assign
         end
     end
 end

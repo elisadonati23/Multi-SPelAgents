@@ -30,15 +30,6 @@ model = model_initialize_parallel(
     #Ma
     1.08,	0.86,	0.69,	0.62,	0.48)
 
-
-
-generate_adult_pop(model,:sardine, 10.5, 10)
-generate_adult_pop(model,:anchovy, 11.5, 100)
-generate_juvenile_pop(model,:sardine,5.5, 100)
-generate_juvenile_pop(model,:anchovy,6.5, 100)
-
-allagents(models[1])
-
 #mdata = [(:initial_conditions, :day_of_the_year):day_of_the_year, :year, :TotB,:JuvB,:AdB, :f, :deadJ_nat, :starvedJ_biom,:starvedA_biom,:natJ_biom, :natA_biom,
 #:deadJ_starved, :deadA_nat, :deadA_starved, :fished, :fishedW, :fished0, :fished1, :fished2, :fished3, :fished4more,
 #:meanJuvL, :sdJuvL, :meanAdL, :sdAdL, :mean_tpuberty, :sd_tpuberty, :meanJuvWw, :sdJuvWw, :meanAdWw, :sdAdWw, :mean_Hjuve, :sd_Hjuve]
@@ -46,40 +37,21 @@ allagents(models[1])
 
 # Initialize dataframes
 adata = [:type, :Nind]
-mdata = [(:initial_conditions, :day_of_the_year)]
+mdata = [
+model -> model.output[:sardine][:lifehistory][:TotB],
+model -> model.output[:anchovy][:lifehistory][:TotB],
+]
 #:starvedJ_biom,  , :natA_biom,
 # Run the model for each model in the list
 #for (i, model) in enumerate(model)
-    start_time = Dates.now()
-
-    function init_model_dataframe2(model, mdata)
-        df = DataFrame()
-        for key in mdata
-            if length(key) == 1
-                df[!, Symbol(key[1])] = []
-            elseif length(key) == 3
-                df[!, Symbol(join(key, "_"))] = []
-            end
-        end
-        return df
-    end
 
     df_agent = init_agent_dataframe(model, adata)
-    df_model = init_model_dataframe2(model, mdata)
+    df_model = init_model_dataframe(model, mdata)
     #run!(model, 365*20; adata, mdata)
 
     #df_agent = run!(model, 16070+365*30; adata, mdata)
-    df_agent = run!(model, 365*5; adata, mdata)
+    df_agent = run!(model, 50; adata, mdata)
 
-    for key in mdata
-        if length(key) == 1
-            push!(df_model[!, Symbol(key[1])], model.properties[key[1]])
-        elseif length(key) == 3
-            push!(df_model[!, Symbol(join(key, "_"))], model.properties[key[1]][key[2]][key[3]])
-        end
-    end
-
-    
     push!(results, df_agent)
 
     end_time = Dates.now()

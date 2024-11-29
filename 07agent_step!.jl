@@ -18,14 +18,15 @@ function eggaging!(Fish, model) #indipendent of the species
 end
 
 function eggDEB!(Fish, model)
+
     deb_all = NamedTuple(model.DEB_parameters_all)
 
 if is_sardine(Fish)
-    deb_species = NamedTuple(model.DEB_species_specific_params[:sardine])
-    deb_derived = NamedTuple(model.DEB_derived_params[:sardine])
+    deb_species = NamedTuple(model.species_specific_DEB_params[:sardine])
+    deb_derived = NamedTuple(model.derived_params[:sardine])
 else
-    deb_species = NamedTuple(model.DEB_species_specific_params[:anchovy])
-    deb_derived = NamedTuple(model.DEB_derived_params[:anchovy])
+    deb_species = NamedTuple(model.species_specific_DEB_params[:anchovy])
+    deb_derived = NamedTuple(model.derived_params[:anchovy])
 end
 
     if !Fish.Dead
@@ -41,7 +42,7 @@ end
                 #Somatic maintenance
         pS = (deb_species.p_M * deb_species.Tc_value) * V  #p_M_T*V
         # Mobilized energy
-        pC = ((Fish.maternal_EggEn / V) * (deb_derived.Eg * (deb_all.v_rate * deb_species.Tc_value) * (V ^ (2/3)) + pS)/(deb_species[:Kappa] * (Fish.maternal_EggEn / V) + deb_derived.Eg))
+        pC = ((Fish.maternal_EggEn / V) * (deb_species.Eg * (model.species_specific_DEB_params[Fish.species][:v_rate] * deb_species.Tc_value) * (V ^ (2/3)) + pS)/(deb_species[:Kappa] * (Fish.maternal_EggEn / V) + deb_species.Eg))
 
         #Maturity maintenance
         pJ = deb_all.k_J * Fish.H * deb_species.Tc_value
@@ -62,7 +63,7 @@ end
             deltaH = 0.0
         end
     
-        deltaV = ((deb_species.Kappa * pC - pS) / deb_derived.Eg)
+        deltaV = ((deb_species.Kappa * pC - pS) / deb_species.Eg)
         if (deltaV < 0.0)
             deltaV = 0.0
         end
@@ -78,20 +79,20 @@ end
 function egghatch!(Fish, model)
 
     if is_sardine(Fish)
-        deb_species = NamedTuple(model.DEB_species_specific_params[:sardine])
-        deb_derived = NamedTuple(model.DEB_derived_params[:sardine])
+        deb_species = NamedTuple(model.species_specific_DEB_params[:sardine])
+        deb_derived = NamedTuple(model.derived_params[:sardine])
     else
-        deb_species = NamedTuple(model.DEB_species_specific_params[:anchovy])
-        deb_derived = NamedTuple(model.DEB_derived_params[:anchovy])
+        deb_species = NamedTuple(model.species_specific_DEB_params[:anchovy])
+        deb_derived = NamedTuple(model.derived_params[:anchovy])
     end
 
-    if !Fish.Dead && (Fish.H >= model.Hb)
+    if !Fish.Dead && (Fish.H >= model.species_specific_DEB_params[Fish.species][:Hb])
         # If egg survived starvation In deb()! and has enough complexity, it becomes a juvenile
         Fish.type = :juvenile
         Fish.f_i = model.initial_conditions[:f] # if model is initialized only with eggs, this value is set to 0.8, otherwise from the model
         Fish.Lw = (Fish.L / deb_species.del_M)
         Fish.Lb_i = Fish.L
-        Fish.Age = deb_species.Ap * (Fish.Lw * deb.species.del_M) / deb_species.Lp
+        Fish.Age = deb_species.Ap * (Fish.Lw * deb_species.del_M) / deb_species.Lp
         #Fish.H = model.Hp * (Fish.Lw * model.del_M) / model.Lp
         Fish.Nind = Float64(ceil((1 - model.natural_mortalities[Fish.species][:M_egg]) * Float64((Fish.Nind))))
         Fish.Nind0 = Fish.Nind
@@ -213,11 +214,11 @@ end
 function juveDEB!(Fish, model)
 
     if is_sardine(Fish)
-        deb_species = NamedTuple(model.DEB_species_specific_params[:sardine])
-        deb_derived = NamedTuple(model.DEB_derived_params[:sardine])
+        deb_species = NamedTuple(model.species_specific_DEB_params[:sardine])
+        deb_derived = NamedTuple(model.derived_params[:sardine])
     else
-        deb_species = NamedTuple(model.DEB_species_specific_params[:anchovy])
-        deb_derived = NamedTuple(model.DEB_derived_params[:anchovy])
+        deb_species = NamedTuple(model.species_specific_DEB_params[:anchovy])
+        deb_derived = NamedTuple(model.derived_params[:anchovy])
     end
 
     if !Fish.Dead
@@ -240,12 +241,12 @@ function juveDEB!(Fish, model)
         deltaH = 0.0
         deltaR = 0.0
 
-        v_T = model.DEB_parameters_all[:v_rate] * deb_species.Tc_value
+        v_T = model.species_specific_DEB_params[Fish.species][:v_rate] * deb_species.Tc_value
 
         # Energy fluxes
-        pA = (Fish.f_i * deb_species.p_Am* deb_species.Tc_value * deb_species.s_M_i * (Vdyn ^ (2/3)))
+        pA = (Fish.f_i * deb_species.p_Am* deb_species.Tc_value * Fish.s_M_i * (Vdyn ^ (2/3)))
         pS = p_M_T * Vdyn
-        pC = ((Endyn/Vdyn) * (deb_derived.Eg * v_T * Fish.s_M_i * (Vdyn ^ (2/3)) + pS) / (deb_species.Kappa * (Endyn/ Vdyn) + deb_derived.Eg))
+        pC = ((Endyn/Vdyn) * (deb_species.Eg * v_T * Fish.s_M_i * (Vdyn ^ (2/3)) + pS) / (deb_species.Kappa * (Endyn/ Vdyn) + deb_species.Eg))
         pJ = model.DEB_parameters_all[:k_J] * Hdyn * deb_species.Tc_value
         deltaEn = pA - pC
 
@@ -268,7 +269,7 @@ function juveDEB!(Fish, model)
         end
 
 
-        deltaV = ((deb_species.Kappa * pC - pS) / deb_derived.Eg)
+        deltaV = ((deb_species.Kappa * pC - pS) / deb_species.Eg)
         if (deltaV < 0.0) 
         deltaV = 0.0
         end
@@ -317,9 +318,9 @@ end
 function juvemature!(Fish, model)
 
     if is_sardine(Fish)
-        deb_species = NamedTuple(model.DEB_species_specific_params[:sardine])
+        deb_species = NamedTuple(model.species_specific_DEB_params[:sardine])
     else
-        deb_species = NamedTuple(model.DEB_species_specific_params[:anchovy])
+        deb_species = NamedTuple(model.species_specific_DEB_params[:anchovy])
     end
 
     if !Fish.Dead && (Fish.H >= deb_species.Hp)
@@ -452,7 +453,7 @@ function adultdie!(Fish, model)
             end
      end
 
-    if Fish.Nind <= Fish.Nind0 * model.death_threshold && !Fish.Dead
+    if Fish.Nind <= Fish.Nind0 * model.natural_mortalities[Fish.species][:death_threshold] && !Fish.Dead
         Fish.Dead = true
         model.output[Fish.species][:natural_mortality][:deadA_nat] += Fish.Nind
     end
@@ -463,15 +464,15 @@ end
 function adultDEB!(Fish, model)
 
     if is_sardine(Fish)
-        deb_species = NamedTuple(model.DEB_species_specific_params[:sardine])
-        deb_derived = NamedTuple(model.DEB_derived_params[:sardine])
+        deb_species = NamedTuple(model.species_specific_DEB_params[:sardine])
+        deb_derived = NamedTuple(model.derived_params[:sardine])
     else
-        deb_species = NamedTuple(model.DEB_species_specific_params[:anchovy])
-        deb_derived = NamedTuple(model.DEB_derived_params[:anchovy])
+        deb_species = NamedTuple(model.species_specific_DEB_params[:anchovy])
+        deb_derived = NamedTuple(model.derived_params[:anchovy])
     end
 
 if !Fish.Dead
-    Fish.f_i = model.f
+    Fish.f_i = model.initial_conditions[:f]
     Vdyn = (Fish.Lw * deb_species.del_M) ^ 3.0
     Endyn = Fish.En
     Hdyn = deb_species.Hp
@@ -488,11 +489,11 @@ if !Fish.Dead
     
     pA = (Fish.f_i * deb_species.p_Am * deb_species.Tc_value * Fish.s_M_i * (Vdyn ^ (2/3)))
     pS = p_M_T * Vdyn
-    pC = ((Endyn/Vdyn) * (deb_derived.Eg * (model.DEB_parameters_all[:v_rate] * deb_species.Tc_value) * Fish.s_M_i * (Vdyn ^ (2/3)) + pS) / (deb_species.Kappa * (Endyn/ Vdyn) + deb_derived.Eg))
+    pC = ((Endyn/Vdyn) * (deb_species.Eg * (model.species_specific_DEB_params[Fish.species][:v_rate] * deb_species.Tc_value) * Fish.s_M_i * (Vdyn ^ (2/3)) + pS) / (deb_species.Kappa * (Endyn/ Vdyn) + deb_species.Eg))
     pJ = model.DEB_parameters_all[:k_J] * Hdyn  * deb_species.Tc_value # should not take into account the temperature?
     deltaEn = (pA - pC)
 
-    deltaV = ((deb_species.Kappa * pC - pS) / deb_derived.Eg)#pG
+    deltaV = ((deb_species.Kappa * pC - pS) / deb_species.Eg)#pG
     if (deltaV < 0.0) 
         deltaV = 0.0
     end
@@ -567,19 +568,19 @@ function adultspawn!(Fish, model)
 
     
 if is_sardine(Fish)
-    first_cond = ((model.DEB_parameters_all[:repro_start_sardine] <= model.day_of_the_year <= 365.0) || (1.0 <= model.day_of_the_year <= model.DEB_parameters_all[:repro_end_sardine]))
-    deb_species = NamedTuple(model.DEB_species_specific_params[:sardine])
+    first_cond = ((model.DEB_parameters_all[:repro_start_sardine] <= model.initial_conditions[:day_of_the_year] <= 365.0) || (1.0 <= model.initial_conditions[:day_of_the_year] <= model.DEB_parameters_all[:repro_end_sardine]))
+    deb_species = NamedTuple(model.species_specific_DEB_params[:sardine])
     fecundity = 400.0
 else
     first_cond = ((model.DEB_parameters_all[:repro_start_anchovy] <= model.initial_conditions[:day_of_the_year] <= model.DEB_parameters_all[:repro_end_anchovy]))
-    deb_species = NamedTuple(model.DEB_species_specific_params[:anchovy])
+    deb_species = NamedTuple(model.species_specific_DEB_params[:anchovy])
     fecundity = 450.0
 end
 
     if first_cond
           
             # 3th condition: random number between 0 and 1 is smaller than the probability of spawning, then reproduction occurs
-            #(rand() <= model.prob_dict[model.day_of_the_year])
+            #(rand() <= model.prob_dict[model.initial_conditions[:day_of_the_year]])
 
             Wg = (model.DEB_parameters_all[:w] * (model.DEB_parameters_all[:w_E] / model.DEB_parameters_all[:mu_E]) * Fish.R)
             free_weight = Fish.Ww - Wg
@@ -594,7 +595,7 @@ end
             spawned_en = Neggs_value_single *  Fish.maternal_EggEn #Fish.R * Kappa_valueR / spawn_period 
 
             # and if the energy to be spawned is lower than the energy available, spawn!
-            if (spawned_en <= Fish.R * model.KappaR) #* Kappa_valueR)
+            if (spawned_en <= Fish.R * model.DEB_parameters_all[:KappaR]) #* Kappa_valueR)
                 #Nind males and females lose the same amount of spawned energy
                 Fish.superind_Neggs = superind_Neggs_value
                 Fish.reproduction = :spawner
