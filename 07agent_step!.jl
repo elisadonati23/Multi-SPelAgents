@@ -568,13 +568,17 @@ function adultspawn!(Fish, model)
 
     
 if is_sardine(Fish)
-    first_cond = ((model.DEB_parameters_all[:repro_start_sardine] <= model.initial_conditions[:day_of_the_year] <= 365.0) || (1.0 <= model.initial_conditions[:day_of_the_year] <= model.DEB_parameters_all[:repro_end_sardine]))
+    reprostart = model.DEB_parameters_all[:repro_start_sardine] + round(Int, randn() * 5)
+    reproend =model.DEB_parameters_all[:repro_end_sardine] + round(Int, randn() * 5)
+    first_cond = ((reprostart <= model.initial_conditions[:day_of_the_year] <= 365.0) || (1.0 <= model.initial_conditions[:day_of_the_year] <= reproend))
     deb_species = NamedTuple(model.species_specific_DEB_params[:sardine])
-    fecundity = 400.0
+    fecundity = 400.0 + randn() * 50
 else
-    first_cond = ((model.DEB_parameters_all[:repro_start_anchovy] <= model.initial_conditions[:day_of_the_year] <= model.DEB_parameters_all[:repro_end_anchovy]))
+    reprostart = model.DEB_parameters_all[:repro_start_anchovy] + round(Int, randn() * 5)
+    reproend =model.DEB_parameters_all[:repro_end_anchovy] + round(Int, randn() * 5)
+    first_cond = ((reprostart <= model.initial_conditions[:day_of_the_year] <= reproend))
     deb_species = NamedTuple(model.species_specific_DEB_params[:anchovy])
-    fecundity = 450.0
+    fecundity = 450.0 + randn() * 50
 end
 
     if first_cond
@@ -590,12 +594,12 @@ end
             Neggs_value_single = Float64(fecundity * free_weight) #420 standard number of eggs per weight of female
 
             # Then determine the energy content of the eggs from maternal effects
-            Fish.maternal_EggEn = Float64(((deb_species.E0_max - deb_species.E0_min) / (1.0- deb_species.ep_min)) * (Fish.Scaled_En - deb_species.ep_min)) + deb_species.E0_min
+            Fish.maternal_EggEn = Float64((((deb_species.E0_max - deb_species.E0_min) / (1.0- deb_species.ep_min)) * (Fish.Scaled_En - deb_species.ep_min)) + deb_species.E0_min) + randn() * 0.1 * deb_species.E0_min
             # spawned energy of a single female, we assume it's the same for all female and male
             spawned_en = Neggs_value_single *  Fish.maternal_EggEn #Fish.R * Kappa_valueR / spawn_period 
 
             # and if the energy to be spawned is lower than the energy available, spawn!
-            if (spawned_en <= Fish.R * model.DEB_parameters_all[:KappaR]) #* Kappa_valueR)
+            if (spawned_en <= Fish.R * (model.DEB_parameters_all[:KappaR] + (randn() * 0.1 * model.DEB_parameters_all[:KappaR]))) #* Kappa_valueR)
                 #Nind males and females lose the same amount of spawned energy
                 Fish.superind_Neggs = superind_Neggs_value
                 Fish.reproduction = :spawner
