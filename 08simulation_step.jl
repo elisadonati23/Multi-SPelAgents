@@ -81,7 +81,7 @@ end
 
 function update_outputs!(model)
     agents = collect(values(allagents(model)))
-    model.Nsuperind = length(agents)
+    #model.Nsuperind = length(agents)
     
     adults = filter(a -> a.type == :adult, agents)
     adults_juv = filter(a -> a.type == :adult || a.type == :juvenile, agents)
@@ -117,53 +117,6 @@ function update_outputs!(model)
     return
 end
 
-function reset_variables(model)
-        # natural mortality
-        #adults
-        model.deadA_nat = 0.0
-        model.deadA_nat1 = 0.0
-        model.deadA_nat2 = 0.0
-        model.deadA_nat3 = 0.0
-        model.deadA_nat4more = 0.0
-        model.natA_biom = 0.0
-        model.natA_biom0 = 0.0
-        model.natA_biom1 = 0.0
-        model.natA_biom2 = 0.0
-        model.natA_biom3 = 0.0
-        model.natA_biom4more = 0.0
-    
-            #juvenile
-        model.deadJ_nat = 0.0
-        model.deadJ_nat0 = 0.0
-        model.deadJ_nat1 = 0.0
-        model.natJ_biom = 0.0
-        model.natJ_biom0 = 0.0
-        model.natJ_biom1 = 0.0
-    
-        # starving mortality
-            # adult
-        model.deadA_starved = 0.0
-        model.deadA_starved0 = 0.0
-        model.deadA_starved1 = 0.0
-        model.deadA_starved2 = 0.0
-        model.deadA_starved3 = 0.0
-        model.deadA_starved4more = 0.0
-        model.starvedA_biom = 0.0
-        model.starvedA_biom0 = 0.0
-        model.starvedA_biom1 = 0.0
-        model.starvedA_biom2 = 0.0
-        model.starvedA_biom3 = 0.0
-        model.starvedA_biom4more = 0.0
-            # juvenile
-        model.starvedJ_biom = 0.0
-        model.starvedJ_biom0 = 0.0
-        model.starvedJ_biom1 = 0.0
-        model.deadJ_starved = 0.0
-        model.deadJ_starved0 = 0.0
-        model.deadJ_starved1 = 0.0
-    return
-end
-
 #################
 #     Scheduler #
 #################
@@ -179,10 +132,6 @@ end
 sEA = scheduler_Adults()
 
 function complex_step!(model)
-
-    reset_variables(model)
-
-    remove_all!(model, is_dead)
 
     # Parallel processing for Sardine agents
     Threads.@threads for sardine in collect(values(allagents(model)))
@@ -204,8 +153,6 @@ function complex_step!(model)
     # Filter spawners for creating new EggMass agents
     spawners = filter!(id -> hasid(model, id) && model[id].reproduction == :spawner, copy(sEA_ids))
 
-    remove_all!(model, is_dead)
-
     if !isempty(spawners)
         # Create new born daily superindividuals
         prop_values = [getfield(model[agent], :superind_Neggs) for agent in spawners]
@@ -215,8 +162,6 @@ function complex_step!(model)
         #function generate_EggMass(No_Egg, model, Nind = missing, maternal_EggEn = missing, En = missing, Generation = missing)
         generate_EggMass(1, model, tot_Neggs, mean_Egg_energy, mean_Egg_energy, max_generation)
     end
-
-    remove_all!(model, is_dead)
 
     # Update model outputs
     update_outputs!(model)
