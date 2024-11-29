@@ -16,11 +16,11 @@ Xmax = Vector(df[!, :JL]) #16071 elements from 1.1.1975 to 31.12.2018
 
 temp = Vector(df[!, :thetao])
 
-Mf0 = Vector(df[!, :mf0_pil])
-Mf1 = Vector(df[!, :mf1_pil])
-Mf2 = Vector(df[!, :mf2_pil])
-Mf3 = Vector(df[!, :mf3_pil])
-Mf4 = Vector(df[!, :mf4_pil])
+Mf0 = Vector(df[!, :mf0_ane])
+Mf1 = Vector(df[!, :mf1_ane])
+Mf2 = Vector(df[!, :mf2_ane])
+Mf3 = Vector(df[!, :mf3_ane])
+Mf4 = Vector(df[!, :mf4_ane])
 
 # value to be used for spin up
 meanXmax = mean(Xmax) #mean for spin up
@@ -34,14 +34,6 @@ zeros = repeat([0.0], 40*365+1)#spinup
 #spin up + timeseries from 1975 to 2018
 Xmax_run = vcat(repXmax, Xmax) #100%
 Xmax10percent = Xmax_run .* 0.1
-Xmax20percent = Xmax_run .* 0.2
-Xmax30percent = Xmax_run .* 0.3
-Xmax40percent = Xmax_run .* 0.4
-Xmax50percent = Xmax_run .* 0.5
-Xmax60percent = Xmax_run .* 0.6
-Xmax70percent = Xmax_run .* 0.7
-Xmax80percent = Xmax_run .* 0.8
-Xmax90percent = Xmax_run .* 0.9
 
 Temp_run = vcat(repTemp, temp)
 Temp_run = Float64.(Temp_run) #spin up + timeseries from 1975 to 2018
@@ -74,11 +66,11 @@ repeated_df = vcat([clima_df for _ in 1:50]...)
 
 clima_Xmax = Vector(repeated_df[!, :JL_mean]) #16071 elements from 1.1.1975 to 31.12.2018
 clima_temp = Vector(repeated_df[!, :thetao_mean])
-clima_Mf0 = Vector(repeated_df[!, :mf0_pil_mean])
-clima_Mf1 = Vector(repeated_df[!, :mf1_pil_mean])
-clima_Mf2 = Vector(repeated_df[!, :mf2_pil_mean])
-clima_Mf3 = Vector(repeated_df[!, :mf3_pil_mean])
-clima_Mf4 = Vector(repeated_df[!, :mf4_pil_mean])
+clima_Mf0 = Vector(repeated_df[!, :mf0_ane_mean])
+clima_Mf1 = Vector(repeated_df[!, :mf1_ane_mean])
+clima_Mf2 = Vector(repeated_df[!, :mf2_ane_mean])
+clima_Mf3 = Vector(repeated_df[!, :mf3_ane_mean])
+clima_Mf4 = Vector(repeated_df[!, :mf4_ane_mean])
 
 mean_clima_Xmax = mean(clima_Xmax)
 rep_mean_clima_Xmax= repeat([mean_clima_Xmax], 40*365+1) #spinup
