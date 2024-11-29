@@ -27,6 +27,9 @@ function generate_EggMass(No_Egg, model, species::Symbol, Nind = missing, matern
     agent_pA = 0.0
     agent_Lb_i = 0.0
     agent_superind_Neggs = 0.0
+    agent_Wg = 0.0
+    agent_Hp_i = model.species_specific_DEB_params[Fish.species][:Hp] + (randn() * 0.01 * odel.species_specific_DEB_params[Fish.species][:Hp])
+    agent_pM_i = model.species_specific_DEB_params[Fish.species][:p_M] + (randn() * 0.01 * model.species_specific_DEB_params[Fish.species][:p_M])
 
     agent_L = model.species_specific_DEB_params[species][:L0]
     # Set maternal egg energy
@@ -45,8 +48,9 @@ function generate_EggMass(No_Egg, model, species::Symbol, Nind = missing, matern
         add_agent!(
             Fish, model, agent_species, agent_type, agent_reproduction, agent_Nind,agent_Nind0, agent_Age, agent_L, agent_H,
             agent_maternal_EggEn, agent_superind_Neggs, agent_En, agent_Generation, agent_Dead,
-            agent_f_i, agent_t_puberty, agent_Lw, agent_Ww, agent_R, agent_Scaled_En,
-            agent_s_M_i, agent_pA, agent_Lb_i, agent_Lj_i, agent_metamorph, agent_CI, agent_GSI, agent_spawned
+            agent_f_i, agent_t_puberty, agent_Lw, agent_Ww, agent_Wg, agent_R, agent_Scaled_En,
+            agent_s_M_i, agent_pA, agent_Lb_i, agent_Lj_i, agent_metamorph, agent_Hp_i, agent_pM_i, 
+            agent_CI, agent_GSI, agent_spawned
         )
 
     end
