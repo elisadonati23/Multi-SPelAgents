@@ -70,6 +70,10 @@ function generate_Juvenile(No_J, model, species::Symbol, Nind = missing, Generat
     agent_Dead = false
     agent_reproduction = :nonspawner
     agent_superind_Neggs = 0.0  # EggMass
+    agent_Wg = 0.0
+    agent_Hp_i = model.species_specific_DEB_params[Fish.species][:Hp] + (randn() * 0.01 * odel.species_specific_DEB_params[Fish.species][:Hp])
+    agent_pM_i = model.species_specific_DEB_params[Fish.species][:p_M] + (randn() * 0.01 * model.species_specific_DEB_params[Fish.species][:p_M])
+
     
     # Silenced features
     agent_maternal_EggEn = model.species_specific_DEB_params[species][:E0]
@@ -126,8 +130,9 @@ function generate_Juvenile(No_J, model, species::Symbol, Nind = missing, Generat
         add_agent!(
             Fish, model, agent_species, agent_type, agent_reproduction, agent_Nind, agent_Nind0, agent_Age, agent_L, agent_H,
             agent_maternal_EggEn, agent_superind_Neggs, agent_En, agent_Generation, agent_Dead,
-            agent_f_i, agent_t_puberty, agent_Lw, agent_Ww, agent_R, agent_Scaled_En,
-            agent_s_M_i, agent_pA, agent_Lb_i, agent_Lj_i, agent_metamorph, agent_CI, agent_GSI, agent_spawned
+            agent_f_i, agent_t_puberty, agent_Lw, agent_Ww, agent_Wg, agent_R, agent_Scaled_En,
+            agent_s_M_i, agent_pA, agent_Lb_i, agent_Lj_i, agent_metamorph, agent_Hp_i, agent_pM_i,
+            agent_CI, agent_GSI, agent_spawned
         )
     end
 end
@@ -146,6 +151,10 @@ function generate_Adult(No_A, model, species::Symbol, Nind = missing, Age = miss
     agent_spawned = 0.0
     agent_Dead = false
     agent_metamorph = true
+    agent_Wg = 0.0
+    agent_Hp_i = model.species_specific_DEB_params[Fish.species][:Hp]
+    agent_pM_i = model.species_specific_DEB_params[Fish.species][:p_M] + (randn() * 0.01 * model.species_specific_DEB_params[Fish.species][:p_M])
+
 
     # Set maturation energy
     agent_H = ismissing(H) ? ind_DEB_params.Hp : H
@@ -230,8 +239,9 @@ function generate_Adult(No_A, model, species::Symbol, Nind = missing, Age = miss
         add_agent!(
             Fish, model, agent_species, agent_type, agent_reproduction, agent_Nind, agent_Nind0, agent_Age, agent_L, agent_H,
             agent_maternal_EggEn, agent_superind_Neggs, agent_En, agent_Generation, agent_Dead,
-            agent_f_i, agent_t_puberty, agent_Lw, agent_Ww, agent_R, agent_Scaled_En,
-            agent_s_M_i, agent_pA, agent_Lb_i, agent_Lj_i, agent_metamorph, agent_CI, agent_GSI, agent_spawned
+            agent_f_i, agent_t_puberty, agent_Lw, agent_Ww, agent_Wg, agent_R, agent_Scaled_En,
+            agent_s_M_i, agent_pA, agent_Lb_i, agent_Lj_i, agent_metamorph, agent_Hp_i, agent_pM_i,
+            agent_CI, agent_GSI, agent_spawned
         )
     end
 
@@ -260,6 +270,10 @@ function generate_adult_pop(model, species, Lwclass = missing, Lw_biom = missing
         agent_H = ind_DEB_params.Hp
         agent_s_M_i = ind_DEB_params.Lj / ind_DEB_params.Lb
         agent_Generation = 0.0
+        agent_Wg = 0.0
+        agent_Hp_i = model.species_specific_DEB_params[Fish.species][:Hp]
+        agent_pM_i = model.species_specific_DEB_params[Fish.species][:p_M] + (randn() * 0.01 * model.species_specific_DEB_params[Fish.species][:p_M])
+    
 
     #Lw class - biom relationship - based on MEDIAS
     agent_R =  0.0 
@@ -318,8 +332,9 @@ function generate_adult_pop(model, species, Lwclass = missing, Lw_biom = missing
         add_agent!(
             Fish, model,agent_species, agent_type, agent_reproduction, agent_Nind, agent_Nind0, agent_Age, agent_L, agent_H,
             agent_maternal_EggEn, agent_superind_Neggs, agent_En, agent_Generation, agent_Dead,
-            agent_f_i, agent_t_puberty, agent_Lw, agent_Ww, agent_R, agent_Scaled_En,
-            agent_s_M_i, agent_pA, agent_Lb_i, agent_Lj_i, agent_metamorph, agent_CI, agent_GSI, agent_spawned
+            agent_f_i, agent_t_puberty, agent_Lw, agent_Ww, agent_Wg, agent_R, agent_Scaled_En,
+            agent_s_M_i, agent_pA, agent_Lb_i, agent_Lj_i, agent_metamorph, agent_Hp_i, agent_pM_i,
+            agent_CI, agent_GSI, agent_spawned
         )
     end
     return
@@ -345,6 +360,10 @@ function generate_juvenile_pop(model, species, Lwclass = missing, Lw_biom = miss
         agent_spawned = 0.0
         agent_Dead = false
         agent_Generation = 0.0
+        agent_Wg = 0.0
+        agent_Hp_i = model.species_specific_DEB_params[Fish.species][:Hp] + (randn() * 0.01 * odel.species_specific_DEB_params[Fish.species][:Hp])
+        agent_pM_i = model.species_specific_DEB_params[Fish.species][:p_M] + (randn() * 0.01 * model.species_specific_DEB_params[Fish.species][:p_M])
+    
 
     #Lw class - biom relationship - based on MEDIAS
     agent_R =  0.0
@@ -404,8 +423,9 @@ function generate_juvenile_pop(model, species, Lwclass = missing, Lw_biom = miss
         add_agent!(
             Fish, model, agent_species,agent_type, agent_reproduction, agent_Nind, agent_Nind0, agent_Age, agent_L, agent_H,
             agent_maternal_EggEn, agent_superind_Neggs, agent_En, agent_Generation, agent_Dead,
-            agent_f_i, agent_t_puberty, agent_Lw, agent_Ww, agent_R, agent_Scaled_En,
-            agent_s_M_i, agent_pA, agent_Lb_i, agent_Lj_i, agent_metamorph, agent_CI, agent_GSI, agent_spawned
+            agent_f_i, agent_t_puberty, agent_Lw, agent_Ww, agent_Wg, agent_R, agent_Scaled_En,
+            agent_s_M_i, agent_pA, agent_Lb_i, agent_Lj_i, agent_metamorph, 
+            agent_Hp_i, agent_pM_i, agent_CI, agent_GSI, agent_spawned
         )
     end
     return
