@@ -505,8 +505,8 @@ function adultspawn!(Sardine, model)
 
     Sardine.reproduction = :nonspawner
     Sardine.superind_Neggs = 0.0
-    reprostart = model.repro_start + randn() * 5 * model.repro_start
-    reproend = model.repro_end + randn() * 5 * model.repro_end
+    reprostart = model.repro_start + randn() * 5
+    reproend = model.repro_end + randn() * 5
 
     #2nd condition: being in the repro period
     if (reprostart <= model.day_of_the_year <= reproend)
