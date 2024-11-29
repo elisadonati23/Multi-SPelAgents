@@ -323,7 +323,7 @@ function juvemature!(Fish, model)
         deb_species = NamedTuple(model.species_specific_DEB_params[:anchovy])
     end
 
-    if !Fish.Dead && (Fish.H >= deb_species.Hp)
+    if !Fish.Dead && (Fish.H >= Fish.Hp_i)
          #Keep the same number of individuals which survived up to now in juvenile superind
          Fish.type = :adult
          Fish.R = 0.0
