@@ -12,54 +12,69 @@ include("10timeseries.jl")
 # running -----------------
 
 results = []
-num_runs = 1
 
 model = model_initialize_parallel(
     # Nind - sardine vs anchovy - adult, juve eggs
-    1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+    1000.0, 0.0, 0.0, 1000.0, 0.0, 0.0,
     #initial cond 
-    1.7e14, 1.0, 5.0, 15.0,
+    1.7e14, 1.0, Xmax_run, Temp_run,
     #Kappa - sardine vs anchovy
-    0.88, 0.9901, 
+    0.883, 0.9901, 
     #Mfs
-    0.0, 0.0, 0.0,0.0,0.0,
+    Mf0_pil_run, Mf1_pil_run, Mf2_pil_run, Mf3_pil_run, Mf4_pil_run,
     #mfa
-    0.0,0.0,0.0,0.0,0.0,
+    Mf0_ane_run, Mf1_ane_run, Mf2_ane_run, Mf3_ane_run, Mf4_ane_run,
     #Ms
     0.9998,	1.08,	0.86,	0.69,	0.62,	0.48,
     #Ma
-    1.08,	0.86,	0.69,	0.62,	0.48)
+    1.38,	1.01,	0.82,	0.69,	0.61)
 
-#mdata = [(:initial_conditions, :day_of_the_year):day_of_the_year, :year, :TotB,:JuvB,:AdB, :f, :deadJ_nat, :starvedJ_biom,:starvedA_biom,:natJ_biom, :natA_biom,
-#:deadJ_starved, :deadA_nat, :deadA_starved, :fished, :fishedW, :fished0, :fished1, :fished2, :fished3, :fished4more,
-#:meanJuvL, :sdJuvL, :meanAdL, :sdAdL, :mean_tpuberty, :sd_tpuberty, :meanJuvWw, :sdJuvWw, :meanAdWw, :sdAdWw, :mean_Hjuve, :sd_Hjuve]
-#adata = [:type, :Nind, :t_puberty,:Age, :Lw, :Ww, :En, :R, :H, :CI, :GSI, :pA, :s_M_i, :superind_Neggs, :reproduction, :spawned, :Dead]
 
 # Initialize dataframes
-adata = [:type, :Nind]
+adata = [:type, :Nind, :t_puberty, :Age, :Lw, :Ww, :En, :R, :H, :CI, :GSI, :pA, :s_M_i, :superind_Neggs, :reproduction, :spawned, :Dead]
+
 mdata = [
-model -> model.output[:sardine][:lifehistory][:TotB],
-model -> model.output[:anchovy][:lifehistory][:TotB],
+    model -> model.initial_conditions[:day_of_the_year],
+    model -> model.initial_conditions[:year],
+    model -> model.initial_conditions[:f],
+    model -> model.output[:sardine][:lifehistory][:TotB],
+    model -> model.output[:sardine][:lifehistory][:JuvB],
+    model -> model.output[:sardine][:lifehistory][:AdB],
+    model -> model.output[:sardine][:lifehistory][:meanAdWw],
+    model -> model.output[:sardine][:lifehistory][:meanJuvWw],
+    model -> model.output[:sardine][:lifehistory][:meanAdL],
+    model -> model.output[:sardine][:lifehistory][:meanJuvL],
+    model -> model.output[:sardine][:lifehistory][:mean_tpuberty],
+    model -> model.output[:sardine][:starvation][:starvedA_biom],
+    model -> model.output[:sardine][:starvation][:starvedJ_biom],
+    model -> model.output[:sardine][:fishing][:fishedW],
+    model -> model.output[:anchovy][:lifehistory][:TotB],
+    model -> model.output[:anchovy][:lifehistory][:JuvB],
+    model -> model.output[:anchovy][:lifehistory][:AdB],
+    model -> model.output[:anchovy][:lifehistory][:meanAdWw],
+    model -> model.output[:anchovy][:lifehistory][:meanJuvWw],
+    model -> model.output[:anchovy][:lifehistory][:meanAdL],
+    model -> model.output[:anchovy][:lifehistory][:meanJuvL],
+    model -> model.output[:anchovy][:lifehistory][:mean_tpuberty],
+    model -> model.output[:anchovy][:starvation][:starvedA_biom],
+    model -> model.output[:anchovy][:starvation][:starvedJ_biom],
+    model -> model.output[:anchovy][:fishing][:fishedW],
 ]
-#:starvedJ_biom,  , :natA_biom,
-# Run the model for each model in the list
-#for (i, model) in enumerate(model)
 
     df_agent = init_agent_dataframe(model, adata)
     df_model = init_model_dataframe(model, mdata)
-    #run!(model, 365*20; adata, mdata)
+    run!(model, 365*40; adata, mdata)
 
-    #df_agent = run!(model, 16070+365*30; adata, mdata)
-    df_agent = run!(model, 50; adata, mdata)
+    df_agent = run!(model, 16071; adata, mdata)
 
     push!(results, df_agent)
-df_agent
+
     end_time = Dates.now()
     duration = end_time - start_time
     minutes = duration / Dates.Minute(1)
     rounded_minutes = round(Int, minutes)
     println("Simulation $i took: ", minutes, " minutes")
-#end
+
 
 
 #    p1 = diagnostic_plots_pt1(results[i][1], results[i][2], model)
@@ -86,8 +101,8 @@ df_agent
 #    summerbiom = plot_timeframe_param_timeseries(results[i][2], [:TotB, :AdB], 150.0, 180.0,true, :mean, "Mid - Year Biomass (tonnes)", 1975)
 #    
 #
-#    CSV.write("update_smipA_agent_$((i)+1).csv", results[i][1])
-#    CSV.write("update_smipA_model_$((i)+1).csv", results[i][2])
+    CSV.write("both_agent_$((i)+1).csv", results[1][1])
+    CSV.write("both_model_$((i)+1).csv", results[1][2])
 #    #save plots
 #    Plots.savefig(p1, "update_smipA__p1_$(Dates.format(today(), "yyyy-mm-dd"))_$((i)+1).png")
 #    Plots.savefig(p2, "update_smipA__p2_$(Dates.format(today(), "yyyy-mm-dd"))_$((i)+1).png")

@@ -16,11 +16,17 @@ Xmax = Vector(df[!, :JL]) #16071 elements from 1.1.1975 to 31.12.2018
 
 temp = Vector(df[!, :thetao])
 
-Mf0 = Vector(df[!, :mf0_pil])
-Mf1 = Vector(df[!, :mf1_pil])
-Mf2 = Vector(df[!, :mf2_pil])
-Mf3 = Vector(df[!, :mf3_pil])
-Mf4 = Vector(df[!, :mf4_pil])
+Mf0_pil = Vector(df[!, :mf0_pil])
+Mf1_pil = Vector(df[!, :mf1_pil])
+Mf2_pil = Vector(df[!, :mf2_pil])
+Mf3_pil = Vector(df[!, :mf3_pil])
+Mf4_pil = Vector(df[!, :mf4_pil])
+
+Mf0_ane = Vector(df[!, :mf0_ane])
+Mf1_ane = Vector(df[!, :mf1_ane])
+Mf2_ane = Vector(df[!, :mf2_ane])
+Mf3_ane = Vector(df[!, :mf3_ane])
+Mf4_ane = Vector(df[!, :mf4_ane])
 
 # value to be used for spin up
 meanXmax = mean(Xmax) #mean for spin up
@@ -34,25 +40,22 @@ zeros = repeat([0.0], 40*365+1)#spinup
 #spin up + timeseries from 1975 to 2018
 Xmax_run = vcat(repXmax, Xmax) #100%
 Xmax10percent = Xmax_run .* 0.1
-Xmax20percent = Xmax_run .* 0.2
-Xmax30percent = Xmax_run .* 0.3
-Xmax40percent = Xmax_run .* 0.4
-Xmax50percent = Xmax_run .* 0.5
-Xmax60percent = Xmax_run .* 0.6
-Xmax70percent = Xmax_run .* 0.7
-Xmax80percent = Xmax_run .* 0.8
-Xmax90percent = Xmax_run .* 0.9
+
 
 Temp_run = vcat(repTemp, temp)
 Temp_run = Float64.(Temp_run) #spin up + timeseries from 1975 to 2018
 
-Mf0_run = vcat(zeros, Mf0) #spin up + timeseries from 1975 to 2018
-Mf1_run = vcat(zeros, Mf1) #spin up + timeseries from 1975 to 2018
-Mf2_run = vcat(zeros, Mf2) #spin up + timeseries from 1975 to 2018
-Mf3_run = vcat(zeros, Mf3) #spin up + timeseries from 1975 to 2018
-Mf4_run = vcat(zeros, Mf4) #spin up + timeseries from 1975 to 2018
+Mf0_pil_run = vcat(zeros, Mf0_pil) #spin up + timeseries from 1975 to 2018
+Mf1_pil_run = vcat(zeros, Mf1_pil) #spin up + timeseries from 1975 to 2018
+Mf2_pil_run = vcat(zeros, Mf2_pil) #spin up + timeseries from 1975 to 2018
+Mf3_pil_run = vcat(zeros, Mf3_pil) #spin up + timeseries from 1975 to 2018
+Mf4_pil_run = vcat(zeros, Mf4_pil) #spin up + timeseries from 1975 to 2018
 
-zeros_long = vcat(repeat([0.0], 365*40+1+16071))
+Mf0_ane_run = vcat(zeros, Mf0_ane) #spin up + timeseries from 1975 to 2018
+Mf1_ane_run = vcat(zeros, Mf1_ane) #spin up + timeseries from 1975 to 2018
+Mf2_ane_run = vcat(zeros, Mf2_ane) #spin up + timeseries from 1975 to 2018
+Mf3_ane_run = vcat(zeros, Mf3_ane) #spin up + timeseries from 1975 to 2018
+Mf4_ane_run = vcat(zeros, Mf4_ane) #spin up + timeseries from 1975 to 2018
 
 #climatologies
 # Read the CSV file
