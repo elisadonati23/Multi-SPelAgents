@@ -259,7 +259,7 @@ function generate_adult_pop(model, Lwclass = missing, Lw_biom = missing)
         agent_s_M_i = model.Lj / model.Lb
         agent_Generation = 0.0
         agent_Wg = 0.0
-        agent_pM_i = model.p_M * (randn() * 0.01 * model.p_M)
+        agent_pM_i = model.p_M + (randn() * 0.01 * model.p_M)
 
     #Lw class - biom relationship - based on MEDIAS
     agent_R =  0.0
@@ -349,7 +349,7 @@ function generate_juvenile_pop(model, Lwclass = missing, Lw_biom = missing)
         agent_Generation = 0.0
         agent_Wg = 0.0
         agent_Hp_i = model.Hp + (randn() * 0.01 * model.Hp)
-        agent_pM_i = model.p_M * (randn() * 0.01 * model.p_M)
+        agent_pM_i = model.p_M + (randn() * 0.01 * model.p_M)
 
     #Lw class - biom relationship - based on MEDIAS
     agent_R =  0.0
