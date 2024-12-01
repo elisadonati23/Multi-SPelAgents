@@ -151,7 +151,7 @@ function juvedie!(Fish, model)
     if !Fish.Dead && Fish.Nind >= Fish.Nind0 * model.natural_mortalities[Fish.species][:death_threshold]
 
         # 1st case: Fish too small to be fished
-        if Fish.Lw < 10.0 || fishM.M_f0 == 0.0
+        if Fish.Lw < 10.0 || fishM.M_f0value == 0.0
             # only natural mortality
             natural_deaths = Float64(rand(Binomial(Int64(Fish.Nind), 1-exp(-(natM.M0)))))
             Fish.Nind -= natural_deaths
@@ -169,8 +169,8 @@ function juvedie!(Fish, model)
         end
 
         #juveniles that are big enough to be fished
-        if Fish.Lw > 10.0 && !(fishM.M_f0 == 0.0)
-            M = natM.M0 + fishM.M_f0
+        if Fish.Lw > 10.0 && !(fishM.M_f0value == 0.0)
+            M = natM.M0 + fishM.M_f0value
 
             total_deaths = Float64(rand(Binomial(Int64(Fish.Nind), 1-exp(-M))))
             natural_deaths = Float64(rand(Binomial(Int64(Fish.Nind), 1-exp(-(natM.M0)))))
@@ -378,19 +378,19 @@ function adultdie!(Fish, model)
 
          #set the new AGE DEPENDENT MORTALITIES -- If Mf is not 0, it is added to M
          if floor(Fish.Age / 365.0 ) == 0.0
-             Mf = fishM.M_f0
+             Mf = fishM.M_f0value
              M = natM.M0 + Mf
          elseif floor(Fish.Age / 365.0 ) == 1.0
-            Mf = fishM.M_f1
+            Mf = fishM.M_f1value
             M = natM.M1 + Mf
          elseif floor(Fish.Age / 365.0 ) == 2.0
-            Mf = fishM.M_f2
+            Mf = fishM.M_f2value
             M = natM.M2 + Mf
          elseif floor(Fish.Age / 365.0 ) == 3.0
-            Mf = fishM.M_f3
+            Mf = fishM.M_f3value
             M = natM.M3 + Mf
          else
-            Mf = fishM.M_f4
+            Mf = fishM.M_f4value
             M = natM.M4 + Mf
          end
 

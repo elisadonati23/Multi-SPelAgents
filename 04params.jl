@@ -37,13 +37,23 @@ function create_params_dict(
                 :M_f1 => M_f1s ./ 365.0,
                 :M_f2 => M_f2s ./ 365.0,
                 :M_f3 => M_f3s ./ 365.0,
-                :M_f4 => M_f4s ./ 365.0),
+                :M_f4 => M_f4s ./ 365.0,
+                :M_f0value => M_f0s[1] ./ 365.0,
+                :M_f1value => M_f1s[1] ./ 365.0,
+                :M_f2value => M_f2s[1] ./ 365.0,
+                :M_f3value => M_f3s[1] ./ 365.0,
+                :M_f4value => M_f4s[1] ./ 365.0),
             :anchovy => Dict(
                 :M_f0 => M_f0a ./ 365.0,
                 :M_f1 => M_f1a ./ 365.0,
                 :M_f2 => M_f2a ./ 365.0,
                 :M_f3 => M_f3a ./ 365.0,
-                :M_f4 => M_f4a ./ 365.0)
+                :M_f4 => M_f4a ./ 365.0,
+                :M_f0value => M_f0a[1] ./ 365.0,
+                :M_f1value => M_f1a[1] ./ 365.0,
+                :M_f2value => M_f2a[1] ./ 365.0,
+                :M_f3value => M_f3a[1] ./ 365.0,
+                :M_f4value => M_f4a[1] ./ 365.0)
                 ),
         :initial_conditions => Dict(
             :No_As => No_As,

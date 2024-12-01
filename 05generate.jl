@@ -178,7 +178,7 @@ function generate_Adult(No_A, model, species::Symbol, Nind = missing, Age = miss
             if ind_derived_params.Lm isa Float64
                 ind_DEB_params.Am * agent_Lw * ind_DEB_params.del_M / ind_derived_params.Lm
             else
-                ind_DEB_params.Am * agent_Lw * ind_DEB_params.del_M / ind_derived_params.Lm[model.sim_timing]
+                ind_DEB_params.Am * agent_Lw * ind_DEB_params.del_M / ind_derived_params.Lm[model.intial_conditions[:sim_timing]]
             end
         else
             Age
@@ -228,7 +228,7 @@ function generate_Adult(No_A, model, species::Symbol, Nind = missing, Age = miss
         agent_Scaled_En = ismissing(Scaled_En) ? agent_En / (ind_derived_params.Em * ((agent_Lw * ind_DEB_params.del_M)^3.0)) : Scaled_En
         
         # Calculate assimilation rate
-        Tc_value = isa(ind_DEB_params.Tc, Vector{Float64}) ? ind_DEB_params.Tc[model.sim_timing] : ind_DEB_params.Tc
+        Tc_value = isa(ind_DEB_params.Tc, Vector{Float64}) ? ind_DEB_params.Tc[model.intial_conditions[:sim_timing]] : ind_DEB_params.Tc
         agent_pA = ismissing(pA) ? agent_f_i * ind_DEB_params.p_Am * Tc_value * agent_s_M_i * ((agent_Lw * ind_DEB_params.del_M)^2.0) : pA
 
         # Calculate condition index and gonadosomatic index
@@ -412,7 +412,7 @@ function generate_juvenile_pop(model, species, Lwclass = missing, Lw_biom = miss
         agent_t_puberty = ind_DEB_params.Ap * (agent_Lw * ind_DEB_params.del_M) / ind_DEB_params.Lp
         
         # Calculate assimilation rate
-        Tc_value = isa(ind_DEB_params.Tc, Vector{Float64}) ? ind_DEB_params.Tc[model.sim_timing] : ind_DEB_params.Tc
+        Tc_value = isa(ind_DEB_params.Tc, Vector{Float64}) ? ind_DEB_params.Tc[model.intial_conditions[:sim_timing]] : ind_DEB_params.Tc
         agent_pA = agent_f_i * ind_DEB_params.p_Am * Tc_value * agent_s_M_i * ((agent_Lw * ind_DEB_params.del_M)^2.0)
 
         # Calculate condition index and gonadosomatic index

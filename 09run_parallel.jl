@@ -18,7 +18,7 @@ model = model_initialize_parallel(
     # Nind - sardine vs anchovy - adult, juve eggs
     1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
     #initial cond 
-    1.7e14, 1.0, 5.0, 15.0,
+    1.7e14, 1.0, 6.0, 15.0,
     #Kappa - sardine vs anchovy
     0.88, 0.9901, 
     #Mfs
@@ -80,11 +80,11 @@ mdata = [
 
     push!(results, df_agent)
     df_agent
-    end_time = Dates.now()
-    duration = end_time - start_time
-    minutes = duration / Dates.Minute(1)
-    rounded_minutes = round(Int, minutes)
-    println("Simulation $i took: ", minutes, " minutes")
+    #end_time = Dates.now()
+    #duration = end_time - start_time
+    #minutes = duration / Dates.Minute(1)
+    #rounded_minutes = round(Int, minutes)
+    #println("Simulation $i took: ", minutes, " minutes")
 #end
 
 

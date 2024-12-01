@@ -3,48 +3,48 @@ function update_Kappa!(model, Kappa::Float64, species::Symbol)
 end
 
 function update_Kappa!(model, Kappa::Vector{Float64}, species::Symbol)
-    model.species_specific_DEB_params[species][:Kappa] = Kappa[model.initial_conditions[:sim_timing]]
+    model.species_specific_DEB_params[species][:Kappa_value] = Kappa[model.initial_conditions[:sim_timing]]
 end
 
 function update_MF0!(model, M_f0::Float64, species::Symbol)
-    model.fishing_mortalities[species][:M_f0] = M_f0
+    model.fishing_mortalities[species][:M_f0value] = M_f0
 end
 
-function update_MF0!(model, M_f0::Vector{Float64},species::Symbol)
-    model.fishing_mortalities[species][:M_f0] = M_f0[model.initial_conditions[:sim_timing]]
+function update_MF0!(model, M_f0::Vector{Float64}, species::Symbol)
+    model.fishing_mortalities[species][:M_f0value] = M_f0[model.initial_conditions[:sim_timing]]
 end
 
 function update_MF1!(model, M_f1::Float64, species::Symbol)
-    model.fishing_mortalities[species][:M_f1] = M_f1
+    model.fishing_mortalities[species][:M_f1value] = M_f1
 end
 
 function update_MF1!(model, M_f1::Vector{Float64},species::Symbol)
-    model.fishing_mortalities[species][:M_f1] = M_f1[model.initial_conditions[:sim_timing]]
+    model.fishing_mortalities[species][:M_f1value] = M_f1[model.initial_conditions[:sim_timing]]
 
 end
 
 function update_MF2!(model, M_f2::Float64,species::Symbol)
-    model.fishing_mortalities[species][:M_f2] = M_f2
+    model.fishing_mortalities[species][:M_f2value] = M_f2
 end
 
 function update_MF2!(model, M_f2::Vector{Float64}, species::Symbol)
-    model.fishing_mortalities[species][:M_f2] = M_f2[model.initial_conditions[:sim_timing]]
+    model.fishing_mortalities[species][:M_f2value] = M_f2[model.initial_conditions[:sim_timing]]
 end
 
 function update_MF3!(model, M_f3::Float64,species::Symbol)
-    model.fishing_mortalities[species][:M_f3] = M_f3
+    model.fishing_mortalities[species][:M_f3value] = M_f3
 end
 
 function update_MF3!(model, M_f3::Vector{Float64}, species::Symbol)
-    model.fishing_mortalities[species][:M_f3] = M_f3[model.initial_conditions[:sim_timing]]   
+    model.fishing_mortalities[species][:M_f3value] = M_f3[model.initial_conditions[:sim_timing]]   
 end
 
 function update_MF4!(model, M_f4::Float64, species::Symbol)
-    model.fishing_mortalities[species][:M_f4] = M_f4
+    model.fishing_mortalities[species][:M_f4value] = M_f4
 end
 
 function update_MF4!(model, M_f4::Vector{Float64}, species::Symbol)
-    model.fishing_mortalities[species][:M_f4] = M_f4[model.initial_conditions[:sim_timing]]   
+    model.fishing_mortalities[species][:M_f4value] = M_f4[model.initial_conditions[:sim_timing]]   
 
 end
 
