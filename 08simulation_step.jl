@@ -120,47 +120,47 @@ end
 function reset_variables(model)
         # natural mortality
         #adults
-        model.deadA_nat = 0
-        model.deadA_nat1 = 0
-        model.deadA_nat2 = 0
-        model.deadA_nat3 = 0
-        model.deadA_nat4more = 0
-        model.natA_biom = 0
-        model.natA_biom0 = 0
-        model.natA_biom1 = 0
-        model.natA_biom2 = 0
-        model.natA_biom3 = 0
-        model.natA_biom4more = 0
+        model.deadA_nat = 0.0
+        model.deadA_nat1 = 0.0
+        model.deadA_nat2 = 0.0
+        model.deadA_nat3 = 0.0
+        model.deadA_nat4more = 0.0
+        model.natA_biom = 0.0
+        model.natA_biom0 = 0.0
+        model.natA_biom1 = 0.0
+        model.natA_biom2 = 0.0
+        model.natA_biom3 = 0.0
+        model.natA_biom4more = 0.0
     
             #juvenile
-        model.deadJ_nat = 0
-        model.deadJ_nat0 = 0
-        model.deadJ_nat1 = 0
-        model.natJ_biom = 0
-        model.natJ_biom0 = 0
-        model.natJ_biom1 = 0
+        model.deadJ_nat = 0.0
+        model.deadJ_nat0 = 0.0
+        model.deadJ_nat1 = 0.0
+        model.natJ_biom = 0.0
+        model.natJ_biom0 = 0.0
+        model.natJ_biom1 = 0.0
     
         # starving mortality
             # adult
-        model.deadA_starved = 0
-        model.deadA_starved0 = 0
-        model.deadA_starved1 = 0
-        model.deadA_starved2 = 0
-        model.deadA_starved3 = 0
-        model.deadA_starved4more = 0
-        model.starvedA_biom = 0
-        model.starvedA_biom0 = 0
-        model.starvedA_biom1 = 0
-        model.starvedA_biom2 = 0
-        model.starvedA_biom3 = 0
-        model.starvedA_biom4more = 0
+        model.deadA_starved = 0.0
+        model.deadA_starved0 = 0.0
+        model.deadA_starved1 = 0.0
+        model.deadA_starved2 = 0.0
+        model.deadA_starved3 = 0.0
+        model.deadA_starved4more = 0.0
+        model.starvedA_biom = 0.0
+        model.starvedA_biom0 = 0.0
+        model.starvedA_biom1 = 0.0
+        model.starvedA_biom2 = 0.0
+        model.starvedA_biom3 = 0.0
+        model.starvedA_biom4more = 0.0
             # juvenile
-        model.starvedJ_biom = 0
-        model.starvedJ_biom0 = 0
-        model.starvedJ_biom1 = 0
-        model.deadJ_starved = 0
-        model.deadJ_starved0 = 0
-        model.deadJ_starved1 = 0
+        model.starvedJ_biom = 0.0
+        model.starvedJ_biom0 = 0.0
+        model.starvedJ_biom1 = 0.0
+        model.deadJ_starved = 0.0
+        model.deadJ_starved0 = 0.0
+        model.deadJ_starved1 = 0.0
     return
 end
 
