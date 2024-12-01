@@ -48,7 +48,7 @@ mdata = [:day_of_the_year, :year, :TotB,:JuvB,:AdB, :f, :deadJ_nat, :starvedJ_bi
     #p1 = diagnostic_plots_pt1(results[i][1], results[i][2], model)
     #p2 = diagnostic_plots_pt2(results[i][2], model)
     ##thousands of individual by year
-    pop = plot_population_timeseries(results[21][1], missing, true)
+    pop = plot_population_timeseries(results[1][1], missing, true)
     #
     ##type of deaths
     deaths = plot_param_timeseries(results[20][2],[:deadA_starved, :deadA_nat,:deadJ_starved, :deadJ_nat, :fished])
