@@ -36,11 +36,37 @@ model = model_initialize_parallel(
 #adata = [:type, :Nind, :t_puberty,:Age, :Lw, :Ww, :En, :R, :H, :CI, :GSI, :pA, :s_M_i, :superind_Neggs, :reproduction, :spawned, :Dead]
 
 # Initialize dataframes
-adata = [:type, :Nind]
+# Initialize dataframes
+adata = [:type, :species, :Nind, :t_puberty, :Age, :Lw, :Ww, :En, :R, :H, :CI, :GSI, :pA, :s_M_i, :superind_Neggs, :reproduction, :spawned, :Dead]
+
 mdata = [
-model -> model.output[:sardine][:lifehistory][:TotB],
-model -> model.output[:anchovy][:lifehistory][:TotB],
+    model -> model.initial_conditions[:day_of_the_year],
+    model -> model.initial_conditions[:year],
+    model -> model.initial_conditions[:f],
+    model -> model.output[:sardine][:lifehistory][:TotB],
+    model -> model.output[:sardine][:lifehistory][:JuvB],
+    model -> model.output[:sardine][:lifehistory][:AdB],
+    model -> model.output[:sardine][:lifehistory][:meanAdWw],
+    model -> model.output[:sardine][:lifehistory][:meanJuvWw],
+    model -> model.output[:sardine][:lifehistory][:meanAdL],
+    model -> model.output[:sardine][:lifehistory][:meanJuvL],
+    model -> model.output[:sardine][:lifehistory][:mean_tpuberty],
+    model -> model.output[:sardine][:starvation][:starvedA_biom],
+    model -> model.output[:sardine][:starvation][:starvedJ_biom],
+    model -> model.output[:sardine][:fishing][:fishedW],
+    model -> model.output[:anchovy][:lifehistory][:TotB],
+    model -> model.output[:anchovy][:lifehistory][:JuvB],
+    model -> model.output[:anchovy][:lifehistory][:AdB],
+    model -> model.output[:anchovy][:lifehistory][:meanAdWw],
+    model -> model.output[:anchovy][:lifehistory][:meanJuvWw],
+    model -> model.output[:anchovy][:lifehistory][:meanAdL],
+    model -> model.output[:anchovy][:lifehistory][:meanJuvL],
+    model -> model.output[:anchovy][:lifehistory][:mean_tpuberty],
+    model -> model.output[:anchovy][:starvation][:starvedA_biom],
+    model -> model.output[:anchovy][:starvation][:starvedJ_biom],
+    model -> model.output[:anchovy][:fishing][:fishedW],
 ]
+
 #:starvedJ_biom,  , :natA_biom,
 # Run the model for each model in the list
 #for (i, model) in enumerate(model)
@@ -50,10 +76,10 @@ model -> model.output[:anchovy][:lifehistory][:TotB],
     #run!(model, 365*20; adata, mdata)
 
     #df_agent = run!(model, 16070+365*30; adata, mdata)
-    df_agent = run!(model, 50; adata, mdata)
+    df_agent = run!(model, 10000; adata, mdata)
 
     push!(results, df_agent)
-df_agent
+    df_agent
     end_time = Dates.now()
     duration = end_time - start_time
     minutes = duration / Dates.Minute(1)

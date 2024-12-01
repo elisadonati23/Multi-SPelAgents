@@ -22,8 +22,8 @@ function evolve_environment!(model)
         model.initial_conditions[:day_of_the_year] = 1.0
         model.initial_conditions[:year] += 1.0
         #fished biomass goes to zero
-        reset_nested_dict_values!(model[:output][:sardine][:fishing], 0.0)
-        reset_nested_dict_values!(model[:output][:anchovy][:fishing], 0.0)
+        reset_nested_dict_values!(model.output[:sardine][:fishing], 0.0)
+        reset_nested_dict_values!(model.output[:anchovy][:fishing], 0.0)
     else
         model.initial_conditions[:day_of_the_year] += 1.0
     end
@@ -154,9 +154,9 @@ function complex_step!(model)
 
     if !isempty(sard_spawners)
         # Create new born daily superindividuals
-        prop_values = [getfield(model[agent], :superind_Neggs) for agent in spawners]
-        mean_Egg_energy = mean([getfield(model[agent], :maternal_EggEn) for agent in spawners])
-        max_generation = maximum([getfield(model[agent], :Generation) for agent in spawners]) + 1.0
+        prop_values = [getfield(model[agent], :superind_Neggs) for agent in sard_spawners]
+        mean_Egg_energy = mean([getfield(model[agent], :maternal_EggEn) for agent in sard_spawners])
+        max_generation = maximum([getfield(model[agent], :Generation) for agent in sard_spawners]) + 1.0
         tot_Neggs = sum(prop_values)
         #function generate_EggMass(No_Egg, model, Nind = missing, maternal_EggEn = missing, En = missing, Generation = missing)
         generate_EggMass(1, model, :sardine, tot_Neggs, mean_Egg_energy, mean_Egg_energy, max_generation)
@@ -164,9 +164,9 @@ function complex_step!(model)
 
     if !isempty(anch_spawners)
         # Create new born daily superindividuals
-        prop_values = [getfield(model[agent], :superind_Neggs) for agent in spawners]
-        mean_Egg_energy = mean([getfield(model[agent], :maternal_EggEn) for agent in spawners])
-        max_generation = maximum([getfield(model[agent], :Generation) for agent in spawners]) + 1.0
+        prop_values = [getfield(model[agent], :superind_Neggs) for agent in anch_spawners]
+        mean_Egg_energy = mean([getfield(model[agent], :maternal_EggEn) for agent in anch_spawners])
+        max_generation = maximum([getfield(model[agent], :Generation) for agent in anch_spawners]) + 1.0
         tot_Neggs = sum(prop_values)
         #function generate_EggMass(No_Egg, model, Nind = missing, maternal_EggEn = missing, En = missing, Generation = missing)
         generate_EggMass(1, model, :anchovy, tot_Neggs, mean_Egg_energy, mean_Egg_energy, max_generation)
