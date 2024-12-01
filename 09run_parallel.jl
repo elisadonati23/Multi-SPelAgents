@@ -118,8 +118,9 @@ results = []
 num_runs = 1
 
 models = [
-    #test_stab_pop
-model_initialize_parallel(1000.0, 0.0, 0.0, Mf0_run, Mf1_run, Mf2_run, Mf3_run, Mf4_run, 1.7e14, 1.0, Xmax10percent, 0.9901, Temp_run, 0.9998, 2.36,	1.10,	0.81,	0.69,	0.62)
+    model_initialize_parallel(1000.0,0.0,0.0, Mf0_run, Mf1_run, Mf2_run, Mf3_run, Mf4_run, 1.7e14, 1.0, Xmax10percent, 0.9901, Temp_run, 0.9998,	2.06,	1.01,	0.81,	0.69,	0.62)
+#    #test_stab_pop
+#model_initialize_parallel(1000.0, 0.0, 0.0, Mf0_run, Mf1_run, Mf2_run, Mf3_run, Mf4_run, 1.7e14, 1.0, Xmax10percent, 0.9901, Temp_run, 0.9998, 2.36,	1.10,	0.81,	0.69,	0.62)
     #temp
 #model_initialize_parallel(1000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.7e14, 1.0, clima_Xmax10percent, 0.9901, clima_Temp_run, 0.9998,	2.36,	1.10,	0.81,	0.69,	0.62)
     # cibo
@@ -127,9 +128,6 @@ model_initialize_parallel(1000.0, 0.0, 0.0, Mf0_run, Mf1_run, Mf2_run, Mf3_run, 
 #   # pesca
 #model_initialize_parallel(1000.0, 0.0, 0.0, clima_Mf0_run, clima_Mf1_run, clima_Mf2_run, clima_Mf3_run, clima_Mf4_run, 1.7e14, 1.0, mean_clima_Xmax, 0.9901, 15.0, 0.9998,	2.36,	1.10,	0.81,	0.69,	0.62)
 ]
-results = []
-num_runs = 1
-
 
 # Initialize dataframes
 adata = [:type, :Nind, :t_puberty,:Age, :Lw, :Ww, :En, :R, :H, :CI, :GSI, :pA, :s_M_i, :superind_Neggs, :reproduction, :spawned, :Dead]
@@ -143,8 +141,8 @@ for (i, model) in enumerate(models)
 
     df_agent = init_agent_dataframe(model, adata)
     df_model = init_model_dataframe(model, mdata)
-    run!(model, 365*20; adata, mdata)
-    df_agent = run!(model, 365*50; adata, mdata)
+    #run!(model, 365*20; adata, mdata)
+    df_agent = run!(model, 365*30; adata, mdata)
     #df_agent = run!(model, 365*50; adata, mdata)
     push!(results, df_agent)
 
@@ -154,41 +152,41 @@ for (i, model) in enumerate(models)
     rounded_minutes = round(Int, minutes)
     println("Simulation $i took: ", minutes, " minutes")
 
-    p1 = diagnostic_plots_pt1(results[i][1], results[i][2], model)
-    p2 = diagnostic_plots_pt2(results[i][2], model)
-    #thousands of individual by year
-    pop = plot_population_timeseries(results[i][1], missing, true)
-    
-    #type of deaths
-    deaths = plot_param_timeseries(results[i][2],[:deadA_starved, :deadA_nat, :deadA_old,:deadJ_starved, :deadJ_nat, :deadJ_old, :fished])
-    
-    #annual mean biomass in tonnes
-    biom = plot_annual_param_timeseries(results[i][2],[:TotB, :AdB], true, :mean, "Anual mean tonnes of biomass", 1975)
-    
-    # food limitations with functional response
-    fr = plot_param_timeseries(results[i][2], [:f])
-    #mean adult and juvenile length
-    lengths = plot_means_with_std(results[i][2], [:meanAdL, :meanJuvL], [:sdAdL, :sdJuvL])
-    
-    # Total annual fished biomass in tonnes 
-    fished = plot_timeframe_param_timeseries(results[i][2],[:fishedW], 363.0, 364.0, true, :mean, "Annual sum of fished weight", 1975)
-    #fished_ages = plot_timeframe_param_timeseries(results[i][2],[:fished0, :fished1, :fished2, :fished3, :fished4more], 363.0, 364.0, true, :mean, "Annual sum of fished weight")
-
-    # mean biomass in medias sampling period (june september)
-    summerbiom = plot_timeframe_param_timeseries(results[i][2], [:TotB, :AdB], 150.0, 180.0,true, :mean, "Mid - Year Biomass (tonnes)", 1975)
-    
-
-    CSV.write("backto_f10_timeseries_anchovy_agent_$((i)+1).csv", results[i][1])
-    CSV.write("backto_f10_timeseries_anchovy_model_$((i)+1).csv", results[i][2])
-    #save plots
-    Plots.savefig(p1, "backto_f10_timeseries_anchovy_p1_$(Dates.format(today(), "yyyy-mm-dd"))_$((i)+1).png")
-    Plots.savefig(p2, "backto_f10_timeseries_anchovy_p2_$(Dates.format(today(), "yyyy-mm-dd"))_$((i)+1).png")
-    Plots.savefig(pop, "backto_f10_timeseries_anchovy_pop_$(Dates.format(today(), "yyyy-mm-dd"))_$((i)+1).png")
-    Plots.savefig(deaths, "backto_f10_timeseries_anchovy_deaths_$(Dates.format(today(), "yyyy-mm-dd"))_$((i)+1).png")
-    Plots.savefig(biom, "backto_f10_timeseries_anchovy_biom_$(Dates.format(today(), "yyyy-mm-dd"))_$((i)+1).png")
-    Plots.savefig(fr, "backto_f10_timeseries_anchovy_fr_$(Dates.format(today(), "yyyy-mm-dd"))_$((i)+1).png")
-    Plots.savefig(lengths, "backto_f10_timeseries_anchovy_lengths_$(Dates.format(today(), "yyyy-mm-dd"))_$((i)+1).png")
-    Plots.savefig(fished, "backto_f10_timeseries_anchovy_fished_$(Dates.format(today(), "yyyy-mm-dd"))_$((i)+1).png")
-    Plots.savefig(summerbiom, "backto_f10_timeseries_anchovy_summerbiom_$(Dates.format(today(), "yyyy-mm-dd"))_$((i)+1).png")
+    #p1 = diagnostic_plots_pt1(results[i][1], results[i][2], model)
+    #p2 = diagnostic_plots_pt2(results[i][2], model)
+    ##thousands of individual by year
+    #pop = plot_population_timeseries(results[i][1], missing, true)
+    #
+    ##type of deaths
+    #deaths = plot_param_timeseries(results[i][2],[:deadA_starved, :deadA_nat, :deadA_old,:deadJ_starved, :deadJ_nat, :deadJ_old, :fished])
+    #
+    ##annual mean biomass in tonnes
+    #biom = plot_annual_param_timeseries(results[i][2],[:TotB, :AdB], true, :mean, "Anual mean tonnes of biomass", 1975)
+    #
+    ## food limitations with functional response
+    #fr = plot_param_timeseries(results[i][2], [:f])
+    ##mean adult and juvenile length
+    #lengths = plot_means_with_std(results[i][2], [:meanAdL, :meanJuvL], [:sdAdL, :sdJuvL])
+    #
+    ## Total annual fished biomass in tonnes 
+    #fished = plot_timeframe_param_timeseries(results[i][2],[:fishedW], 363.0, 364.0, true, :mean, "Annual sum of fished weight", 1975)
+    ##fished_ages = plot_timeframe_param_timeseries(results[i][2],[:fished0, :fished1, :fished2, :fished3, :fished4more], 363.0, 364.0, true, :mean, "Annual sum of fished weight")
+#
+    ## mean biomass in medias sampling period (june september)
+    #summerbiom = plot_timeframe_param_timeseries(results[i][2], [:TotB, :AdB], 150.0, 180.0,true, :mean, "Mid - Year Biomass (tonnes)", 1975)
+    #
+#
+    #CSV.write("backto_f10_timeseries_anchovy_agent_$((i)+1).csv", results[i][1])
+    #CSV.write("backto_f10_timeseries_anchovy_model_$((i)+1).csv", results[i][2])
+    ##save plots
+    #Plots.savefig(p1, "backto_f10_timeseries_anchovy_p1_$(Dates.format(today(), "yyyy-mm-dd"))_$((i)+1).png")
+    #Plots.savefig(p2, "backto_f10_timeseries_anchovy_p2_$(Dates.format(today(), "yyyy-mm-dd"))_$((i)+1).png")
+    #Plots.savefig(pop, "backto_f10_timeseries_anchovy_pop_$(Dates.format(today(), "yyyy-mm-dd"))_$((i)+1).png")
+    #Plots.savefig(deaths, "backto_f10_timeseries_anchovy_deaths_$(Dates.format(today(), "yyyy-mm-dd"))_$((i)+1).png")
+    #Plots.savefig(biom, "backto_f10_timeseries_anchovy_biom_$(Dates.format(today(), "yyyy-mm-dd"))_$((i)+1).png")
+    #Plots.savefig(fr, "backto_f10_timeseries_anchovy_fr_$(Dates.format(today(), "yyyy-mm-dd"))_$((i)+1).png")
+    #Plots.savefig(lengths, "backto_f10_timeseries_anchovy_lengths_$(Dates.format(today(), "yyyy-mm-dd"))_$((i)+1).png")
+    #Plots.savefig(fished, "backto_f10_timeseries_anchovy_fished_$(Dates.format(today(), "yyyy-mm-dd"))_$((i)+1).png")
+    #Plots.savefig(summerbiom, "backto_f10_timeseries_anchovy_summerbiom_$(Dates.format(today(), "yyyy-mm-dd"))_$((i)+1).png")
 
 end
