@@ -125,18 +125,18 @@ function juvedie!(Sardine, model)
 
         # 1st case: sardine too small to be fished
         if Sardine.Lw < 10.0 || model.MF0_value == 0.0
-            if Sardine.Nind < 0
+#=             if Sardine.Nind < 0
             # only natural mortality
             println(Sardine.Nind, "for the id: ", Sardine.id)
             return
-            end
+            end =#
             natural_deaths = Float64(rand(Binomial(Int64(Sardine.Nind), 1-exp(-(model.M_j)))))
             Sardine.Nind -= natural_deaths
             model.deadJ_nat += natural_deaths
             model.natJ_biom += natural_deaths * Sardine.Ww
-            if Sardine.Nind < 0.0 || natural_deaths < 0.0 || model.deadJ_nat < 0.0
+#=             if Sardine.Nind < 0.0 || natural_deaths < 0.0 || model.deadJ_nat < 0.0
                 println("Sardine id, Lw and MF0_value is ", Sardine.id, Sardine.Lw, model.MF0_value, ", natural deaths: ", natural_deaths, ", Nind: ", Sardine.Nind, ", deadJ_nat: ", model.deadJ_nat)
-            end
+            end =#
             #keep track of the age
             if floor(Sardine.Age / 365.0 ) == 0.0
                 model.deadJ_nat0 += natural_deaths
@@ -150,12 +150,12 @@ function juvedie!(Sardine, model)
         #juveniles that are big enough to be fished
         if Sardine.Lw > 10.0 && !(model.MF0_value == 0.0)
             M = model.M_j + ((model.MF0_value)/365.0)
-            if Sardine.Nind < 0
+#=             if Sardine.Nind < 0
                 # only natural mortality
                 println(Sardine.Nind, "for the id: ", Sardine.id)
                 return
             end
-
+ =#
             total_deaths = Float64(rand(Binomial(Int64(Sardine.Nind), 1-exp(-M))))
             natural_deaths = Float64(rand(Binomial(Int64(Sardine.Nind), 1-exp(-(model.M_j)))))
 
@@ -185,20 +185,19 @@ function juvedie!(Sardine, model)
                     model.deadJ_nat1 += natural_deaths
                     model.natJ_biom1 += natural_deaths * Sardine.Ww
                 end
-                if Sardine.Nind < 0.0 || natural_deaths < 0.0 || model.deadJ_nat < 0.0
+#=                 if Sardine.Nind < 0.0 || natural_deaths < 0.0 || model.deadJ_nat < 0.0
                     println("Sardine id Lw and MF0_value is ", Sardine.id, Sardine.Lw, ", MF0_value: ", model.MF0_value, ", natural deaths: ", natural_deaths, ", Nind: ", Sardine.Nind, ", deadJ_nat: ", model.deadJ_nat)
-                end
+                end =#
         end
     end
 #if less than 1a certain threshold of ind, superindividual dies
     if  Sardine.Nind <=  100000.0 #Sardine.Nind0 * model.death_threshold && !Sardine.Dead
             Sardine.Dead = true
             model.deadJ_nat += Sardine.Nind
-            if Sardine.Nind < 0.0 || natural_deaths < 0.0 || model.deadJ_nat < 0.0
+#=             if Sardine.Nind < 0.0 || natural_deaths < 0.0 || model.deadJ_nat < 0.0
                 println("Sardine id Lw and MF0_value is ", sardine.id, Sardine.Lw, ", MF0_value: ", model.MF0_value, ", natural deaths: ", natural_deaths, ", Nind: ", Sardine.Nind, ", deadJ_nat: ", model.deadJ_nat)
             return
-            end
-
+            end =#
     end
 return
 end
