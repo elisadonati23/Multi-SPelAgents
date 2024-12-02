@@ -85,6 +85,51 @@ function is_dead(sardine::Sardine)
     return sardine.Dead == true
 end
 
+function calculate_threshold(lifespan::Int, mortalities::Vector{Float64}, days_per_year::Int=365)
+    # Convertiamo le mortalità annuali in probabilità giornaliere
+    daily_mortality_rates = [1 - exp(-m / days_per_year) for m in mortalities]
+
+    # Simula il declino di Nind nel tempo
+    function simulate_decline(threshold::Float64, daily_mortality_rates::Vector{Float64}, lifespan::Int)
+        Nind = 1.0  # Normalizziamo a 1.0 per rappresentare la frazione di Nind
+        for age in 0:lifespan-1
+            for day in 1:days_per_year
+                # Applica la mortalità giornaliera
+                if age + 1 <= length(daily_mortality_rates)
+                    Nind *= 1 - daily_mortality_rates[age + 1]
+                else
+                    Nind *= 1 - daily_mortality_rates[end]  # Mortalità massima
+                end
+                # Se scendiamo sotto la soglia, terminare
+                if Nind <= threshold
+                    return age + day / days_per_year  # Restituiamo l'età al momento della soglia
+                end
+            end
+        end
+        return lifespan  # Non raggiunge mai la soglia
+    end
+
+    # Trova la soglia usando ricerca binaria
+    lower, upper = 1e-6, 0.1  # Limiti della soglia
+    while upper - lower > 1e-6
+        mid = (lower + upper) / 2
+        final_age = simulate_decline(mid, daily_mortality_rates, lifespan)
+        if final_age >= lifespan
+            lower = mid  # La soglia è valida, proviamo a ridurla
+        else
+            upper = mid  # La soglia è troppo bassa
+        end
+    end
+    return lower
+end
+
+sardine_threshold = calculate_threshold(8, [1.08, 0.86, 0.69, 0.62, 0.48])
+anchovy_threshold = calculate_threshold(7, [1.36, 1.06, 0.82, 0.69, 0.62])
+
+println("Soglia per le sardine: ", sardine_threshold)
+println("Soglia per le acciughe: ", anchovy_threshold)
+
+
 function savemyfig(file_name)
     # Specify the path to the folder where you want to save the PNG file
     folder_path = "C:/Users/elli2/Documents/PhD2/figure_report/"
