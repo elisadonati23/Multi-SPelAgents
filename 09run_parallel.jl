@@ -17,11 +17,11 @@ results = []
 num_runs = 1
 
 
-model = model_initialize_parallel(5.0, 5.0, 5.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.7e14, 1.0, 5.0, 0.9901, 15.0, 0.9998,	1.36,	1.06,	0.82,	0.69,	0.62)
+model = model_initialize_parallel(0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.7e14, 1.0, 5.0, 0.9901, 15.0, 0.9998,	1.36,	1.06,	0.82,	0.69,	0.62)
 
 
 # Initialize dataframes
-adata = [:type, :Nind, :t_puberty,:Age, :Lw, :Ww, :En, :R, :H, :CI, :GSI, :pA, :s_M_i, :superind_Neggs, :reproduction, :spawned, :Dead]
+adata = [:type, :Nind, :t_puberty,:Age, :Lw, :Ww, :Wg, :En, :R, :H, :CI, :GSI, :pA, :s_M_i, :superind_Neggs, :reproduction, :spawned, :Dead]
 mdata = [:day_of_the_year, :year, :TotB,:JuvB,:AdB, :f, :deadJ_nat, :starvedJ_biom,:starvedA_biom,:natJ_biom, :natA_biom,
 :deadJ_starved, :deadA_nat, :deadA_starved, :fished, :fishedW, :fished0, :fished1, :fished2, :fished3, :fished4more,
 :meanJuvL, :sdJuvL, :meanAdL, :sdAdL, :mean_tpuberty, :sd_tpuberty, :meanJuvWw, :sdJuvWw, :meanAdWw, :sdAdWw, :mean_Hjuve, :sd_Hjuve]
@@ -34,17 +34,26 @@ mdata = [:day_of_the_year, :year, :TotB,:JuvB,:AdB, :f, :deadJ_nat, :starvedJ_bi
     #run!(model, 365*20; adata, mdata)
 
     #df_agent = run!(model, 16070+365*30; adata, mdata)
-    df_agent = run!(model, 365; adata, mdata)
+    df_agent = run!(model, 365*2; adata, mdata)
     push!(results, df_agent)
 
     pop = plot_population_timeseries(results[1][1], missing, true)
     
+
+
 # Access the DataFrame
-df = results[1][2]
+df = results[1][1]
 
 # Filter out rows where deadJ_nat is negative
-filtered_df = filter(row -> row[:deadJ_nat] <= 0, df)
-filtered_df
+filtered_df = filter(row -> row[:superind_Neggs] < 0, df)
+
+# Select specific columns
+selected_columns = select(filtered_df, [:id, :Nind, :Ww, :Wg, :R, :superind_Neggs])
+
+# Print the selected columns
+println(selected_columns)
+
+
     #type of deaths
     deaths = plot_param_timeseries(results[1][2],[:deadA_starved, :deadA_nat,:deadJ_starved, :deadJ_nat, :fished])
     

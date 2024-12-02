@@ -121,17 +121,21 @@ function juvedie!(Sardine, model)
     total_deaths = 0.0
     fishing_deaths = 0.0
     
-    if !Sardine.Dead && Sardine.Nind >= 100000.0
+    if !Sardine.Dead #&& Sardine.Nind >= 100000.0
 
         # 1st case: sardine too small to be fished
         if Sardine.Lw < 10.0 || model.MF0_value == 0.0
+            if Sardine.Nind < 0
             # only natural mortality
+            println(Sardine.Nind, "for the id: ", Sardine.id)
+            return
+            end
             natural_deaths = Float64(rand(Binomial(Int64(Sardine.Nind), 1-exp(-(model.M_j)))))
             Sardine.Nind -= natural_deaths
             model.deadJ_nat += natural_deaths
             model.natJ_biom += natural_deaths * Sardine.Ww
             if Sardine.Nind < 0.0 || natural_deaths < 0.0 || model.deadJ_nat < 0.0
-                println("Sardine Lw and MF0_value is ", Sardine.Lw, ", MF0_value: ", model.MF0_value, ", natural deaths: ", natural_deaths, ", Nind: ", Sardine.Nind, ", deadJ_nat: ", model.deadJ_nat)
+                println("Sardine id, Lw and MF0_value is ", Sardine.id, Sardine.Lw, model.MF0_value, ", natural deaths: ", natural_deaths, ", Nind: ", Sardine.Nind, ", deadJ_nat: ", model.deadJ_nat)
             end
             #keep track of the age
             if floor(Sardine.Age / 365.0 ) == 0.0
@@ -146,6 +150,11 @@ function juvedie!(Sardine, model)
         #juveniles that are big enough to be fished
         if Sardine.Lw > 10.0 && !(model.MF0_value == 0.0)
             M = model.M_j + ((model.MF0_value)/365.0)
+            if Sardine.Nind < 0
+                # only natural mortality
+                println(Sardine.Nind, "for the id: ", Sardine.id)
+                return
+            end
 
             total_deaths = Float64(rand(Binomial(Int64(Sardine.Nind), 1-exp(-M))))
             natural_deaths = Float64(rand(Binomial(Int64(Sardine.Nind), 1-exp(-(model.M_j)))))
@@ -177,7 +186,7 @@ function juvedie!(Sardine, model)
                     model.natJ_biom1 += natural_deaths * Sardine.Ww
                 end
                 if Sardine.Nind < 0.0 || natural_deaths < 0.0 || model.deadJ_nat < 0.0
-                    println("Sardine Lw and MF0_value is ", Sardine.Lw, ", MF0_value: ", model.MF0_value, ", natural deaths: ", natural_deaths, ", Nind: ", Sardine.Nind, ", deadJ_nat: ", model.deadJ_nat)
+                    println("Sardine id Lw and MF0_value is ", Sardine.id, Sardine.Lw, ", MF0_value: ", model.MF0_value, ", natural deaths: ", natural_deaths, ", Nind: ", Sardine.Nind, ", deadJ_nat: ", model.deadJ_nat)
                 end
         end
     end
@@ -186,8 +195,10 @@ function juvedie!(Sardine, model)
             Sardine.Dead = true
             model.deadJ_nat += Sardine.Nind
             if Sardine.Nind < 0.0 || natural_deaths < 0.0 || model.deadJ_nat < 0.0
-                println("Sardine Lw and MF0_value is ", Sardine.Lw, ", MF0_value: ", model.MF0_value, ", natural deaths: ", natural_deaths, ", Nind: ", Sardine.Nind, ", deadJ_nat: ", model.deadJ_nat)
+                println("Sardine id Lw and MF0_value is ", sardine.id, Sardine.Lw, ", MF0_value: ", model.MF0_value, ", natural deaths: ", natural_deaths, ", Nind: ", Sardine.Nind, ", deadJ_nat: ", model.deadJ_nat)
+            return
             end
+
     end
 return
 end
@@ -491,6 +502,7 @@ if !Sardine.Dead
     Sardine.H = Hdyn + deltaH
     Sardine.R = Rdyn + deltaR
     Sardine.Ww = (model.w *(model.d_V * V + model.w_E/ model.mu_E * (Sardine.En + Sardine.R)))
+    Sardine.Wg = (model.w * (model.w_E / model.mu_E) * Sardine.R)
     Sardine.L = Sardine.Lw * model.del_M
     Sardine.Scaled_En= Sardine.En / (model.Em * (( Sardine.Lw * model.del_M)^3.0))
     Sardine.pA = Sardine.f_i * model.p_Am * model.Tc_value * Sardine.s_M_i * ((Sardine.Lw * model.del_M)^2.0)
@@ -523,8 +535,8 @@ function adultspawn!(Sardine, model)
             #(rand() <= model.prob_dict[model.day_of_the_year])
 
             Wg = (model.w * (model.w_E / model.mu_E) * Sardine.R)
-            free_weight = Sardine.Ww - Wg
-            fecundity = 450.0 + randn() * 50.0 * 450.0
+            free_weight = Sardine.Ww - Sardine.Wg
+            fecundity = 450.0 + randn() * 50.0
             #eggs from all females
             superind_Neggs_value = Float64(fecundity * free_weight) * ceil((Sardine.Nind/2.0)) 
             #eggs from one female
