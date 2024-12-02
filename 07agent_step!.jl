@@ -29,7 +29,7 @@ function eggDEB!(Sardine, model)
         
         ## Energy fluxes
                 #Somatic maintenance
-        pS = (model.p_M * model.Tc_value) * V  #p_M_T*V
+        pS = (Sardine.pM_i * model.Tc_value) * V  #p_M_T*V
         # Mobilized energy
         pC = ((Sardine.maternal_EggEn / V) * (model.Eg * (model.v_rate * model.Tc_value) * (V ^ (2/3)) + pS)/(model.Kappa_value * (Sardine.maternal_EggEn / V) + model.Eg))
 
@@ -177,7 +177,7 @@ function juvedie!(Sardine, model)
         end
     end
 #if less than 1a certain threshold of ind, superindividual dies
-    if  Sardine.Nind <= Sardine.Nind0 * model.death_threshold && !Sardine.Dead
+    if  Sardine.Nind <=  100000.0 #Sardine.Nind0 * model.death_threshold && !Sardine.Dead
             Sardine.Dead = true
             model.deadJ_nat += Sardine.Nind
     end
@@ -198,7 +198,7 @@ function juveDEB!(Sardine, model)
         Hdyn = Sardine.H
         Rdyn = Sardine.R
 
-        p_M_T = model.p_M * model.Tc_value 
+        p_M_T = Sardine.pM_i * model.Tc_value 
 
         #initialize the variation in the state variables
         deltaV = 0.0
@@ -401,7 +401,7 @@ function adultdie!(Sardine, model)
             end
      end
 
-    if Sardine.Nind <= Sardine.Nind0 * model.death_threshold && !Sardine.Dead
+    if Sardine.Nind <= 100000.0 #Sardine.Nind0 * model.death_threshold && !Sardine.Dead
         Sardine.Dead = true
         model.deadA_nat += Sardine.Nind
     end
@@ -415,10 +415,10 @@ if !Sardine.Dead
     Sardine.f_i = model.f
     Vdyn = (Sardine.Lw * model.del_M) ^ 3.0
     Endyn = Sardine.En
-    Hdyn = model.Hp
+    Hdyn = Sardine.Hp_i
     Rdyn = Sardine.R
 
-    p_M_T = model.p_M * model.Tc_value # this should be in the update environment module
+    p_M_T = Sardine.pM_i * model.Tc_value # this should be in the update environment module
     
     deltaV = 0.0
     deltaEn  = 0.0

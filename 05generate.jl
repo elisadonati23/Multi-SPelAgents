@@ -186,23 +186,24 @@ function generate_Adult(No_A, model, Nind = missing, Age = missing, t_puberty = 
         end
         # not sure needed with anchovies because the lifespan was correct.
         # in case remove
-        if ismissing(Nind)
-            if agent_Age <= 1.0*365.0
-                agent_Nind = 1e7
-            elseif  1.0*365.0 < agent_Age < 2.0*365.0
-                agent_Nind = 4.23e6
-            elseif 2.0*365.0 <= agent_Age < 3.0*365.0
-                agent_Nind = 2.12248e6
-            elseif 3.0*365.0 <= agent_Age < 4*365.0
-                agent_Nind = 1.141776e6
-            elseif 4.0*365 <= agent_Age < 5.0*365.0
-                agent_Nind = 706512.0
-            else
-                agent_Nind = 500000  # Default value if age is 5 or more
-            end
-        else
-            agent_Nind = Nind
-        end
+        #if ismissing(Nind)
+        #    if agent_Age <= 1.0*365.0
+        #        agent_Nind = 1e7
+        #    elseif  1.0*365.0 < agent_Age < 2.0*365.0
+        #        agent_Nind = 4.23e6
+        #    elseif 2.0*365.0 <= agent_Age < 3.0*365.0
+        #        agent_Nind = 2.12248e6
+        #    elseif 3.0*365.0 <= agent_Age < 4*365.0
+        #        agent_Nind = 1.141776e6
+        #    elseif 4.0*365 <= agent_Age < 5.0*365.0
+        #        agent_Nind = 706512.0
+        #    else
+        #        agent_Nind = 500000  # Default value if age is 5 or more
+        #    end
+        #else
+        #    agent_Nind = Nind
+        #end
+        agent_Nind = ismissing(Nind) ? 1e7 : Nind
 
         agent_Nind0 = 1e7
 
