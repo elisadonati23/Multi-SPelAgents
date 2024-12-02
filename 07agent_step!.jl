@@ -122,7 +122,7 @@ function juvedie!(Sardine, model)
     total_deaths = 0.0
     fishing_deaths = 0.0
     
-    if !Sardine.Dead && Sardine.Nind >= 100000.0
+    if !Sardine.Dead #&& Sardine.Nind >= 100000.0
 
         # 1st case: sardine too small to be fished
         if Sardine.Lw < 10.0 || model.MF0_value == 0.0
