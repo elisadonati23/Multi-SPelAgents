@@ -130,7 +130,9 @@ function juvedie!(Sardine, model)
             Sardine.Nind -= natural_deaths
             model.deadJ_nat += natural_deaths
             model.natJ_biom += natural_deaths * Sardine.Ww
-
+            if Sardine.Nind < 0.0 || natural_deaths < 0.0 || model.deadJ_nat < 0.0
+                println("Sardine Lw and MF0_value is ", Sardine.Lw, ", MF0_value: ", model.MF0_value, ", natural deaths: ", natural_deaths, ", Nind: ", Sardine.Nind, ", deadJ_nat: ", model.deadJ_nat)
+            end
             #keep track of the age
             if floor(Sardine.Age / 365.0 ) == 0.0
                 model.deadJ_nat0 += natural_deaths
@@ -174,12 +176,18 @@ function juvedie!(Sardine, model)
                     model.deadJ_nat1 += natural_deaths
                     model.natJ_biom1 += natural_deaths * Sardine.Ww
                 end
+                if Sardine.Nind < 0.0 || natural_deaths < 0.0 || model.deadJ_nat < 0.0
+                    println("Sardine Lw and MF0_value is ", Sardine.Lw, ", MF0_value: ", model.MF0_value, ", natural deaths: ", natural_deaths, ", Nind: ", Sardine.Nind, ", deadJ_nat: ", model.deadJ_nat)
+                end
         end
     end
 #if less than 1a certain threshold of ind, superindividual dies
     if  Sardine.Nind <=  100000.0 #Sardine.Nind0 * model.death_threshold && !Sardine.Dead
             Sardine.Dead = true
             model.deadJ_nat += Sardine.Nind
+            if Sardine.Nind < 0.0 || natural_deaths < 0.0 || model.deadJ_nat < 0.0
+                println("Sardine Lw and MF0_value is ", Sardine.Lw, ", MF0_value: ", model.MF0_value, ", natural deaths: ", natural_deaths, ", Nind: ", Sardine.Nind, ", deadJ_nat: ", model.deadJ_nat)
+            end
     end
 return
 end
