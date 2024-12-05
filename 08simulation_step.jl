@@ -73,29 +73,29 @@ for species in [:sardine, :anchovy]
     adults_juv = species == :sardine ? adults_juv_sard : adults_juv_anch 
         if !isempty(adults_juv)
             # B plot: take into account Nind
-        model.output[species][:lifehistory][:TotB] = calculate_sum_prop(model, :anchovy, "Ww", Nind = true)
-        model.output[species][:lifehistory][:JuvB] = calculate_sum_prop(model,:anchovy, "Ww", type = :juvenile, Nind = true)
-        model.output[species][:lifehistory][:AdB] = calculate_sum_prop(model, :anchovy, "Ww", type = :adult, Nind = true)
+        model.output[species][:lifehistory][:TotB] = calculate_sum_prop(model, species, "Ww", Nind = true)
+        model.output[species][:lifehistory][:JuvB] = calculate_sum_prop(model,species, "Ww", type = :juvenile, Nind = true)
+        model.output[species][:lifehistory][:AdB] = calculate_sum_prop(model, species, "Ww", type = :adult, Nind = true)
 
         # Mean weight (Ww) plot
-        model.output[species][:lifehistory][:meanAdWw] = calculate_mean_prop(model,:anchovy, "Ww", type = :adult, age = 3.0)
-        model.output[species][:lifehistory][:sdAdWw] =  calculate_sd_prop(model,:anchovy, "Ww", type = :adult)
-        model.output[species][:lifehistory][:meanJuvWw] = calculate_mean_prop(model,:anchovy, "Ww", type = :juvenile)
-        model.output[species][:lifehistory][:sdJuvWw] = calculate_sd_prop(model,:anchovy, "Ww", type = :juvenile)
+        model.output[species][:lifehistory][:meanAdWw] = calculate_mean_prop(model,species, "Ww", type = :adult, age = 3.0)
+        model.output[species][:lifehistory][:sdAdWw] =  calculate_sd_prop(model,species, "Ww", type = :adult)
+        model.output[species][:lifehistory][:meanJuvWw] = calculate_mean_prop(model,species, "Ww", type = :juvenile)
+        model.output[species][:lifehistory][:sdJuvWw] = calculate_sd_prop(model,species, "Ww", type = :juvenile)
         
         # Mean length (Lw) plot
-        model.output[species][:lifehistory][:meanAdL] = calculate_mean_prop(model,:anchovy, "Lw", type = :adult)
-        model.output[species][:lifehistory][:sdAdL] = calculate_sd_prop(model,:anchovy, "Lw", type = :adult)
-        model.output[species][:lifehistory][:meanJuvL] = calculate_mean_prop(model, :anchovy, "Lw", type = :juvenile)
-        model.output[species][:lifehistory][:sdJuvL] = calculate_sd_prop(model, :anchovy, "Lw", type = :juvenile)
+        model.output[species][:lifehistory][:meanAdL] = calculate_mean_prop(model,species, "Lw", type = :adult)
+        model.output[species][:lifehistory][:sdAdL] = calculate_sd_prop(model,species, "Lw", type = :adult)
+        model.output[species][:lifehistory][:meanJuvL] = calculate_mean_prop(model, species, "Lw", type = :juvenile)
+        model.output[species][:lifehistory][:sdJuvL] = calculate_sd_prop(model, species, "Lw", type = :juvenile)
 
         # Mean time to puberty plot
-        model.output[species][:lifehistory][:mean_tpuberty] = calculate_mean_prop(model,:anchovy, "t_puberty", type = :adult)
-        model.output[species][:lifehistory][:sd_tpuberty] = calculate_sd_prop(model, :anchovy, "t_puberty", type = :adult)
+        model.output[species][:lifehistory][:mean_tpuberty] = calculate_mean_prop(model,species, "t_puberty", type = :adult)
+        model.output[species][:lifehistory][:sd_tpuberty] = calculate_sd_prop(model, species, "t_puberty", type = :adult)
 
         # Mean juvenile maturation energy plot
-        model.output[species][:lifehistory][:mean_Hjuve] = calculate_mean_prop(model,:anchovy, "H", type = :juvenile)
-        model.output[species][:lifehistory][:sd_Hjuve] = calculate_sd_prop(model,:anchovy, "H", type = :juvenile)
+        model.output[species][:lifehistory][:mean_Hjuve] = calculate_mean_prop(model,species, "H", type = :juvenile)
+        model.output[species][:lifehistory][:sd_Hjuve] = calculate_sd_prop(model,species, "H", type = :juvenile)
         end
     end
     return
