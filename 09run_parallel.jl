@@ -17,8 +17,26 @@ results = []
 num_runs = 1
 
 
-model = model_initialize_parallel(0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.7e14, 1.0, 5.0, 0.9901, 15.0, 0.9998,	1.36,	1.06,	0.82,	0.69,	0.62)
+model = model_initialize_parallel(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.7e14, 180.0, 5.0, 0.9901, 15.0, 0.9998,	1.36,	1.06,	0.82,	0.69,	0.62)
 
+#MEDIAS AVERAGE BIOMASS FOR LENGHTCLASSES FROM 2004 TO 2018
+generate_juvenile_pop(models[1],3.5, 57953455)
+generate_juvenile_pop(models[1],4.5, 393264761)
+generate_juvenile_pop(models[1],5.5, 292277101)
+generate_juvenile_pop(models[1],6.5, 771987734)
+generate_juvenile_pop(models[1],7.5, 2331711546)
+generate_adult_pop(models[1],8.5, 5813809929)
+generate_adult_pop(models[1],9.5, 11099328436)
+generate_adult_pop(models[1],10.5, 23899013633)
+generate_adult_pop(models[1],11.5, 38701201123)
+generate_adult_pop(models[1],12.5, 40334358527)
+generate_adult_pop(models[1],13.5, 26652988373)
+generate_adult_pop(models[1],14.5, 10577370584)
+generate_adult_pop(models[1],15.5, 2868275514)
+generate_adult_pop(models[1],16.5, 590329661)
+generate_adult_pop(models[1],17.5, 162384204)
+
+allagents(models[1])
 
 # Initialize dataframes
 adata = [:type, :Nind, :t_puberty,:Age, :Lw, :Ww, :Wg, :En, :R, :H, :CI, :GSI, :pA, :s_M_i, :superind_Neggs, :reproduction, :spawned, :Dead]
