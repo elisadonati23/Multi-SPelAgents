@@ -3,11 +3,7 @@
   #      EGGMASS      #
   #####################
 
-  function parallel_eggmass_step!(Sardine, model)
-    eggDEB!(Sardine, model)
-    eggaging!(Sardine, model)
-    egghatch!(Sardine, model) # egghatch non comporta più un generate_fx() con i superindividui quindi può andare in paralelo
-end #-- it follows hatch! in complex step so same order of eggmass_step!()
+ #-- it follows hatch! in complex step so same order of eggmass_step!()
 
 
 function eggaging!(Sardine, model)
@@ -107,12 +103,6 @@ end
                                   #####################
                                   
 
-function parallel_juvenile_step!(Sardine, model)
-    juvedie!(Sardine, model)
-    juveDEB!(Sardine, model)
-    juvemature!(Sardine,model)
-    juveaging!(Sardine, model)
-end
 
 function juvedie!(Sardine, model)
 
@@ -121,13 +111,31 @@ function juvedie!(Sardine, model)
     natural_deaths = 0.0
     total_deaths = 0.0
     fishing_deaths = 0.0
+
+    if Sardine.Scaled_En >= Sardine.L / (model.Lm * Sardine.s_M_i)
+        #growth
+
+    r = model.Tc_value * Sardine.s_M_i * model.v_rate * (Sardine.Scaled_En/Sardine.L - 1/(model.Lm*Sardine.s_M_i)) / (Sardine.Scaled_En + model.g)
+    thin = Sardine.H < model.Hj ? r : 2/3 * r
+    thin = thin/10.0
+    else
+        #shrinking - r is negative
+
+    r = model.Tc_value * Sardine.s_M_i * model.v_rate * (Sardine.Scaled_En/Sardine.L - 1/(model.Lm*Sardine.s_M_i)) / (Sardine.Scaled_En + model.kap_G * model.g)
+    thin = Sardine.H < model.Hj ? r : 2/3 * r
+    thin = thin/10.0
+    end
+
+
     
     if !Sardine.Dead #&& Sardine.Nind >= 100000.0
 
-        # 1st case: sardine too small to be fished
+        # 1st case: sardine too small to be fished or no fishing mortality
         if Sardine.Lw < 10.0 || model.MF0_value == 0.0
+            M = model.M0 + thin
+
             # only natural mortality
-            natural_deaths = Float64(rand(Binomial(Int64(Sardine.Nind), 1-exp(-(model.M_j)))))
+            natural_deaths = Float64(rand(Binomial(Int64(Sardine.Nind), 1-exp(-(M)))))
             Sardine.Nind -= natural_deaths
             model.deadJ_nat += natural_deaths
             model.natJ_biom += natural_deaths * Sardine.Ww
@@ -144,10 +152,10 @@ function juvedie!(Sardine, model)
 
         #juveniles that are big enough to be fished
         if Sardine.Lw > 10.0 && !(model.MF0_value == 0.0)
-            M = model.M_j + ((model.MF0_value)/365.0)
+            M = model.M0 + thin + ((model.MF0_value)/365.0)
 
             total_deaths = Float64(rand(Binomial(Int64(Sardine.Nind), 1-exp(-M))))
-            natural_deaths = Float64(rand(Binomial(Int64(Sardine.Nind), 1-exp(-(model.M_j)))))
+            natural_deaths = Float64(rand(Binomial(Int64(Sardine.Nind), 1-exp(-(model.M0 + thin)))))
 
             if natural_deaths > total_deaths
                 natural_deaths = total_deaths
@@ -178,9 +186,10 @@ function juvedie!(Sardine, model)
         end
     end
 #if less than 1a certain threshold of ind, superindividual dies
-    if  Sardine.Nind <= Sardine.Nind0 * model.death_threshold && !Sardine.Dead
+    if  Sardine.Nind <= Sardine.Nind0 * model.death_threshold
             Sardine.Dead = true
             model.deadJ_nat += Sardine.Nind
+            Sardine.death_type = :decline
     end
 return
 end
@@ -231,6 +240,7 @@ function juveDEB!(Sardine, model)
             end
 
             Sardine.Dead = true
+            Sardine.death_type = :starved
             return
         end
 
@@ -271,7 +281,7 @@ function juveDEB!(Sardine, model)
                 Sardine.Lj_i = Sardine.Lw * model.del_M
                 Sardine.s_M_i = Sardine.Lj_i / Sardine.Lb_i
                 Sardine.metamorph = true
-                println("s_M_i: ", Sardine.s_M_i, " Lj_i: ", Sardine.Lj_i, " Lb_i: ", Sardine.Lb_i)
+                #println("s_M_i: ", Sardine.s_M_i, " Lj_i: ", Sardine.Lj_i, " Lb_i: ", Sardine.Lb_i)
             end
         end
 
@@ -303,19 +313,14 @@ end
                                   #      ADULT 
                                   #####################
 
-function parallel_adult_step!(Sardine, model)
-    adultdie!(Sardine, model)
-    adultDEB!(Sardine, model)
-    adultaging!(Sardine, model)
-end
 
-
-function adult_step!(Sardine, model)
+  function adult_step!(Sardine, model)
     adultdie!(Sardine, model)
     adultDEB!(Sardine, model)
     adultaging!(Sardine, model)
     adultspawn!(Sardine, model) #same order of parallel step
 end
+
 
 function adultdie!(Sardine, model)
 
@@ -323,29 +328,45 @@ function adultdie!(Sardine, model)
     natural_deaths = 0.0
     total_deaths = 0.0
     fishing_deaths = 0.0
-
     
+    if Sardine.Scaled_En >= Sardine.L / (model.Lm * Sardine.s_M_i)
+    r = model.Tc_value * Sardine.s_M_i * model.v_rate * (Sardine.Scaled_En/Sardine.L - 1/(model.Lm*Sardine.s_M_i)) / (Sardine.Scaled_En + model.g)
+    thin = 2/3 * r
+    thin = thin/10.0 
+    else
+    r = model.Tc_value * Sardine.s_M_i * model.v_rate * (Sardine.Scaled_En/Sardine.L - 1/(model.Lm*Sardine.s_M_i)) / (Sardine.Scaled_En + model.kap_G * model.g)
+    thin = Sardine.H < model.Hj ? r : 2/3 * r
+    thin = thin/10.0
+    end
+
+
+
     if !Sardine.Dead
 
          #set the new AGE DEPENDENT MORTALITIES -- If Mf is not 0, it is added to M
          if floor(Sardine.Age / 365.0 ) == 0.0
-             Mf = (model.MF0_value/365.0)
-             M = model.M0 + Mf
+             Mf = (model.MF0_value/365.0) # always positive or zero
+             M = model.M0 + Mf + thin
+
          elseif floor(Sardine.Age / 365.0 ) == 1.0
             Mf = (model.MF1_value/365.0)
-             M = model.M1 + Mf
+             M = model.M1 + Mf + thin
+
          elseif floor(Sardine.Age / 365.0 ) == 2.0
             Mf = (model.MF2_value/365.0)
-             M = model.M2 + Mf
+             M = model.M2 + Mf + thin
+
          elseif floor(Sardine.Age / 365.0 ) == 3.0
             Mf =  (model.MF3_value/365.0)
-             M = model.M3 + Mf
+             M = model.M3 + Mf + thin
+
          else
             Mf = (model.MF4_value/365.0)
-            M = model.M4 + Mf
+            M = model.M4 + Mf + thin
+
          end
 
-         println(Sardine.Nind)
+         #println(Sardine.Nind)
          
             if Mf == 0.0
                 total_deaths = natural_deaths = Float64(rand(Binomial(Int64(Sardine.Nind), 1-exp(-M))))
@@ -404,9 +425,10 @@ function adultdie!(Sardine, model)
             end
      end
 
-    if Sardine.Nind <= Sardine.Nind0 * model.death_threshold && !Sardine.Dead
+    if Sardine.Nind <= Sardine.Nind0 * model.death_threshold
         Sardine.Dead = true
         model.deadA_nat += Sardine.Nind
+        Sardine.death_type = :decline
     end
     return
 end
@@ -466,6 +488,7 @@ if !Sardine.Dead
             end
 
             Sardine.Dead = true
+            Sardine.death_type = :starved
             return
         else
             #take energy from repro reserve in case of starvation
@@ -509,8 +532,8 @@ function adultspawn!(Sardine, model)
 
     Sardine.reproduction = :nonspawner
     Sardine.superind_Neggs = 0.0
-    reprostart = model.repro_start + round(Int, randn() * 5)
-    reproend = model.repro_end + round(Int, randn() * 5)
+    reprostart = model.repro_start + rand(-14:14) # noise of two weeks on the start day
+    reproend = model.repro_end
 
 #1st condition to reproduce not being dead
 if  ((reprostart <= model.day_of_the_year <= 365.0) || (1.0 <= model.day_of_the_year <= reproend))

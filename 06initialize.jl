@@ -61,15 +61,13 @@ function model_initialize_parallel(
     # Calculate the mean length-weight (Lw) for initialization
     mean_Lw = calculate_mean_prop(model, "Lw")
 
-    # Collect all agents in the model
     agents = collect(values(allagents(model)))
-
-    # Filter the agents based on type (Adults and Juveniles)
-    adults = filter(a -> a.type == :adult, agents)
-    juveniles = filter(a -> a.type == :juvenile, agents)
-
+    adults_juve = filter(a -> a.type == :adult || a.type == :juvenile, agents)
+                        
+    # If there are no adults or juveniles, set f to 0.8.
+    # This prevents numerical instability when there are no agents in the model that feed exogenously.
     # Determine the initial value of functional response (f)
-    if isempty(adults) && isempty(juveniles)    
+    if isempty(adults_juve)
         model.f = 0.8
     else
         # sim_timing = 1 at initialization, so directly index Xmax and Tc
@@ -80,10 +78,10 @@ function model_initialize_parallel(
         model.f = max(0, min(f, 1.0))
     end
 
-    # Assign the calculated f to all agents in the model
-    for agent in agents
-        agent.f_i = model.f
-    end
+        # Assign the calculated f to all agents in the model
+        for agent in agents
+            agent.f_i = model.f
+        end
 
     return model
 end

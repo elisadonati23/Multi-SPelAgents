@@ -21,7 +21,6 @@ function create_params(
 )
     # Fixed parameters
     M_egg = M_egg
-    M_j = M0 / 365.0  # Juvenile mortality rate per day
     M0 = M0 / 365.0   # Mortality rates per day
     M1 = M1 / 365.0
     M2 = M2 / 365.0
@@ -50,7 +49,8 @@ function create_params(
     total_repro_sardine = 10
     std_dev = 60
     fecundity = 400.0 # number of eggs per gram of free female weight
-    death_threshold = 0.01
+    # if Nind < Nind0 * death_threshold, the individual dies: the threshold ensures that whatever the initial Nind0, the 8y lifespan is respected
+    death_threshold = Float64(calculate_dead_threshold_binomial(11, 365 .* [M0, M1, M2, M3, M4], 365))
 
     repro_period = vcat(270.0:365.0, 1.0:90.0)  # Reproduction period covering the year-end
 
@@ -74,6 +74,7 @@ function create_params(
     w_V = 23.9  # Molecular weight of structure
     w_E = 23.9  # Molecular weight of reserve
     w = 5.0  # Conversion factor for energy to mass
+    kap_G = 0.833894 # Growth efficiency
 
     # Growth, puberty, and reproduction parameters
 
@@ -234,7 +235,6 @@ function create_params(
         :f => f,
         :Xmax_value => Xmax_value, 
         :M_egg => M_egg,
-        :M_j => M_j,
         :M0 => M0,
         :M1 => M1,
         :M2 => M2,
@@ -263,6 +263,7 @@ function create_params(
         :Kappa => Kappa,
         :KappaX => KappaX,
         :KappaR => KappaR,
+        :kap_G => kap_G,
         :Fm => Fm,
         :del_M => del_M,
         :k_J => k_J,

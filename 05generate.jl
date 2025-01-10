@@ -17,8 +17,9 @@ function generate_EggMass(No_Egg, model, Nind = missing, maternal_EggEn = missin
     agent_Lj_i = 0.0
     agent_metamorph = false
     agent_Wg = 0.0
-    agent_Hp_i = model.Hp + (randn() * 0.01 * model.Hp)
-    agent_pM_i = model.p_M + (randn() * 0.01 * model.p_M)
+    agent_Hp_i = model.Hp *exp(rand(Normal(0.0, 0.1)))
+    agent_pM_i = model.p_M *exp(rand(Normal(0.0, 0.1)))
+    agent_death_type = :alive
 
     # Set maternal egg energy
     agent_maternal_EggEn = ismissing(maternal_EggEn) ? Float64(model.E0) : Float64(maternal_EggEn)
@@ -48,7 +49,7 @@ function generate_EggMass(No_Egg, model, Nind = missing, maternal_EggEn = missin
         # Add agent to the model
         add_agent!(
             Sardine, model, agent_type, agent_reproduction, agent_Nind, agent_Nind0, agent_Age, agent_L, agent_H,
-            agent_maternal_EggEn, agent_superind_Neggs, agent_En, agent_Generation, agent_Dead,
+            agent_maternal_EggEn, agent_superind_Neggs, agent_En, agent_Generation, agent_Dead,agent_death_type,
             agent_f_i, agent_t_puberty, agent_Lw, agent_Ww, agent_Wg, agent_R, agent_Scaled_En,
             agent_s_M_i, agent_pA, agent_Lb_i, agent_Lj_i, agent_metamorph, agent_Hp_i, agent_pM_i, agent_CI, agent_GSI, agent_spawned
         )
@@ -68,8 +69,9 @@ function generate_Juvenile(No_J, model, Nind = missing, Generation = 0.0, En = m
     agent_Dead = false
     agent_reproduction = :nonspawner
     agent_Wg = 0.0
-    agent_Hp_i = model.Hp + (randn() * 0.01 * model.Hp)
-    agent_pM_i = model.p_M + (randn() * 0.01 * model.p_M)
+    agent_Hp_i = model.Hp *exp(rand(Normal(0.0, 0.1)))
+    agent_pM_i = model.p_M *exp(rand(Normal(0.0, 0.1)))
+    agent_death_type = :alive
     
     # Silenced features
     agent_maternal_EggEn = model.E0
@@ -126,7 +128,7 @@ function generate_Juvenile(No_J, model, Nind = missing, Generation = 0.0, En = m
         # Add agent to the model
         add_agent!(
             Sardine, model, agent_type, agent_reproduction, agent_Nind, agent_Nind0, agent_Age, agent_L, agent_H,
-            agent_maternal_EggEn, agent_superind_Neggs, agent_En, agent_Generation, agent_Dead,
+            agent_maternal_EggEn, agent_superind_Neggs, agent_En, agent_Generation, agent_Dead, agent_death_type,
             agent_f_i, agent_t_puberty, agent_Lw, agent_Ww, agent_Wg, agent_R, agent_Scaled_En,
             agent_s_M_i, agent_pA, agent_Lb_i, agent_Lj_i, agent_metamorph, agent_Hp_i, agent_pM_i, agent_CI, agent_GSI, agent_spawned
         )
@@ -148,7 +150,8 @@ function generate_Adult(No_A, model, Nind = missing, Age = missing, t_puberty = 
     agent_metamorph = true
     agent_Wg = 0.0
     agent_Hp_i = model.Hp
-    agent_pM_i = model.p_M + (randn() * 0.01 * model.p_M)
+    agent_pM_i = model.p_M * exp(rand(Normal(0.0, 0.1)))
+    agent_death_type = :alive
 
     # Set maturation energy
     agent_H = ismissing(H) ? model.Hp : H
@@ -179,24 +182,12 @@ function generate_Adult(No_A, model, Nind = missing, Age = missing, t_puberty = 
         end
 
         if ismissing(Nind)
-            if agent_Age <= 1.0*365.0
-                agent_Nind = 1e7
-            elseif  1.0*365.0 < agent_Age < 2.0*365.0
-                agent_Nind = 4.23e6
-            elseif 2.0*365.0 <= agent_Age < 3.0*365.0
-                agent_Nind = 2.12248e6
-            elseif 3.0*365.0 <= agent_Age < 4*365.0
-                agent_Nind = 1.141776e6
-            elseif 4.0*365 <= agent_Age < 5.0*365.0
-                agent_Nind = 706512.0
-            else
-                agent_Nind = 500000  # Default value if age is 5 or more
-            end
+            agent_Nind = 1e7
+            agent_Nind0 = calculate_Nind0(Float64(agent_Nind), Int64(floor(agent_Age)), 365 .* [model.M0, model.M1, model.M2, model.M3, model.M4], 365) # Adjust the divisor as needed to define the number of superindividuals
         else
             agent_Nind = Nind
+            agent_Nind0 = calculate_Nind0(Float64(agent_Nind), Int64(floor(agent_Age)), 365 .* [model.M0, model.M1, model.M2, model.M3, model.M4], 365) # Adjust the divisor as needed to define the number of superindividuals
         end
-
-        agent_Nind0 = 1e7 # depending on age, above, i put the Nind to ensure correct lifespan but I assume that they were 1e7 at age 0+
         
         agent_Lj_i = if ismissing(Lj)
             model.Lj
@@ -230,7 +221,7 @@ function generate_Adult(No_A, model, Nind = missing, Age = missing, t_puberty = 
         # Add agent to the model
         add_agent!(
             Sardine, model, agent_type, agent_reproduction, agent_Nind, agent_Nind0, agent_Age, agent_L, agent_H,
-            agent_maternal_EggEn, agent_superind_Neggs, agent_En, agent_Generation, agent_Dead,
+            agent_maternal_EggEn, agent_superind_Neggs, agent_En, agent_Generation, agent_Dead,agent_death_type,
             agent_f_i, agent_t_puberty, agent_Lw, agent_Ww, agent_Wg, agent_R, agent_Scaled_En,
             agent_s_M_i, agent_pA, agent_Lb_i, agent_Lj_i, agent_metamorph, agent_Hp_i, agent_pM_i, agent_CI, agent_GSI, agent_spawned
         )
@@ -259,7 +250,7 @@ function generate_adult_pop(model, Lwclass = missing, Lw_biom = missing)
         agent_s_M_i = model.Lj / model.Lb
         agent_Generation = 0.0
         agent_Wg = 0.0
-        agent_pM_i = model.p_M + (randn() * 0.01 * model.p_M)
+        agent_pM_i = model.p_M * (randn() * 0.01 * model.p_M)
 
     #Lw class - biom relationship - based on MEDIAS
     agent_R =  0.0
@@ -267,17 +258,23 @@ function generate_adult_pop(model, Lwclass = missing, Lw_biom = missing)
     agent_En_class = agent_f_i * model.Em * ((Lwclass * model.del_M)^3.0)
     agent_Ww_class = (model.w * (model.d_V * ((Lwclass * model.del_M) ^ 3.0) + model.w_E / model.mu_E * (agent_En_class + agent_R))) 
 
-    Nind = Int64(floor(Lw_biom/agent_Ww_class))
+    class_Age = model.Am * Lwclass * model.del_M / model.Lm # the age of the length class
 
-    # Define No_A based on Nind if Nind is greater than 1e7
-    if Nind > 1e7
+    Nind = Int64(floor(Lw_biom/agent_Ww_class)) # how many n ind we have according to the weight of the lwclass
+
+
+    if Nind > 1e7 # to generate a reasonable number of superindividuals, I divide by 1e7.
         No_A = ceil(Int, Nind / 1e7)
         agent_Nind = ceil(Int, Nind / No_A)
-        agent_Nind0 = agent_Nind
+        #However, to respect the lifespan, if at an adult age I still have 1e7 individuals, given the natural mortalities, it will survive too long.
+        # Given the death threshold, i will adjust the Nind0 to ensure that the superindividuals are removed from the model after 7-8 years.
+        agent_Nind0 = calculate_Nind0(Float64(agent_Nind), Int64(floor(class_Age)), [model.M0, model.M1, model.M2, model.M3, model.M4], 365) # the usual Nind0, so that after 7-8 yo the superind is removed from the model due to natural death accordin the natural mortality we have put in the model.
     else
         No_A = 1
         agent_Nind = Nind
-        agent_Nind0 = Nind # Adjust the divisor as needed to define the number of superindividuals
+        #to respect the lifespan, if at an adult age I still have 1e7 individuals, given the natural mortalities, it will survive too long.
+        # Given the death threshold, i will adjust the Nind0 to ensure that the superindividuals are removed from the model after 7-8 years.
+        agent_Nind0 = calculate_Nind0(Float64(agent_Nind), Int64(floor(class_Age)), [model.M0, model.M1, model.M2, model.M3, model.M4], 365) # Adjust the divisor as needed to define the number of superindividuals
     end
 
     # Generate Adult agents
@@ -298,8 +295,6 @@ function generate_adult_pop(model, Lwclass = missing, Lw_biom = missing)
             model.Am * agent_Lw * model.del_M / model.Lm[model.sim_timing]
             end
 
-
-        
         # Calculate scaled energy reserve
         agent_Scaled_En = agent_En / (model.Em * ((agent_Lw * model.del_M)^3.0))
 
@@ -326,6 +321,28 @@ function generate_adult_pop(model, Lwclass = missing, Lw_biom = missing)
             agent_f_i, agent_t_puberty, agent_Lw, agent_Ww, agent_Wg, agent_R, agent_Scaled_En,
             agent_s_M_i, agent_pA, agent_Lb_i, agent_Lj_i, agent_metamorph, agent_Hp_i, agent_pM_i, agent_CI, agent_GSI, agent_spawned
         )
+
+
+                    # Update response function f
+                    max_assimilation = calculate_max_assimilation(model)
+                         
+                    if ismissing(max_assimilation) || max_assimilation == 0.0 || isnan(max_assimilation)
+                        f = 0.0
+                    else
+                        # Ratio between available food and what is consumed based on size and Tc
+                        f = (model.Xmax_value * model.Wv * model.KappaX) / max_assimilation
+                    end
+                
+                    # Ensure that f is bounded between 0 and 1
+                    model.f = max(0, min(f, 1.0))
+                
+                    adults_juve = filter(a -> a.type == :adult || a.type == :juvenile, collect(values(allagents(model))))
+                
+                    # If there are no adults or juveniles, set f to 0.8.
+                    # This prevents numerical instability when there are no agents in the model that feed exogenously.
+                    if isempty(adults_juve)
+                        model.f = 0.8 
+                    end
     end
     return
 end
@@ -349,14 +366,17 @@ function generate_juvenile_pop(model, Lwclass = missing, Lw_biom = missing)
         agent_Generation = 0.0
         agent_Wg = 0.0
         agent_Hp_i = model.Hp + (randn() * 0.01 * model.Hp)
-        agent_pM_i = model.p_M + (randn() * 0.01 * model.p_M)
+        agent_pM_i = model.p_M * (randn() * 0.01 * model.p_M)
 
     #Lw class - biom relationship - based on MEDIAS
     agent_R =  0.0
     # Set reserve energy
     agent_En_class = agent_f_i * model.Em * ((Lwclass * model.del_M)^3.0)
-    agent_Ww_class = (model.w * (model.d_V * ((Lwclass * model.del_M) ^ 3.0) + model.w_E / model.mu_E * (agent_En_class + agent_R))) 
+    agent_Ww_class = (model.w * (model.d_V * ((Lwclass * model.del_M) ^ 3.0) + model.w_E / model.mu_E * (agent_En_class + agent_R)))
+    println(agent_Ww_class, Lw_biom)
     Nind = Int64(floor(Lw_biom/agent_Ww_class))
+    println(Nind)
+
 
     # Define No_A based on Nind if Nind is greater than 1e7
     if Nind > 1e7
@@ -369,10 +389,13 @@ function generate_juvenile_pop(model, Lwclass = missing, Lw_biom = missing)
         agent_Nind0 = Nind # Adjust the divisor as needed to define the number of superindividuals
     end
 
+    println(No_J)
+
     # Generate Adult agents
     for _ in 1:No_J
         # Set number of individuals in the superindividual
         agent_Lw = clamp(round(randn() * 0.5 + Lwclass, digits=2), Lwclass - 0.5, Lwclass+0.5)
+        println(agent_Lw)
         agent_L = agent_Lw * model.del_M
         # Set reproduction energy
         agent_En = agent_f_i * model.Em * ((agent_Lw * model.del_M)^3.0)
@@ -412,6 +435,27 @@ function generate_juvenile_pop(model, Lwclass = missing, Lw_biom = missing)
             agent_f_i, agent_t_puberty, agent_Lw, agent_Ww, agent_Wg, agent_R, agent_Scaled_En,
             agent_s_M_i, agent_pA, agent_Lb_i, agent_Lj_i, agent_metamorph, agent_Hp_i, agent_pM_i, agent_CI, agent_GSI, agent_spawned
         )
+
+            # Update response function f
+                         max_assimilation = calculate_max_assimilation(model)
+                         
+                         if ismissing(max_assimilation) || max_assimilation == 0.0 || isnan(max_assimilation)
+                             f = 0.0
+                         else
+                             # Ratio between available food and what is consumed based on size and Tc
+                             f = (model.Xmax_value * model.Wv * model.KappaX) / max_assimilation
+                         end
+                     
+                         # Ensure that f is bounded between 0 and 1
+                         model.f = max(0, min(f, 1.0))
+                     
+                         adults_juve = filter(a -> a.type == :adult || a.type == :juvenile, collect(values(allagents(model))))
+                     
+                         # If there are no adults or juveniles, set f to 0.8.
+                         # This prevents numerical instability when there are no agents in the model that feed exogenously.
+                         if isempty(adults_juve)
+                             model.f = 0.8 
+                         end
     end
     return
 end

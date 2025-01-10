@@ -12,6 +12,7 @@
     En::Float64               # Reserve energy
     Generation::Float64       # Generation category: EggMass, Juvenile, Adult
     Dead::Bool                # Indicates if the sardine is dead
+    death_type::Symbol        # :starved, :decline
 
     # Features for Juveniles and Adults
     f_i::Float64              # Individual functional response

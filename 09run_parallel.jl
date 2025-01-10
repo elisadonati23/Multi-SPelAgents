@@ -12,45 +12,50 @@ include("10timeseries.jl")
 
 # running -----------------
 
-#initialize model: Na, Nj,Negg, Mf, Ww, day_of_the_year, Xmax, Kappa, Temp, M_egg, M0, M1, M2, M3, M4)
-# Initialize models
-#models = [
-#model_initialize_parallel(1000.0, 0.0, 0.0, Mf0_run, Mf1_run, Mf2_run, Mf3_run, Mf4_run, 1.7e14, 1.0, Xmax_run, 0.945, Temp_run, 0.9998,	1.08,	0.86,	0.69,	0.62,	0.48)
-#]
 results = []
 num_runs = 1
 
+
+#models = [
+#model_initialize_parallel(0.0, 0.0, 1000.0, 0.0, 0.0, 0.0,0.0, 0.0, 1.7e14, 1.0, clima_Xmax, 0.883, clima_LowFood, 0.9998, 1.08,	0.86,	0.69,	0.62,	0.48)
+#]
+
 models = [
-model_initialize_parallel(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.7e14, 1.0, 5.0, 0.883, 15.0, 0.9998,	1.08,	0.86,	0.69,	0.62,	0.48)
+    # temp increase
+    model_initialize_parallel(0.0, 0.0, 1000.0, 0.0, 0.0,0.0,0.0,0.0, 1.7e14, 1.0, clima_Xmax, 0.883, complete_series_temp_3C, 0.9998, 1.08,	0.86,	0.69,	0.62,	0.48)
 ]
 
 
+#models = [
+#    
+#    # food reduction
+#    model_initialize_parallel(0.0, 0.0, 1000.0, 0.0, 0.0,0.0,0.0,0.0, 1.7e14, 1.0, complete_series_food_20low, 0.883, clima_temp, 0.9998, 1.08,	0.86,	0.69,	0.62,	0.48)
+#
+#]
 
-#MEDIAS AVERAGE BIOMASS FOR LENGHTCLASSES FROM 2004 TO 2018
-generate_juvenile_pop(models[1],5.5, 19696660)
-generate_juvenile_pop(models[1],6.5, 46562368)
-generate_juvenile_pop(models[1],7.5, 366401609)
-generate_juvenile_pop(models[1],8.5, 3008980797)
+#models = [
+#    
+#    # food reduction 50%
+#    model_initialize_parallel(0.0, 0.0, 1000.0, 0.0, 0.0,0.0,0.0,0.0, 1.7e14, 1.0, complete_series_food_99low, 0.883, clima_temp, 0.9998, 1.08,	0.86,	0.69,	0.62,	0.48)
+#
+#]
 
-generate_adult_pop(models[1],9.5, 4758526047)
-generate_adult_pop(models[1],10.5, 3752379762)
-generate_adult_pop(models[1],11.5, 7621146191)
-generate_adult_pop(models[1],12.5, 17922361088)
-generate_adult_pop(models[1],13.5, 28433818026)
-generate_adult_pop(models[1],14.5, 18419060058)
-generate_adult_pop(models[1],15.5, 7649568157)
-generate_adult_pop(models[1],16.5, 3772702440)
-generate_adult_pop(models[1],17.5, 1300426215)
-generate_adult_pop(models[1],18.5, 335762811)
-generate_adult_pop(models[1],19.5, 205142644)
+#
+#models = [
+#
+#     # MF increase - max value
+#     model_initialize_parallel(0.0, 0.0, 1000.0, complete_series_maxM0_sardine, complete_series_maxM1_sardine,complete_series_maxM2_sardine,complete_series_maxM3_M4_sardine,complete_series_maxM3_M4_sardine, 1.7e14, 1.0, clima_Xmax, 0.883, clima_temp, 0.9998, 1.06,	1.01,	0.82,	0.69,	0.62)
+#
+#]
 
-allagents(models[1])
 
 # Initialize dataframes
-adata = [:type, :Nind, :t_puberty,:Age, :Lw, :Ww, :En, :R, :H, :CI, :GSI, :pA, :s_M_i, :superind_Neggs, :reproduction, :spawned, :Dead]
-mdata = [:day_of_the_year, :year, :TotB,:JuvB,:AdB, :f, :deadJ_nat, :starvedJ_biom,:starvedA_biom,:natJ_biom, :natA_biom,
+adata = [:type, :Nind, :t_puberty,:Age, :Lw, :Ww, :En, :R, :H, :CI, :GSI, :pA, :s_M_i, :superind_Neggs, :reproduction, :spawned, :Dead, :death_type]
+mdata = [:day_of_the_year, :year, :Nsuperind, :TotB,:JuvB,:AdB, :f, :deadJ_nat, :starvedJ_biom,:starvedA_biom,:natJ_biom, :natA_biom,
 :deadJ_starved, :deadA_nat, :deadA_starved, :fished, :fishedW, :fished0, :fished1, :fished2, :fished3, :fished4more,
-:meanJuvL, :sdJuvL, :meanAdL, :sdAdL, :mean_tpuberty, :sd_tpuberty, :meanJuvWw, :sdJuvWw, :meanAdWw, :sdAdWw, :mean_Hjuve, :sd_Hjuve]
+:meanJuvL, :sdJuvL, :meanAdL, :sdAdL, :mean_tpuberty, :sd_tpuberty, :meanJuvWw, :sdJuvWw, :meanAdWw, :sdAdWw, :mean_Hjuve, :sd_Hjuve, 
+:natA_biom0, :natA_biom1, :natA_biom2, :natA_biom3, :natA_biom4more, 
+:starvedA_biom0, :starvedA_biom1, :starvedA_biom2, :starvedA_biom3, :starvedA_biom4more, :fished0_biom, :fished1_biom, :fished2_biom, :fished3_biom, :fished4more_biom]
 
 #:starvedJ_biom,  , :natA_biom,
 # Run the model for each model in the list
@@ -59,10 +64,9 @@ for (i, model) in enumerate(models)
 
     df_agent = init_agent_dataframe(model, adata)
     df_model = init_model_dataframe(model, mdata)
-    #run!(model, 365*20; adata, mdata)
+    run!(model, 365*30; adata, mdata)
 
-    #df_agent = run!(model, 16070+365*30; adata, mdata)
-    df_agent = run!(model, 365*5; adata, mdata)
+    df_agent = run!(model, 365*45-1; adata, mdata) #16071
     push!(results, df_agent)
 
     end_time = Dates.now()
@@ -80,7 +84,7 @@ for (i, model) in enumerate(models)
     deaths = plot_param_timeseries(results[i][2],[:deadA_starved, :deadA_nat,:deadJ_starved, :deadJ_nat, :fished])
     
     #annual mean biomass in tonnes
-    biom = plot_annual_param_timeseries(results[i][2],[:TotB, :AdB], true, :mean, "Anual mean tonnes of biomass", 1975)
+    biom = plot_annual_param_timeseries(results[i][2],[:TotB, :AdB], true, :mean, "Annual mean tonnes of biomass", 1975)
     
     # food limitations with functional response
     fr = plot_param_timeseries(results[i][2], [:f])
@@ -95,17 +99,17 @@ for (i, model) in enumerate(models)
     summerbiom = plot_timeframe_param_timeseries(results[i][2], [:TotB, :AdB], 150.0, 180.0,true, :mean, "Mid - Year Biomass (tonnes)", 1975)
     
 
-    CSV.write("update_smipA_agent_$((i)+1).csv", results[i][1])
-    CSV.write("update_smipA_model_$((i)+1).csv", results[i][2])
+    CSV.write("scTEMP_3C_err01_thin_new_main_agent_$((i)+1).csv", results[i][1])
+    CSV.write("scTEMP_3C_err01_thin_new_main_model_$((i)+1).csv", results[i][2])
     #save plots
-    Plots.savefig(p1, "update_smipA__p1_$(Dates.format(today(), "yyyy-mm-dd"))_$((i)+1).png")
-    Plots.savefig(p2, "update_smipA__p2_$(Dates.format(today(), "yyyy-mm-dd"))_$((i)+1).png")
-    Plots.savefig(pop, "update_smipA_pop_$(Dates.format(today(), "yyyy-mm-dd"))_$((i)+1).png")
-    Plots.savefig(deaths, "update_smipA_deaths_$(Dates.format(today(), "yyyy-mm-dd"))_$((i)+1).png")
-    Plots.savefig(biom, "update_smipA_biom_$(Dates.format(today(), "yyyy-mm-dd"))_$((i)+1).png")
-    Plots.savefig(fr, "update_smipA_fr_$(Dates.format(today(), "yyyy-mm-dd"))_$((i)+1).png")
-    Plots.savefig(lengths, "update_smipA_lengths_$(Dates.format(today(), "yyyy-mm-dd"))_$((i)+1).png")
-    Plots.savefig(fished, "update_smipA_fished_$(Dates.format(today(), "yyyy-mm-dd"))_$((i)+1).png")
-    Plots.savefig(summerbiom, "update_smipA_summerbiom_$(Dates.format(today(), "yyyy-mm-dd"))_$((i)+1).png")
+    Plots.savefig(p1, "scTEMP_3C_err01_thin_new_main__p1_$(Dates.format(today(), "yyyy-mm-dd"))_$((i)+1).png")
+    Plots.savefig(p2, "scTEMP_3C_err01_thin_new_main__p2_$(Dates.format(today(), "yyyy-mm-dd"))_$((i)+1).png")
+    Plots.savefig(pop, "scTEMP_3C_err01_thin_new_main_pop_$(Dates.format(today(), "yyyy-mm-dd"))_$((i)+1).png")
+    Plots.savefig(deaths, "scTEMP_3C_err01_thin_new_main_deaths_$(Dates.format(today(), "yyyy-mm-dd"))_$((i)+1).png")
+    Plots.savefig(biom, "scTEMP_3C_err01_thin_new_main_biom_$(Dates.format(today(), "yyyy-mm-dd"))_$((i)+1).png")
+    Plots.savefig(fr, "scTEMP_3C_err01_thin_new_main_fr_$(Dates.format(today(), "yyyy-mm-dd"))_$((i)+1).png")
+    Plots.savefig(lengths, "scTEMP_3C_err01_thin_new_main_lengths_$(Dates.format(today(), "yyyy-mm-dd"))_$((i)+1).png")
+    Plots.savefig(fished, "scTEMP_3C_err01_thin_new_main_fished_$(Dates.format(today(), "yyyy-mm-dd"))_$((i)+1).png")
+    Plots.savefig(summerbiom, "scTEMP_3C_err01_thin_new_main_summerbiom_$(Dates.format(today(), "yyyy-mm-dd"))_$((i)+1).png")
 
 end
