@@ -1,6 +1,27 @@
 ###############
 #   Wraps     #
 ###############
+function parallel_eggmass_step!(Sardine, model)
+    eggDEB!(Sardine, model)
+    eggaging!(Sardine, model)
+    egghatch!(Sardine, model) # egghatch non comporta più un generate_fx() con i superindividui quindi può andare in paralelo
+end
+
+function parallel_juvenile_step!(Sardine, model)
+    juvedie!(Sardine, model)
+    juveDEB!(Sardine, model)
+    juvemature!(Sardine,model)
+    juveaging!(Sardine, model)
+end
+
+function parallel_adult_step!(Sardine, model)
+    adultdie!(Sardine, model)
+    adultDEB!(Sardine, model)
+    adultaging!(Sardine, model)
+end
+
+
+
 
 function parallel_sardine_step!(Sardine, model)
     if Sardine.type == :eggmass
@@ -212,8 +233,20 @@ function complex_step!(model)
         mean_Egg_energy = mean([getfield(model[agent], :maternal_EggEn) for agent in spawners])
         max_generation = maximum([getfield(model[agent], :Generation) for agent in spawners]) + 1.0
         tot_Neggs = sum(prop_values)
+        Neggmass = 1
+        percapita = tot_Neggs
+        # avoid huge superindividuals that could lead to pop jumps
+        # put together up to what would be produced by 100 superind of 40 grams
+        #if tot_Neggs > 1000 * (1e7 * model.fecundity * 40)
+        #    Neggmass = Int64(floor(tot_Neggs / ((1e7) * model.fecundity * 40.0)))
+        #    percapita = Float64(floor(tot_Neggs / Neggmass))
+        #else
+        #    Neggmass = 1
+        #    percapita = tot_Neggs
+        #end
         #function generate_EggMass(No_Egg, model, Nind = missing, maternal_EggEn = missing, En = missing, Generation = missing)
-        generate_EggMass(1, model, tot_Neggs, mean_Egg_energy, mean_Egg_energy, max_generation)
+        generate_EggMass(Neggmass, model, percapita, mean_Egg_energy, mean_Egg_energy, max_generation)
+        #function generate_EggMass(No_Egg, model, Nind = missing, maternal_EggEn = missing, En = missing, Generation = missing)
     end
 
     remove_all!(model, is_dead)
