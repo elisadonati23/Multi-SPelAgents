@@ -16,14 +16,14 @@ results = []
 num_runs = 1
 
 
-#models = [
-#model_initialize_parallel(0.0, 0.0, 1000.0, 0.0, 0.0, 0.0,0.0, 0.0, 1.7e14, 1.0, clima_Xmax, 0.883, clima_LowFood, 0.9998, 1.08,	0.86,	0.69,	0.62,	0.48)
-#]
-
 models = [
-    # temp increase
-    model_initialize_parallel(0.0, 0.0, 1000.0, 0.0, 0.0,0.0,0.0,0.0, 1.7e14, 1.0, clima_Xmax, 0.883, complete_series_temp_3C, 0.9998, 1.08,	0.86,	0.69,	0.62,	0.48)
+model_initialize_parallel(0.0, 0.0, 1.0, 0.0, 0.0, 0.0,0.0, 0.0, 1.7e14, 1.0, clima_Xmax, 0.883, clima_temp, 0.9998, 1.08,	0.86,	0.69,	0.62,	0.48)
 ]
+
+#models = [
+#    # temp increase
+#    model_initialize_parallel(0.0, 0.0, 1000.0, 0.0, 0.0,0.0,0.0,0.0, 1.7e14, 1.0, clima_Xmax, 0.883, complete_series_temp_3C, 0.9998, 1.08,	0.86,	0.69,	0.62,	0.48)
+#]
 
 
 #models = [
@@ -51,7 +51,7 @@ models = [
 
 # Initialize dataframes
 adata = [:type, :Nind, :t_puberty,:Age, :Lw, :Ww, :En, :R, :H, :CI, :GSI, :pA, :s_M_i, :superind_Neggs, :reproduction, :spawned, :Dead, :death_type]
-mdata = [:day_of_the_year, :year, :Nsuperind, :TotB,:JuvB,:AdB, :f, :deadJ_nat, :starvedJ_biom,:starvedA_biom,:natJ_biom, :natA_biom,
+mdata = [:day_of_the_year, :sim_timing, :Xmax_value, :Tc_value, :year, :Nsuperind, :TotB,:JuvB,:AdB, :f, :deadJ_nat, :starvedJ_biom,:starvedA_biom,:natJ_biom, :natA_biom,
 :deadJ_starved, :deadA_nat, :deadA_starved, :fished, :fishedW, :fished0, :fished1, :fished2, :fished3, :fished4more,
 :meanJuvL, :sdJuvL, :meanAdL, :sdAdL, :mean_tpuberty, :sd_tpuberty, :meanJuvWw, :sdJuvWw, :meanAdWw, :sdAdWw, :mean_Hjuve, :sd_Hjuve, 
 :natA_biom0, :natA_biom1, :natA_biom2, :natA_biom3, :natA_biom4more, 
@@ -64,9 +64,9 @@ for (i, model) in enumerate(models)
 
     df_agent = init_agent_dataframe(model, adata)
     df_model = init_model_dataframe(model, mdata)
-    run!(model, 365*30; adata, mdata)
+    run!(model, 365*2; adata, mdata)
 
-    df_agent = run!(model, 365*45-1; adata, mdata) #16071
+    df_agent = run!(model, 365*2; adata, mdata) #16071
     push!(results, df_agent)
 
     end_time = Dates.now()
