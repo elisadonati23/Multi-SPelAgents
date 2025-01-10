@@ -21,8 +21,6 @@ function parallel_adult_step!(Sardine, model)
 end
 
 
-
-
 function parallel_sardine_step!(Sardine, model)
     if Sardine.type == :eggmass
         parallel_eggmass_step!(Sardine, model)  # DEB + aging + hatch
@@ -66,16 +64,6 @@ function evolve_environment!(model)
     update_MF3!(model, model.M_f3)
     update_MF4!(model, model.M_f4)
     
-
-    # Calculate Xall
-    Xall = model.Xmax_value - (calculate_real_assimilation(model) / model.KappaX) / model.Wv
-    
-    if Xall < 0.0  
-        Xall = 0.0 
-    end
-    
-    model.Xall = Xall
-
     # Update response function f
     max_assimilation = calculate_max_assimilation(model)
     
@@ -103,15 +91,13 @@ end
 function update_outputs!(model)
     agents = collect(values(allagents(model)))
     model.Nsuperind = length(agents)
-    
-    adults = filter(a -> a.type == :adult, agents)
     adults_juv = filter(a -> a.type == :adult || a.type == :juvenile, agents)
+
     if !isempty(adults_juv)
         # B plot: take into account Nind
         model.TotB = calculate_sum_prop(model, "Ww", Nind = true)
         model.JuvB = calculate_sum_prop(model, "Ww", type = :juvenile, Nind = true)
         model.AdB = calculate_sum_prop(model, "Ww", type = :adult, Nind = true)
-
 
         # Mean weight (Ww) plot
         model.meanAdWw = calculate_mean_prop(model, "Ww", type = :adult, age = 3.0)
@@ -119,7 +105,6 @@ function update_outputs!(model)
         model.meanJuvWw = calculate_mean_prop(model, "Ww", type = :juvenile)
         model.sdJuvWw = calculate_sd_prop(model, "Ww", type = :juvenile)
         
-
         # Mean length (Lw) plot
         model.meanAdL = calculate_mean_prop(model, "Lw", type = :adult)
         model.sdAdL = calculate_sd_prop(model, "Lw", type = :adult)
@@ -201,7 +186,7 @@ sEA = scheduler_Adults()
 
 function complex_step!(model)
 
-    reset_variables(model)
+    #reset_variables(model)
 
     remove_all!(model, is_dead)
 
@@ -235,18 +220,7 @@ function complex_step!(model)
         tot_Neggs = sum(prop_values)
         Neggmass = 1
         percapita = tot_Neggs
-        # avoid huge superindividuals that could lead to pop jumps
-        # put together up to what would be produced by 100 superind of 40 grams
-        #if tot_Neggs > 1000 * (1e7 * model.fecundity * 40)
-        #    Neggmass = Int64(floor(tot_Neggs / ((1e7) * model.fecundity * 40.0)))
-        #    percapita = Float64(floor(tot_Neggs / Neggmass))
-        #else
-        #    Neggmass = 1
-        #    percapita = tot_Neggs
-        #end
-        #function generate_EggMass(No_Egg, model, Nind = missing, maternal_EggEn = missing, En = missing, Generation = missing)
         generate_EggMass(Neggmass, model, percapita, mean_Egg_energy, mean_Egg_energy, max_generation)
-        #function generate_EggMass(No_Egg, model, Nind = missing, maternal_EggEn = missing, En = missing, Generation = missing)
     end
 
     remove_all!(model, is_dead)

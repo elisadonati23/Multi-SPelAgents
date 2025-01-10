@@ -46,8 +46,6 @@ function update_MF4!(model, M_f4::Vector{Float64})
     model.MF4_value = M_f4[model.sim_timing]
 end
 
-
-
 function update_Tc!(model, Tc::Float64)
     model.Tc_value = Tc
 end

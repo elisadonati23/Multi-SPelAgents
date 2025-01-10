@@ -71,6 +71,7 @@ function model_initialize_parallel(
         model.f = 0.8
     else
         # sim_timing = 1 at initialization, so directly index Xmax and Tc
+        # NB: this f is based on mean Lw population size
         f = (model.Xmax[model.sim_timing] * model.Wv * model.KappaX) / 
             (model.p_Am * model.Tc[model.sim_timing] * model.s_M * ((mean_Lw * model.del_M) ^ 2))
 
