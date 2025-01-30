@@ -46,8 +46,6 @@ function update_MF4!(model, M_f4::Vector{Float64})
     model.MF4_value = M_f4[model.sim_timing]
 end
 
-
-
 function update_Tc!(model, Tc::Float64)
     model.Tc_value = Tc
 end
@@ -63,6 +61,63 @@ end
 function update_Xmax!(model, Xmax::Vector{Float64})
     model.Xmax_value = Xmax[model.sim_timing]
 end
+
+function fit_selectivity(mean_sizes, age_mortality)
+    # Check if all age_mortality values are zero
+    if all(age_mortality .== 0.0)
+        println("All fishing mortality values are zero. Selectivity cannot be fit.")
+        return Dict(
+            :fitted_selectivity => fill(0.0, length(mean_sizes)),
+            :L50 => 0.0,
+            :slope => 0.0
+        )
+    end
+
+    # Convert Annual Fishing Mortality to Daily Rate
+    daily_mortality = age_mortality ./ 365
+
+    # Proportion Removed
+    proportion_fished = 1 .- exp.(-daily_mortality)
+
+    # Handle zero or invalid maximum values
+    max_proportion = maximum(proportion_fished)
+    if max_proportion == 0.0
+        println("Maximum proportion is zero. Selectivity cannot be fit.")
+        return Dict(
+            :fitted_selectivity => fill(0.0, length(mean_sizes)),
+            :L50 => 0.0,
+            :slope => 0.0
+        )
+    end
+
+    selectivity = proportion_fished ./ max_proportion
+
+    # Define Logistic Function
+    logistic_function(x, p) = 1 ./(1 .+ exp.(-(x .- p[1]) ./ p[2]))
+
+    # Fit Logistic Model
+    initial_params = [mean(mean_sizes), 5.0]
+    fit = curve_fit(logistic_function, mean_sizes, selectivity, initial_params)
+
+    # Extract Parameters
+    L50 = fit.param[1]
+    slope = fit.param[2]
+
+    # Calculate Fitted Selectivity
+    fitted_selectivity = logistic_function(mean_sizes, [L50, slope])
+
+    return Dict(
+        :fitted_selectivity => fitted_selectivity,
+        :L50 => L50,
+        :slope => slope
+    )
+end
+
+
+function size_selectivity(L, L50, slope)
+    return 1 / (1 + exp(-(L - L50) / slope))
+end
+
                                                 ###############
                                                 # is xx_agent #
                                                 ###############
@@ -647,7 +702,7 @@ function diagnostic_plots_pt2(out_model, model)
     #p5 = plot_param_timeseries(out_model, [:fishedW], missing,  true)
     p6 = plot_means_with_std(out_model, [:mean_tpuberty], [:sd_tpuberty])
     p7 = plot_means_with_std(out_model, [:meanAdWw, :meanJuvWw], [:sdAdWw, :sdJuvWw])
-    p8 = plot_param_timeseries(out_model, [:TotB, :starvedJ_biom, :starvedA_biom, :natA_biom, :natJ_biom, :fishedW])
+    p8 = plot_param_timeseries(out_model, [:TotB, :starvedJ_biom, :starvedA_biom, :natA_biom, :natJ_biom, :fished_W])
 
 
     # Combine the plots in a 3x3 grid

@@ -2,7 +2,7 @@
 
 using Pkg
 using Random
-using Agents #5.17.1
+using Agents
 using Statistics
 using CSV
 using Plots
@@ -14,5 +14,6 @@ using DataFrames
 using StatsPlots
 using CategoricalArrays
 using Dates
+using LsqFit
 
 #add Random Agents Statistics CSV Plots CairoMakie Distributions Colors DataFrames StatsPlots CategoricalArrays Dates
