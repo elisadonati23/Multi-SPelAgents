@@ -45,7 +45,6 @@
     E0_max_i::Float64 
     W0_i::Float64
     L0_i::Float64 
-    Ta_i::Float64
     Em_i::Float64
     Lm_i::Float64
     Kx_i::Float64

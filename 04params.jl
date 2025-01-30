@@ -32,8 +32,8 @@ function create_params(
     # Initial conditions
     Xall = Xmax[1]
     Xmax_value = Xmax[1]
-    Ta = 8000.0
-    Tr = 273.0
+    Ta = 9800.0
+    Tr = 293.0
     
     # Arrhenius temperature function (can be a value or vector depending on Temp)
     Tc = exp.(Ta / Tr .- Ta ./ (Temp .+ 273.0))

@@ -7,7 +7,7 @@ function generate_EggMass(model,
     pAm = missing, Hp = missing, pM= missing, v= missing,
     K= missing, KappaX= missing, KappaR= missing, Fm= missing, delM= missing, kJ= missing,
     sM= missing, kG= missing, Hb= missing, Hj = missing, E0= missing, epmin= missing, E0min= missing, E0max= missing, 
-    W0= missing, L0= missing, Ta= missing, Eg = missing)
+    W0= missing, L0= missing, Eg = missing)
 
     # Features for Juveniles and Adults
     agent_pM_i = ismissing(pM) ? 54.67  : pM
@@ -31,7 +31,6 @@ function generate_EggMass(model,
     agent_E0_max_i = ismissing(E0max) ? 0.0137527  : E0max 
     agent_W0_i = ismissing(W0) ?  2.98e-6  : W0
     agent_L0_i =  ismissing(L0) ? 0.001  : L0
-    agent_Ta_i = ismissing(Ta) ? 9800  : Ta
     agent_Em_i = agent_pAm_i / agent_v_i
     agent_Lm_i = agent_K_i * agent_pAm_i * agent_s_M_i / agent_pM_i
     agent_Kx_i = agent_pAm_i * agent_s_M_i / (agent_KappaX_i * agent_Fm)
@@ -54,7 +53,7 @@ function generate_EggMass(model,
 
     agent_f_i = model.f
     agent_Lw = 0.0
-    agent_Ww = 0.0
+    agent_Ww = agent_W0_i
     agent_R = 0.0
     agent_Scaled_En = 0.0
     agent_pA = 0.0
@@ -111,7 +110,6 @@ function generate_EggMass(model,
         agent_E0_max_i, 
         agent_W0_i, 
         agent_L0_i, 
-        agent_Ta_i, 
         agent_Em_i, 
         agent_Lm_i, 
         agent_Kx_i, 
