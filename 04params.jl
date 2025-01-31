@@ -9,8 +9,8 @@ function create_params(
     DEB_timing = 1.0
     sim_timing = 1
 
-    repro_start = 270.0  # Sardines reproduction starts in October
-    repro_end = 90.0     # Sardines reproduction ends in April
+    repro_start = 90.0 # Sardines reproduction starts in October
+    repro_end = 270.0   # Sardines reproduction ends in April
     peak1_sardine = 1
     peak2_sardine = missing
     total_repro_sardine = 10

@@ -89,7 +89,7 @@ function juvenile_step!(Sardine, model)
         Endyn = Sardine.En
         Hdyn = Sardine.H
         Rdyn = Sardine.R
-        Sardine.f_i = model.f
+        Sardine.f_i = model.f_value
         Sardine.pA = (Sardine.f_i * Sardine.p_Am_i* model.Tc_value * Sardine.s_M_i * (Vdyn ^ (2/3)))
         pS = Sardine.pM_i * model.Tc_value * Vdyn
         v_T = Sardine.v_i * model.Tc_value
@@ -145,7 +145,7 @@ function adult_step!(Sardine, model)
            #adult deb
            if Sardine.type == :adult
             
-            Sardine.f_i = model.f
+            Sardine.f_i = model.f_value
             Vdyn = (Sardine.Lw * Sardine.del_Mi) ^ 3.0
             Endyn = Sardine.En
             Hdyn = Sardine.Hp_i
