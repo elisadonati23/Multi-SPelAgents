@@ -1,5 +1,5 @@
 function create_params(
-    f,
+    f::Union{Float64, Vector{Float64}},
     day_of_the_year,
     Xmax::Union{Float64, Vector{Float64}},
     Temp::Union{Float64, Vector{Float64}}
@@ -9,30 +9,31 @@ function create_params(
     DEB_timing = 1.0
     sim_timing = 1
 
-    repro_start = 270.0  # Sardines reproduction starts in October
-    repro_end = 90.0     # Sardines reproduction ends in April
+    repro_start = 270.0  
+    repro_end = 90.0  
     peak1_sardine = 1
     peak2_sardine = missing
     total_repro_sardine = 10
     std_dev = 60
-    fecundity = 400.0 # number of eggs per gram of free female weight
-    Lb = 0.0133472
-    Lj = 0.232013
-    Lp = 1.50
-    Ab = 6.0
-    Ap = 292.0
-    Am = 1825.0
-    d_V = 0.2  # Volume-specific density of structure
-    mu_V = 500000.0  # Chemical potential of structure
-    mu_E = 550000.0  # Chemical potential of reserve
-    w_V = 23.9  # Molecular weight of structure
-    w_E = 23.9  # Molecular weight of reserve
-    w = 5.0  # Conversion factor for energy to mass
-    f = f
+    fecundity = 400.0 
+    Lb = 0.0279366
+    Lj = 0.0630058
+    Lp = 1.19937
+    Ab = 6.56247	
+    Ap = 202.166
+    Am = 3461.0
+    d_V = 0.2  
+    mu_V = 500000.0 
+    mu_E = 550000.0 
+    w_V = 23.9  
+    w_E = 23.9  
+    w = 5.0
+    f = f  
+    f_value = f[1]
     # Initial conditions
     Xall = Xmax[1]
     Xmax_value = Xmax[1]
-    Ta = 9800.0
+    Ta = 8000.0
     Tr = 293.0
     
     # Arrhenius temperature function (can be a value or vector depending on Temp)
@@ -41,7 +42,7 @@ function create_params(
 
     day_of_the_year = day_of_the_year
     year = 1.0
-    smi = 17.3829
+    smi = 2.25531
     # Store all parameters in a dictionary for easy access in the model
     model_parameters = Dict(
 
@@ -50,6 +51,7 @@ function create_params(
         :day_of_the_year => day_of_the_year,
         :year => year,
         :f => f,
+        :f_value => f_value,
         :Xmax_value => Xmax_value,
         :Lb => Lb,
         :Lj => Lj,

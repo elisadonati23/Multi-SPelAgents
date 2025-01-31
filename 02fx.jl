@@ -62,6 +62,15 @@ function update_Xmax!(model, Xmax::Vector{Float64})
     model.Xmax_value = Xmax[model.sim_timing]
 end
 
+
+function update_f!(model, f::Float64)
+    model.f_value = f
+end
+
+function update_f!(model, f::Vector{Float64})
+    model.f_value = f[model.sim_timing]
+end
+
 function fit_selectivity(mean_sizes, age_mortality)
     # Check if all age_mortality values are zero
     if all(age_mortality .== 0.0)

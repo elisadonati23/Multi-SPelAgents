@@ -10,26 +10,26 @@ function generate_EggMass(model,
     W0= missing, L0= missing, Eg = missing)
 
     # Features for Juveniles and Adults
-    agent_pM_i = ismissing(pM) ? 54.67  : pM
-    agent_pAm_i = ismissing(pAm) ? 11.1372  : pAm                                                       
-    agent_Eg_i = ismissing(Eg) ? 5077.00  : Eg            
-    agent_v_i = ismissing(v) ? 0.01944  : v              
-    agent_K_i = ismissing(K) ? 0.9901  : K              
+    agent_pM_i = ismissing(pM) ? 438.602  : pM
+    agent_pAm_i = ismissing(pAm) ? 554.351  : pAm                                                       
+    agent_Eg_i = ismissing(Eg) ? 5017.55  : Eg            
+    agent_v_i = ismissing(v) ? 0.0216466  : v              
+    agent_K_i = ismissing(K) ? 0.883  : K              
     agent_KappaX_i = ismissing(KappaX) ? 0.9  : KappaX         
     agent_KappaR_i = ismissing(KappaR) ? 0.95  : KappaR        
     agent_Fm =    ismissing(Fm) ? 65.0  : Fm         
-    agent_del_Mi = ismissing(delM) ? 0.1656  : delM           
+    agent_del_Mi = ismissing(delM) ? 0.1152  : delM           
     agent_k_j_i =  ismissing(kJ) ? 0.002   : kJ           
-    agent_s_M_i =   1.0          
-    agent_kap_G_i = ismissing(kG) ? 0.824129  : kG          
-    agent_Hb_i = ismissing(Hb) ? 0.0001223   : Hb 
-    agent_Hj_i = ismissing(Hj) ? 0.6741  : Hj 
-    agent_Hp_i =  ismissing(Hp) ? 244.0  : Hp
-    agent_E0_i = ismissing(E0) ? 0.0137527  : E0 
-    agent_ep_min_i =  ismissing(epmin) ? 0.30   : epmin
-    agent_E0_min_i =  ismissing(E0min) ? 0.004  : E0min 
-    agent_E0_max_i = ismissing(E0max) ? 0.0137527  : E0max 
-    agent_W0_i = ismissing(W0) ?  2.98e-6  : W0
+    agent_s_M_i =   1.0 #smi when egg       
+    agent_kap_G_i = ismissing(kG) ? 0.833894  : kG          
+    agent_Hb_i = ismissing(Hb) ?  0.0157489   : Hb 
+    agent_Hj_i = ismissing(Hj) ? 0.187349  : Hj 
+    agent_Hp_i =  ismissing(Hp) ? 4553.63  : Hp
+    agent_E0_i = ismissing(E0) ? 1.47992  : E0 
+    agent_ep_min_i =  ismissing(epmin) ? 0.218697   : epmin
+    agent_E0_min_i =  ismissing(E0min) ? 0.3  : E0min 
+    agent_E0_max_i = ismissing(E0max) ? 1.5 : E0max 
+    agent_W0_i = ismissing(W0) ?  0.000150792  : W0
     agent_L0_i =  ismissing(L0) ? 0.001  : L0
     agent_Em_i = agent_pAm_i / agent_v_i
     agent_Lm_i = agent_K_i * agent_pAm_i * agent_s_M_i / agent_pM_i
@@ -51,7 +51,7 @@ function generate_EggMass(model,
     agent_Wg = 0.0
     agent_death_type = :alive
 
-    agent_f_i = model.f
+    agent_f_i = model.f_value
     agent_Lw = 0.0
     agent_Ww = agent_W0_i
     agent_R = 0.0

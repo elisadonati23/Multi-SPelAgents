@@ -89,7 +89,7 @@ function juvenile_step!(Sardine, model)
         Endyn = Sardine.En
         Hdyn = Sardine.H
         Rdyn = Sardine.R
-        Sardine.f_i = model.f
+        Sardine.f_i = model.f_value
         Sardine.pA = (Sardine.f_i * Sardine.p_Am_i* model.Tc_value * Sardine.s_M_i * (Vdyn ^ (2/3)))
         pS = Sardine.pM_i * model.Tc_value * Vdyn
         v_T = Sardine.v_i * model.Tc_value
@@ -145,7 +145,7 @@ function adult_step!(Sardine, model)
            #adult deb
            if Sardine.type == :adult
             
-            Sardine.f_i = model.f
+            Sardine.f_i = model.f_value
             Vdyn = (Sardine.Lw * Sardine.del_Mi) ^ 3.0
             Endyn = Sardine.En
             Hdyn = Sardine.Hp_i
@@ -203,7 +203,7 @@ function adult_step!(Sardine, model)
             Sardine.Scaled_En = Sardine.En / (Sardine.Em_i * (( Sardine.Lw * Sardine.del_Mi)^3.0))
            end
     
-        if Sardine.Dead != true && ((model.repro_start <= model.day_of_the_year <= model.repro_end))
+        if Sardine.Dead != true && ((365 >= model.day_of_the_year >= model.repro_start ) || (1.0 <= model.day_of_the_year <= model.repro_end))
         Neggs = Float64((model.fecundity + randn() * 50) * (Sardine.Ww - Sardine.Wg))
         # spawned energy of a single female, we assume it's the same for all female and male
         spawned_en = Neggs *  Sardine.E0_i 

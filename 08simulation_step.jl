@@ -25,6 +25,10 @@ function evolve_environment!(model)
         model.day_of_the_year += 1.0
     end
 
+    update_Tc!(model, model.Tc)
+    update_Xmax!(model, model.Xmax)
+    update_f!(model, model.f)
+
     # Increase simulation timing
     model.sim_timing += 1
 
