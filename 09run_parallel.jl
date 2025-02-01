@@ -15,15 +15,15 @@ include("10timeseries.jl")
 models_high_param = [
 model_initialize_parallel(0.8, 1.0, 5.0, 15.0)
 model_initialize_parallel(0.8, 1.0, 5.0, 17.0)
-model_initialize_parallel(0.5, 1.0, 5.0, 17.0)
 model_initialize_parallel(0.5, 1.0, 5.0, 15.0)
+model_initialize_parallel(0.5, 1.0, 5.0, 17.0)
 ]
 
 models_low_param = [
 model_initialize_parallel(0.8, 1.0, 5.0, 15.0)
 model_initialize_parallel(0.8, 1.0, 5.0, 17.0)
-model_initialize_parallel(0.5, 1.0, 5.0, 17.0)
 model_initialize_parallel(0.5, 1.0, 5.0, 15.0)
+model_initialize_parallel(0.5, 1.0, 5.0, 17.0)
 ]
 
 for model in models_high_param
@@ -31,8 +31,7 @@ generate_EggMass(model)
 generate_EggMass(model, pAm = 15.0)
 generate_EggMass(model, pM = 70.0)
 generate_EggMass(model, Eg = 6000.0)
-generate_EggMass(model, v = 0.25)
-generate_EggMass(model, K = 0.9999)
+generate_EggMass(model, K = 0.9990)
 generate_EggMass(model, Hp = 300.0)
 end
 
@@ -41,13 +40,13 @@ for model in models_low_param
     generate_EggMass(model, pAm = 8.0)
     generate_EggMass(model, pM = 40.0)
     generate_EggMass(model, Eg = 4000.0)
-    generate_EggMass(model, v = 0.15)
-    generate_EggMass(model, K = 0.9)
+    generate_EggMass(model, K = 0.85)
     generate_EggMass(model, Hp = 200.0)
-    end
+end
 
 results_low = []
 results_high = []
+
 adata = [:type,:f_i, :Age, :Lw, :L, :Ww, :En, :K_i, :H,:s_M_i, :spawned, :Dead, :Ap_i]
 mdata = [:day_of_the_year, :year, :f]
 
@@ -73,7 +72,7 @@ agent3_high = results_high[3][1]
 agent4_high = results_high[4][1]
 
 # Define a mapping from id to name
-id_to_name = Dict(1 => "standard", 2 => "pAm", 3 => "pM", 4 => "Eg", 5 => "v", 6 => "K", 7 => "Hp")
+id_to_name = Dict(1 => "standard", 2 => "pAm", 3 => "pM", 4 => "Eg", 5 => "K", 6 => "Hp")
 
 # Add the new column
 agent1_high.ID = [id_to_name[id] for id in agent1_high.id]
@@ -87,9 +86,6 @@ agent2_low = results_low[2][1]
 agent3_low = results_low[3][1]
 agent4_low = results_low[4][1]
 
-# Define a mapping from id to name
-id_to_name = Dict(1 => "standard", 2 => "pAm", 3 => "pM", 4 => "Eg", 5 => "v", 6 => "K", 7 => "Hp")
-
 # Add the new column
 agent1_low.ID = [id_to_name[id] for id in agent1_low.id]
 agent2_low.ID = [id_to_name[id] for id in agent2_low.id]
@@ -98,9 +94,17 @@ agent4_low.ID = [id_to_name[id] for id in agent4_low.id]
 
 
 using Plots
+p1high = Plots.plot(agent1_high.Age, agent1_high.Lw, group = agent1_high.ID, title = "High param, 15C, f = 0.8", xlabel = "Age in days", ylabel = "Length cm", legend = :bottomright, color = [:red :orange :green :black :purple :blue :pink])
+p2high = Plots.plot(agent2_high.Age, agent2_high.Lw, group = agent2_high.ID, title = "High param, 17C, f = 0.8", xlabel = "Age in days", ylabel = "Length cm", legend = :bottomright, color = [:red :orange :green :black :purple :blue :pink])
+p3high = Plots.plot(agent3_high.Age, agent3_high.Lw, group = agent3_high.ID, title = "High param, 15C, f = 0.5", xlabel = "Age in days", ylabel = "Length cm", legend = :bottomright, color = [:red :orange :green :black :purple :blue :pink])
+p4high = Plots.plot(agent4_high.Age, agent4_high.Lw, group = agent4_high.ID, title = "High param, 17C, f = 0.5", xlabel = "Age in days", ylabel = "Length cm", legend = :bottomright, color = [:red :orange :green :black :purple :blue :pink])
 
-agent1_high_Plot = filter(row -> row.ID in ["standard", "pAm", "pM", "Eg"], agent1_high)
+p1low = Plots.plot(agent1_low.Age, agent1_low.Lw, group = agent1_low.ID, title = "Low param, 15C, f = 0.8", xlabel = "Age in days", ylabel = "Length cm", legend = :bottomright, color = [:red :orange :green :black :purple :blue :pink])
+p2low = Plots.plot(agent2_low.Age, agent2_low.Lw, group = agent2_low.ID, title = "Low param, 17C, f = 0.8", xlabel = "Age in days", ylabel = "Length cm", legend = :bottomright, color = [:red :orange :green :black :purple :blue :pink])
+p3low = Plots.plot(agent3_low.Age, agent3_low.Lw, group = agent3_low.ID, title = "Low param, 15C, f = 0.5", xlabel = "Age in days", ylabel = "Length cm", legend = :bottomright, color = [:red :orange :green :black :purple :blue :pink])
+p4low = Plots.plot(agent4_low.Age, agent4_low.Lw, group = agent4_low.ID, title = "Low param, 17C, f = 0.5", xlabel = "Age in days", ylabel = "Length cm", legend = :bottomright, color = [:red :orange :green :black :purple :blue :pink])
 
-Plots.plot(agent4_low.Age, agent4_low.Lw, group = agent4_low.ID, title = "Low params, 15C, f = 0.5", xlabel = "Age in days", ylabel = "Length cm", legend = :topleft, color = [:red :orange :green :black :purple :blue :pink])
-agent3_high_Plot = filter(row -> row.ID in ["v", "K", "standard"], agent1_high)
-Plots.plot(agent4_high.Age, agent4_high.Lw, group = agent4_high.ID, title = "High params, 15C, f = 0.5", xlabel = "Age in days", ylabel = "Length cm", legend = :topleft)
+anchovyparams = Plots.plot(p1high, p2high, p3high, p4high, p1low, p2low, p3low, p4low, layout = (4,2), size = (1100, 1400))
+savefig(anchovyparams, "C:/Users/elli2/Documents/anchovyparams.png")
+
+agent1_high_dead = filter(row -> row.ID == "Eg", agent4_low)
