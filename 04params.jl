@@ -1,5 +1,5 @@
 function create_params(
-    f,
+    f::Union{Float64, Vector{Float64}},
     day_of_the_year,
     Xmax::Union{Float64, Vector{Float64}},
     Temp::Union{Float64, Vector{Float64}}
@@ -29,6 +29,7 @@ function create_params(
     w_E = 23.9  # Molecular weight of reserve
     w = 5.0  # Conversion factor for energy to mass
     f = f
+    f_value = f[1]
     # Initial conditions
     Xall = Xmax[1]
     Xmax_value = Xmax[1]
@@ -50,6 +51,7 @@ function create_params(
         :day_of_the_year => day_of_the_year,
         :year => year,
         :f => f,
+        :f_value => f_value,
         :Xmax_value => Xmax_value,
         :Lb => Lb,
         :Lj => Lj,
