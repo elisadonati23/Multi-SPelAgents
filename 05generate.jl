@@ -3,7 +3,7 @@
 # Age at length and parameters are taken from AmP and DEB portal with 20°C as reference.
 # All rates and ages at length change with varying parameters.
 
-function generate_EggMass(model,
+function generate_EggMass(model;
     pAm = missing, Hp = missing, pM= missing, v= missing,
     K= missing, KappaX= missing, KappaR= missing, Fm= missing, delM= missing, kJ= missing,
     sM= missing, kG= missing, Hb= missing, Hj = missing, E0= missing, epmin= missing, E0min= missing, E0max= missing, 

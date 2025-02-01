@@ -27,7 +27,7 @@ function evolve_environment!(model)
 
     update_Tc!(model, model.Tc)
     update_Xmax!(model, model.Xmax)
-    update_f!(model, model.f)
+    #update_f!(model, model.f)
 
     # Increase simulation timing
     model.sim_timing += 1
