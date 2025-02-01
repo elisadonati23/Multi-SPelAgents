@@ -96,15 +96,15 @@ agent4_low.ID = [id_to_name[id] for id in agent4_low.id]
 using Plots
 
 
-p1high = Plots.plot(agent1_high.Age, agent1_high.Lw, group = agent1_high.ID, title = "High param, 15C, f = 0.8", xlabel = "Age in days", ylabel = "Length cm", legend = :bottomright, color = [:red :orange :green :black :purple :blue :pink])
-p2high = Plots.plot(agent2_high.Age, agent2_high.Lw, group = agent2_high.ID, title = "High param, 17C, f = 0.8", xlabel = "Age in days", ylabel = "Length cm", legend = :bottomright, color = [:red :orange :green :black :purple :blue :pink])
-p3high = Plots.plot(agent3_high.Age, agent3_high.Lw, group = agent3_high.ID, title = "High param, 15C, f = 0.5", xlabel = "Age in days", ylabel = "Length cm", legend = :bottomright, color = [:red :orange :green :black :purple :blue :pink])
-p4high = Plots.plot(agent4_high.Age, agent4_high.Lw, group = agent4_high.ID, title = "High param, 17C, f = 0.5", xlabel = "Age in days", ylabel = "Length cm", legend = :bottomright, color = [:red :orange :green :black :purple :blue :pink])
+p1high = Plots.plot(agent1_high.Age, agent1_high.Lw, group = agent1_high.ID, title = "High param, 15C, f = 0.8", xlabel = "Age in days", ylabel = "Length cm", legend = :bottomright, color = [:red :orange :green :black :purple :blue :pink], ylims = (0, 25), linewidth = 2)
+p2high = Plots.plot(agent2_high.Age, agent2_high.Lw, group = agent2_high.ID, title = "High param, 17C, f = 0.8", xlabel = "Age in days", ylabel = "Length cm", legend = :bottomright, color = [:red :orange :green :black :purple :blue :pink], ylims = (0, 25), linewidth = 2)
+p3high = Plots.plot(agent3_high.Age, agent3_high.Lw, group = agent3_high.ID, title = "High param, 15C, f = 0.5", xlabel = "Age in days", ylabel = "Length cm", legend = :bottomright, color = [:red :orange :green :black :purple :blue :pink], ylims = (0, 15), linewidth = 2)
+p4high = Plots.plot(agent4_high.Age, agent4_high.Lw, group = agent4_high.ID, title = "High param, 17C, f = 0.5", xlabel = "Age in days", ylabel = "Length cm", legend = :bottomright, color = [:red :orange :green :black :purple :blue :pink], ylims = (0, 15), linewidth = 2)
 
-p1low = Plots.plot(agent1_low.Age, agent1_low.Lw, group = agent1_low.ID, title = "Low param, 15C, f = 0.8", xlabel = "Age in days", ylabel = "Length cm", legend = :bottomright, color = [:red :orange :green :black :purple :blue :pink])
-p2low = Plots.plot(agent2_low.Age, agent2_low.Lw, group = agent2_low.ID, title = "Low param, 17C, f = 0.8", xlabel = "Age in days", ylabel = "Length cm", legend = :bottomright, color = [:red :orange :green :black :purple :blue :pink])
-p3low = Plots.plot(agent3_low.Age, agent3_low.Lw, group = agent3_low.ID, title = "Low param, 15C, f = 0.5", xlabel = "Age in days", ylabel = "Length cm", legend = :bottomright, color = [:red :orange :green :black :purple :blue :pink])
-p4low = Plots.plot(agent4_low.Age, agent4_low.Lw, group = agent4_low.ID, title = "Low param, 17C, f = 0.5", xlabel = "Age in days", ylabel = "Length cm", legend = :bottomright, color = [:red :orange :green :black :purple :blue :pink])
+p1low = Plots.plot(agent1_low.Age, agent1_low.Lw, group = agent1_low.ID, title = "Low param, 15C, f = 0.8", xlabel = "Age in days", ylabel = "Length cm", legend = :bottomright, color = [:red :orange :green :black :purple :blue :pink], ylims = (0, 25), linewidth = 2)
+p2low = Plots.plot(agent2_low.Age, agent2_low.Lw, group = agent2_low.ID, title = "Low param, 17C, f = 0.8", xlabel = "Age in days", ylabel = "Length cm", legend = :bottomright, color = [:red :orange :green :black :purple :blue :pink], ylims = (0, 25), linewidth = 2)
+p3low = Plots.plot(agent3_low.Age, agent3_low.Lw, group = agent3_low.ID, title = "Low param, 15C, f = 0.5", xlabel = "Age in days", ylabel = "Length cm", legend = :bottomright, color = [:red :orange :green :black :purple :blue :pink], ylims = (0, 15), linewidth = 2)
+p4low = Plots.plot(agent4_low.Age, agent4_low.Lw, group = agent4_low.ID, title = "Low param, 17C, f = 0.5", xlabel = "Age in days", ylabel = "Length cm", legend = :bottomright, color = [:red :orange :green :black :purple :blue :pink], ylims = (0, 15), linewidth = 2)
 
 sardineparams = Plots.plot(p1high, p2high, p3high, p4high, p1low, p2low, p3low, p4low, layout = (4,2), size = (1100, 1400))
 savefig(sardineparams, "C:/Users/elli2/Documents/sardineparams.png")
